@@ -13,6 +13,7 @@ interface IAvisadorData
     List<CambStatDTO> cambiostatus { get; set; }
     List<CambFecDTO> cambiofecha { get; set; }
     RegistroCambiosDTO listaRegistro { get; set; }
+    List<CambiReuVDTO> listaCambiReu { get; set; }
 
     Task<List<CambStatDTO>> GetCambioStatus(int idreu);
     Task<List<CambFecDTO>> GetCambioFecha(int idreu);
@@ -21,5 +22,8 @@ interface IAvisadorData
     Task<bool> InsertCambioFec(CambFecDTO cambiofec);
 
     Task<bool> InsertarRegistros(RegistroCambiosDTO registroCambios);
+
+    Task<List<CambiReuVDTO>> GetPendientesQuincenal2(string idcentro, string iddiv);
+
 
 }
