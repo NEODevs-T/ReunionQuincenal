@@ -60,37 +60,37 @@
         </div>
         @if(band == true){
 
-            @if(PizarraData.reudiatablas.Count() > 0)
+            @if(PizarraData.listaCambiReu.Count() > 0)
             {
             <RadzenDataGrid @ref="reunion" AllowFiltering="true" FilterPopupRenderMode="PopupRenderMode.OnDemand" AllowPaging="true" PageSize="10" AllowSorting="true" 
-                        Data="@PizarraData.reudiatablas" TItem="ReunionDTO" >
+                        Data="@PizarraData.listaCambiReu" TItem="CambiReuVDTO" >
                 <Columns>
-                    <RadzenDataGridColumn Width="5%" TItem="ReunionDTO" Title="Linea" Filterable="false" Sortable="false" TextAlign="TextAlign.Center">
+                    <RadzenDataGridColumn Width="5%" TItem="CambiReuVDTO" Title="Linea" Filterable="false" Sortable="false" TextAlign="TextAlign.Center">
                         <Template Context="data">
-                            <RadzenText class="mb-0 tipografia">@data.Rdarea</RadzenText>
+                            <RadzenText class="mb-0 tipografia">@data.Linea</RadzenText>
                         </Template>
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn Width="5%" TItem="ReunionDTO" Title="C. Equipo" Filterable="false" Sortable="false" TextAlign="TextAlign.Center">
+                    <RadzenDataGridColumn Width="5%" TItem="CambiReuVDTO" Title="C. Equipo" Filterable="false" Sortable="false" TextAlign="TextAlign.Center">
                         <Template Context="data">
-                            <RadzenText class="mb-0 tipografia">@data.RdcodEq</RadzenText>
+                            <RadzenText class="mb-0 tipografia">@data.EquipoCodigo</RadzenText>
                         </Template>
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn Width="5%" TItem="ReunionDTO" Title="Discrepancia" Filterable="false" Sortable="false" TextAlign="TextAlign.Center">
+                    <RadzenDataGridColumn Width="5%" TItem="CambiReuVDTO" Title="Discrepancia" Filterable="false" Sortable="false" TextAlign="TextAlign.Center">
                         <Template Context="data">
-                            <RadzenText class="mb-0 tipografia">@data.RdcodDis</RadzenText>
+                            <RadzenText class="mb-0 tipografia">@data.Discrepancia</RadzenText>
                         </Template>
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn Width="5%" TItem="ReunionDTO" Title="Plan de Accion" Filterable="false" Sortable="false" TextAlign="TextAlign.Center">
+                    <RadzenDataGridColumn Width="5%" TItem="CambiReuVDTO" Title="Plan de Accion" Filterable="false" Sortable="false" TextAlign="TextAlign.Center">
                         <Template Context="data">
-                            <RadzenText class="mb-0 tipografia">@data.RdplanAcc</RadzenText>
+                            <RadzenText class="mb-0 tipografia">@data.Accion</RadzenText>
                         </Template>
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn Width="5%" TItem="ReunionDTO" Title="F. Reunion" Filterable="false" Sortable="false" TextAlign="TextAlign.Center">
+                    <RadzenDataGridColumn Width="5%" TItem="CambiReuVDTO" Title="F. Reunion" Filterable="false" Sortable="false" TextAlign="TextAlign.Center">
                         <Template Context="data">
-                            <RadzenText class="mb-0 tipografia">@data.RdfecReu</RadzenText>
+                            <RadzenText class="mb-0 tipografia">@data.FechaCambio</RadzenText>
                         </Template>
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn Width="5%" TItem="ReunionDTO" Title="Acciones" Filterable="false" Sortable="false" TextAlign="TextAlign.Center">
+                    <RadzenDataGridColumn Width="5%" TItem="CambiReuVDTO" Title="Acciones" Filterable="false" Sortable="false" TextAlign="TextAlign.Center">
                         <Template Context="data">
                             <RadzenButton Icon="add" Size="ButtonSize.Small" Click="@(() => Add(data))" />
                             <RadzenButton Icon="delete" Size="ButtonSize.Small" Click="@(() => Rechazada(data))" />
@@ -167,7 +167,7 @@ ition: relative; /* o absolute, dependiendo de tus necesidades */
     public DateTime fecha2;
     private List<Claim> claims { get; set; }
     private string mensaje = "";
-    public RadzenDataGrid<ReunionDTO> reunion {get; set;} = new RadzenDataGrid<ReunionDTO>();
+    public RadzenDataGrid<CambiReuVDTO> reunion {get; set;} = new RadzenDataGrid<CambiReuVDTO>();
     private NotifiRadzen Notificar = new NotifiRadzen();
     
 
@@ -216,7 +216,7 @@ ition: relative; /* o absolute, dependiendo de tus necesidades */
         {
             string idCentro = idCent.ToString();
             string IdDivision = idDiv.ToString();
-            PizarraData.reudiatablas = await PizarraData.GetPendientesTurno(idCentro, IdDivision);
+            PizarraData.listaCambiReu = await PizarraData.GetPendientesQuincenal2(idCentro, IdDivision);
             band = true;
         } else
         {
@@ -226,11 +226,12 @@ ition: relative; /* o absolute, dependiendo de tus necesidades */
         }
     }
 
-    protected async Task Add(ReunionDTO e)
+    protected async Task Add(CambiReuVDTO e)
     {
-        ReunionDTO registro = e;
+        ReunionDTO registro;
+        registro = await PizarraData.GetDiscrepantacia(e.IdReuDia);
         registro.IdTipReu = 1;
-        bool validacion = await PizarraData.UpdateDiscrepancia3(e, e.IdReuDia);
+        bool validacion = await PizarraData.UpdateDiscrepancia3(registro, registro.IdReuDia);
         if( validacion == true)
         {
             mensaje = "Se agrego correctamente a la Reunion diaria";
@@ -243,12 +244,13 @@ ition: relative; /* o absolute, dependiendo de tus necesidades */
 
         }
     }
-    protected async Task Rechazada(ReunionDTO e)
+    protected async Task Rechazada(CambiReuVDTO e)
     {
-        ReunionDTO registro = e;
+        ReunionDTO registro;
+        registro = await PizarraData.GetDiscrepantacia(e.IdReuDia);
         registro.IdTipReu = 1;
         registro.Rdstatus = "Rechazada";
-        bool validacion = await PizarraData.UpdateDiscrepancia3(e, e.IdReuDia);
+        bool validacion = await PizarraData.UpdateDiscrepancia3(registro, registro.IdReuDia);
         if( validacion == true)
         {
             mensaje = "La reunion a sido rechazada";

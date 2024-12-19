@@ -34,6 +34,8 @@ public class PizarraData : IPizarraData
     public ReunionDTO reuniondia { get; set; } = new ReunionDTO();
     public List<ReunionDTO> reudiatablas { get; set; } = new List<ReunionDTO>();
     public List<CalendarioTrabajoDTO> calentrabajo { get; set; } = new List<CalendarioTrabajoDTO>();
+    public List<CambiReuVDTO> listaCambiReu { get; set; } = new List<CambiReuVDTO>();
+
 
     public async Task<List<CalendarioTrabajoDTO>> GetTrabajosCalendario(string pais, string centro, string division)
     {
@@ -78,6 +80,19 @@ public class PizarraData : IPizarraData
         url = $"{BaseUrl}/GetHistoricos/{idcentro}/{iddiv}/{f1Formatiado}/{f2Formatiado}/{tipo}/{estado}/{reunionDiaria}";
         return reunionditablas = await _http.GetFromJsonAsync<List<ReunionDTO>>(url) ?? new List<ReunionDTO>();
 
+    }
+
+    public async Task<List<CambiReuVDTO>> GetPendientesQuincenal2(string idcentro, string iddiv){
+        url = $"{BaseUrl}/GetPendientesQuincenal2/{idcentro}/{iddiv}";
+        
+        List<CambiReuVDTO> listaCambiReus = await _http.GetFromJsonAsync<List<CambiReuVDTO>>(url) ?? new List<CambiReuVDTO>();
+        
+        listaCambiReu = listaCambiReus.GroupBy(x => x.IdReuDia)
+                .Where(g => g.Count() > 3)
+                .SelectMany(g => g)
+                .ToList();        
+        
+        return listaCambiReu;
     }
 
     //Update Discrepancia

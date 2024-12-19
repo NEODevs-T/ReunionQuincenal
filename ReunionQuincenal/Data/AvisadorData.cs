@@ -30,7 +30,6 @@ public class AvisadorData: IAvisadorData
     public List<CambStatDTO> cambiostatus { get; set; } = new List<CambStatDTO>();
     public List<CambFecDTO> cambiofecha { get; set; } = new List<CambFecDTO>();
     public RegistroCambiosDTO listaRegistro { get; set; }
-    List<CambiReuVDTO> listaCambiReu { get; set; } = new List<CambiReuVDTO>();
 
     private readonly NavigationManager _navigationManager;
 
@@ -47,11 +46,6 @@ public class AvisadorData: IAvisadorData
         url = $"{BaseUrl}/GetCambioFecha/{idreu}";
         return cambiofecha = await _http.GetFromJsonAsync<List<CambFecDTO>>(url) ?? new List<CambFecDTO>();
     }
-
-    Task<List<CambiReuVDTO>> GetPendientesQuincenal2(string idcentro, string iddiv){
-
-    }
-
 
 
     public async Task<bool> InsertCambioStatus(CambStatDTO status)

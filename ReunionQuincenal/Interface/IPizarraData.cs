@@ -13,6 +13,7 @@ interface IPizarraData
     ReunionDTO reuniondia { get; set; }
     List<ReunionDTO> reudiatablas { get; set; }
     List<CalendarioTrabajoDTO> calentrabajo { get; set; }
+    List<CambiReuVDTO> listaCambiReu { get; set; }
 
     Task<List<CalendarioTrabajoDTO>> GetTrabajosCalendario(string pais, string centro, string division);
     Task<List<ReunionDTO>> GetByODT(string ODT, string idcentro, string iddiv);
@@ -25,6 +26,7 @@ interface IPizarraData
     Task<int> InsertDiscrepancia(ReunionDTO discre);
     Task<CentroDivisionDTO> GetCentroDivi(string centro, string division, int tipo);
     Task<List<ReunionDTO>> GetPendientesTurno(string idcentro, string iddiv);
+    Task<List<CambiReuVDTO>> GetPendientesQuincenal2(string idcentro, string iddiv);
 
 
 }

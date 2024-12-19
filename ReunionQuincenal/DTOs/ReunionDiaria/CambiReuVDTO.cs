@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace NeoAPI.DTOs.ReunionDiaria;
+namespace ReunionWeb.ReunionDiaria.DTOs;
 
 public partial class CambiReuVDTO
 {
