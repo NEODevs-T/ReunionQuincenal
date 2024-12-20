@@ -100,7 +100,7 @@
                 </RadzenDataGrid>
             } else
             {
-                <p><Noframes> hay registros vencidos</Noframes></p>
+                <p> hay registros vencidos</p>
             }
 
         }
@@ -230,11 +230,11 @@ ition: relative; /* o absolute, dependiendo de tus necesidades */
     {
         ReunionDTO registro;
         registro = await PizarraData.GetDiscrepantacia(e.IdReuDia);
-        registro.IdTipReu = 1;
+        registro.IdTipReu = 3;
         bool validacion = await PizarraData.UpdateDiscrepancia3(registro, registro.IdReuDia);
         if( validacion == true)
         {
-            mensaje = "Se agrego correctamente a la Reunion diaria";
+            mensaje = "Se agrego correctamente a la Reunion Quincenal";
             NotificationService.Notify(Notificar.Notificacion("exito", mensaje, ""));
             await buscar();
         } else
@@ -248,12 +248,12 @@ ition: relative; /* o absolute, dependiendo de tus necesidades */
     {
         ReunionDTO registro;
         registro = await PizarraData.GetDiscrepantacia(e.IdReuDia);
-        registro.IdTipReu = 1;
+        registro.IdTipReu = 3;
         registro.Rdstatus = "Rechazada";
         bool validacion = await PizarraData.UpdateDiscrepancia3(registro, registro.IdReuDia);
         if( validacion == true)
         {
-            mensaje = "La reunion a sido rechazada";
+            mensaje = "La discrepancia a sido rechazada";
             NotificationService.Notify(Notificar.Notificacion("exito", mensaje, ""));
             await buscar();
 

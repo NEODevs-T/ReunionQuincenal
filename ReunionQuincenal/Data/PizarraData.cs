@@ -40,8 +40,8 @@ public class PizarraData : IPizarraData
     public async Task<List<CalendarioTrabajoDTO>> GetTrabajosCalendario(string pais, string centro, string division)
     {
 
-        int reunionDiaria = 1;
-        url = $"{BaseUrl}/GetTrabajosPorCalendario/{pais}/{centro}/{division}/{reunionDiaria}";
+        int reunionQuincenal = 3;
+        url = $"{BaseUrl}/GetTrabajosPorCalendario/{pais}/{centro}/{division}/{reunionQuincenal}";
         cliente = _clientFactory.CreateClient();
         return calentrabajo = await cliente.GetFromJsonAsync<List<CalendarioTrabajoDTO>>(url) ?? new List<CalendarioTrabajoDTO>();
     }
@@ -56,10 +56,10 @@ public class PizarraData : IPizarraData
     //obtener discrepancias para pendientes y reunion 
     public async Task<List<ReunionDTO>> GetPendientes(string idcentro, string iddiv, DateTime f1, DateTime f2, string tipo, string estado)
     {
-        int reunionDiaria = 1;
+        int reunionQuincenal = 3;
         string f1Formatiado = f1.ToString("yyyy-MM-dd");
         string f2Formatiado = f2.ToString("yyyy-MM-dd");
-        url = $"{BaseUrl}/GetPendientes/{idcentro}/{iddiv}/{f1Formatiado}/{f2Formatiado}/{tipo}/{estado}/{reunionDiaria}";
+        url = $"{BaseUrl}/GetPendientes/{idcentro}/{iddiv}/{f1Formatiado}/{f2Formatiado}/{tipo}/{estado}/{reunionQuincenal}";
         return reudiatablas = await _http.GetFromJsonAsync<List<ReunionDTO>>(url) ?? new List<ReunionDTO>();
 
     }
@@ -74,10 +74,10 @@ public class PizarraData : IPizarraData
     //historicos
     public async Task<List<ReunionDTO>> GetHistoricos(string idcentro, string iddiv, DateTime f1, DateTime f2, string tipo, string estado)
     {
-        int reunionDiaria = 1;
+        int reunionQuincenal = 3;
         string f1Formatiado = f1.ToString("yyyy-MM-dd");
         string f2Formatiado = f2.ToString("yyyy-MM-dd");
-        url = $"{BaseUrl}/GetHistoricos/{idcentro}/{iddiv}/{f1Formatiado}/{f2Formatiado}/{tipo}/{estado}/{reunionDiaria}";
+        url = $"{BaseUrl}/GetHistoricos/{idcentro}/{iddiv}/{f1Formatiado}/{f2Formatiado}/{tipo}/{estado}/{reunionQuincenal}";
         return reunionditablas = await _http.GetFromJsonAsync<List<ReunionDTO>>(url) ?? new List<ReunionDTO>();
 
     }
@@ -88,11 +88,11 @@ public class PizarraData : IPizarraData
         List<CambiReuVDTO> listaCambiReus = await _http.GetFromJsonAsync<List<CambiReuVDTO>>(url) ?? new List<CambiReuVDTO>();
         
         listaCambiReu = listaCambiReus.GroupBy(x => x.IdReuDia)
-                .Where(g => g.Count() > 3)
-                .SelectMany(g => g)
+                .Where(g => g.Count() >= 3)
+                .Select(g => g.Last())
                 .ToList();        
         
-        return listaCambiReu;
+        return listaCambiReus;
     }
 
     //Update Discrepancia

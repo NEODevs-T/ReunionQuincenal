@@ -253,7 +253,7 @@
     private bool isDesactivado { get; set; } = false;
     private List<AsistenReuDTO> listaAsistencia { get; set; } = new List<AsistenReuDTO>();
 
-    int reunionDia = 1;
+    int reunionQuincenal = 3;
     protected override async Task OnInitializedAsync()
     {
 
@@ -343,8 +343,9 @@
             Reuniondb.IdMaster = MaestraData.maestra.Where(x => x.IdLinea == idLin).FirstOrDefault().IdMaster;
             Reuniondb.Rdarea = MaestraData.lineas.Where(x => x.IdLinea == idLin).FirstOrDefault().Linea;
             Reuniondb.Rdstatus = "Pendiente";
-            Reuniondb.IdTipReu = reunionDia;
+            Reuniondb.IdTipReu = reunionQuincenal;
             Reuniondb.IdCausaCal = 1;
+            Reuniondb.RdfecCrea = DateTime.Now;
             Reuniondb.IdPais = int.Parse(claims.FirstOrDefault(c => c.Type == "IdPais")?.Value);
             Reuniondb.IdEmpresa = int.Parse(claims.FirstOrDefault(c => c.Type == "IdEmpresa")?.Value);
 
