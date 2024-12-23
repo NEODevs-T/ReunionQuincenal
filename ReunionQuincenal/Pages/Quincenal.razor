@@ -60,7 +60,10 @@
         </div>
         @if(band == true){
 
-            @if(PizarraData.listaCambiReu.Count() > 0)
+            @if (PizarraData.listaCambiReu.Count() == 0)
+            {
+                <div class="loader"></div>
+            }else if(PizarraData.listaCambiReu.Count() > 0)
             {
             <RadzenDataGrid @ref="reunion" AllowFiltering="true" FilterPopupRenderMode="PopupRenderMode.OnDemand" AllowPaging="true" PageSize="10" AllowSorting="true" 
                         Data="@PizarraData.listaCambiReu" TItem="CambiReuVDTO" >
