@@ -92,7 +92,7 @@ public class PizarraData : IPizarraData
                 .Select(g => g.Last())
                 .ToList();        
         
-        return listaCambiReus;
+        return listaCambiReu;
     }
 
     //Update Discrepancia
