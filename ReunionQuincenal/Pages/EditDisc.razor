@@ -517,6 +517,7 @@
     public string? est { get; set; }
 
     string _message = "";
+    int reunionQuincenal = 3;
     bool cambio = true;
     bool loader = true;
 
@@ -593,10 +594,10 @@
         try
         {
 
-
+            DiscForm.IdTipReu = reunionQuincenal;
             if (DiscForm.RdfecTra  >= DiscForm.RdfecReu && (int)tipo == 1 || (int)tipo == 0 || (int)tipo == 2)
             {
-                if (CambiosFecha.Count() >= 3 & camFec != DiscForm.RdfecTra)
+                if (CambiosFecha.Count() >= 5 & camFec != DiscForm.RdfecTra)
                 {
                     NotificationService.Notify(Notificar.Notificacion("error", "Atención", "Alcanzó el límite de cambios de Fecha de Trabajo."));
                 }

@@ -59,7 +59,7 @@ public class PizarraData : IPizarraData
         int reunionQuincenal = 3;
         string f1Formatiado = f1.ToString("yyyy-MM-dd");
         string f2Formatiado = f2.ToString("yyyy-MM-dd");
-        url = $"{BaseUrl}/GetPendientes/{idcentro}/{iddiv}/{f1Formatiado}/{f2Formatiado}/{tipo}/{estado}/{reunionQuincenal}";
+        url = $"{BaseUrl2}/GetPendientes/{idcentro}/{iddiv}/{f1Formatiado}/{f2Formatiado}/{tipo}/{estado}/{reunionQuincenal}";
         return reudiatablas = await _http.GetFromJsonAsync<List<ReunionDTO>>(url) ?? new List<ReunionDTO>();
 
     }

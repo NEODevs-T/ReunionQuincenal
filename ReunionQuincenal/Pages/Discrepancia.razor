@@ -165,8 +165,9 @@
 
                 <option value="">Seleccione...</option>
                 @foreach (var d in KsfData.ksfs)
-                {
-                    <option value="@d.Idksf">@d.KsfNombre</option>
+                    { @if(d.KsfNombre != "Reunión Quincenal"){
+                        <option value="@d.Idksf">@d.KsfNombre</option>
+                    }
                 }
 
             </BSInput>

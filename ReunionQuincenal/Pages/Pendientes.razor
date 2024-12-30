@@ -72,6 +72,7 @@ else
                 <option value="Listo">Listo</option>
                 <option value="Cerrado">Cerrado</option>
                 <option value="Vencidos">Vencidos</option>
+                <option value="VencidasDiaria">Vencidas diaria</option>
             </BSInput>
         </BSCol>
 
@@ -230,7 +231,7 @@ else
 
                                             @*<BSTD>@d.IdReuDia</BSTD>*@
                                             <BSTD>@d.Rdarea</BSTD>
-                                                <BSTD>@d.Ksf</BSTD>
+                                                <BSTD>@KsfData.ksfs.Where(x => x.Idksf == d.Idksf).FirstOrDefault().KsfNombre</BSTD>
                                                 <BSTD>@d.RdcodEq</BSTD>
                                                 <BSTD>@d.Rddisc.ToUpperInvariant()</BSTD>
                                                 <BSTD>@d.RdcodDis</BSTD>
