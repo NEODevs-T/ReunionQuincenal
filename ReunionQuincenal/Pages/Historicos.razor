@@ -130,7 +130,7 @@
 @if (tabla.Count() > 0 && dataIsLoaded == 2)
 {
 
-    <RadzenDataGrid @ref="@ReuTabla" Data="@tabla" class="rz-shadow-2" AllowFiltering="true" AllowColumnResize="true"
+    <RadzenDataGrid @ref="@ReuTabla" Data="@PizarraData.reudiatablas" class="rz-shadow-2" AllowFiltering="true" AllowColumnResize="true"
         AllowAlternatingRows="true" FilterMode="FilterMode.Advanced" AllowSorting="true" PageSize="30" AllowPaging="true"
         PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true" TItem="ReunionDTO"
         LogicalFilterOperator="LogicalFilterOperator.Or" OrOperatorText="O" AndOperatorText="Y" EqualsText="Igual a"
@@ -293,6 +293,7 @@ else if (dataIsLoaded == 2 && tabla.Count() == 0)
         fecha1 = DateTime.Now;
         fecha2 = DateTime.Now;
         await CreateData();
+        
 
         var rol = claims.FirstOrDefault(c => c.Type.Contains("role"))?.Value;
 
@@ -407,6 +408,12 @@ else if (dataIsLoaded == 2 && tabla.Count() == 0)
         {
             dataIsLoaded = 1;
             tabla = await PizarraData.GetHistoricos(IdCentro.ToString(), IdDiv.ToString(), fecha1, fecha2, tipoconsulta, Status);
+            foreach(var d in PizarraData.reudiatablas)
+            {
+                d.Ksf = KsfData.ksfs.Where(x => x.Idksf == d.Idksf).FirstOrDefault().KsfNombre;
+                d.Responsable = RespoReuData.resporeus.Where(x => x.IdResReu == d.IdResReu).FirstOrDefault().Rrnombre;
+            }
+            
             dataIsLoaded = 2;
         }
     }

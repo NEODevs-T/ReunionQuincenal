@@ -238,13 +238,13 @@ else
                                                 <BSTD Class="textotabla">@d.RdplanAcc</BSTD>
                                                 <BSTD>@d.Rdtiempo</BSTD>
 
-                                                @if (@d.Responsable == "Por Definir")
+                                                @if (RespoReuData.resporeus.Where(x => x.IdResReu == d.IdResReu).FirstOrDefault().Rrnombre == "Por Definir")
                                             {
-                                                <BSTD Class="Definir">@d.Responsable </BSTD>
+                                                <BSTD Class="Definir">@RespoReuData.resporeus.Where(x => x.IdResReu == d.IdResReu).FirstOrDefault().Rrnombre </BSTD>
                                             }
                                             else
                                             {
-                                                <BSTD>@d.Responsable </BSTD>
+                                                <BSTD>@RespoReuData.resporeus.Where(x => x.IdResReu == d.IdResReu).FirstOrDefault().Rrnombre </BSTD>
                                             }
 
                                             @if (@d.Rdstatus == "Listo")
