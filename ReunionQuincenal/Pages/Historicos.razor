@@ -11,6 +11,7 @@
 @inject HttpClient Http
 @inject AuthenticationStateProvider AuthStateProvider
 @inject ILocalStorageService LocalStorage
+@inject NotificationService NotificationService
 <h3>Históricos</h3>
 
 
@@ -274,9 +275,7 @@ else if (dataIsLoaded == 2 && tabla.Count() == 0)
 
     private string mensaje = "";
 
-
-
-
+    private NotifiRadzen Notificar = new NotifiRadzen();
 
     private async Task CreateData()
 
@@ -404,17 +403,25 @@ else if (dataIsLoaded == 2 && tabla.Count() == 0)
     }
     protected async Task Get()
     {
-        if (dataIsLoaded != 1)
+        if (IdCentro != 0 & IdDiv != 0)
         {
-            dataIsLoaded = 1;
-            tabla = await PizarraData.GetHistoricos(IdCentro.ToString(), IdDiv.ToString(), fecha1, fecha2, tipoconsulta, Status);
-            foreach(var d in PizarraData.reudiatablas)
+            if (dataIsLoaded != 1)
             {
-                d.Ksf = KsfData.ksfs.Where(x => x.Idksf == d.Idksf).FirstOrDefault().KsfNombre;
-                d.Responsable = RespoReuData.resporeus.Where(x => x.IdResReu == d.IdResReu).FirstOrDefault().Rrnombre;
+                dataIsLoaded = 1;
+                tabla = await PizarraData.GetHistoricos(IdCentro.ToString(), IdDiv.ToString(), fecha1, fecha2, tipoconsulta, Status);
+                foreach(var d in PizarraData.reudiatablas)
+                {
+                    d.Ksf = KsfData.ksfs.Where(x => x.Idksf == d.Idksf).FirstOrDefault().KsfNombre;
+                    d.Responsable = RespoReuData.resporeus.Where(x => x.IdResReu == d.IdResReu).FirstOrDefault().Rrnombre;
+                }
+                
+                dataIsLoaded = 2;
             }
-            
-            dataIsLoaded = 2;
+        }
+        else
+        {
+            mensaje = "Verifique todos los campos";
+            NotificationService.Notify(Notificar.Notificacion("advertencia", mensaje, ""));
         }
     }
 }
