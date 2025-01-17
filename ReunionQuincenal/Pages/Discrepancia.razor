@@ -341,7 +341,7 @@
         //Reuniondb.Fecha = fecha;
         try
         {
-            Reuniondb.OrigenCal = "Quincenal";
+            Reuniondb.OrigenCal = "N/A";
             Reuniondb.IdMaster = MaestraData.maestra.Where(x => x.IdLinea == idLin).FirstOrDefault().IdMaster;
             Reuniondb.Rdarea = MaestraData.lineas.Where(x => x.IdLinea == idLin).FirstOrDefault().Linea;
             Reuniondb.Rdstatus = "Pendiente";
