@@ -63,7 +63,9 @@
 
             <BSCol Column="3">
                 <BSRow><BSLabel> Buscar</BSLabel></BSRow>
+                <div class="desabilitacion">
                 <BSButton IsOutlined Color="BSColor.Success" Size="Size.ExtraSmall" IsDisabled @onclick="Get">   Estadísticas  <span class="oi oi-check"></span></BSButton>
+                </div>
              </BSCol>
 
 
@@ -278,7 +280,13 @@ else if (dataIsLoaded == 1 && porasis.Count() == 0)
     <div class="loader"></div>
 }
 
-
+<style>
+    .desabilitacion{
+        background-color: #aaa;
+        width: 105px;
+        border-radius: 5px;
+    }
+</style>
 
 @code {
 

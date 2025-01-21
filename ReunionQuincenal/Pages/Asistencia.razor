@@ -37,7 +37,9 @@
         </BSCol>
 
         <BSCol ColumnSmall="3">
+            <div class="desabilitacion">
             <BSButton IsOutlined Color="BSColor.Success" Size="Size.ExtraSmall" IsDisabled @onclick="Get">   Asistentes  <span class="oi oi-check"></span></BSButton>
+            </div>
         </BSCol>
 
     </BSRow>
@@ -142,7 +144,13 @@ else if (dataIsLoaded == 1 && RespoReuData.resporeus.Count() == 0)
     <div class="loader"></div>
 }
 
-
+<style>
+    .desabilitacion{
+        background-color: #aaa;
+        width: 97px;
+        border-radius: 5px;
+    }
+</style>
 
 @code {
 
