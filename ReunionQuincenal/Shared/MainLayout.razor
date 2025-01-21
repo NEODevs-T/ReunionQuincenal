@@ -28,7 +28,7 @@
             </main>
         </div>
         <RadzenDialog /> @*Radzen *@
-      
+
 
     </Authorized>
     <NotAuthorized>
@@ -37,7 +37,7 @@
         <div class="text-center fondo">
 
             <div class="form-signin w-25 m-auto loginform ">
-@*                <div>
+                @*                <div>
                     @if (@mensaje == "Accediendo...")
                     {
                         <BSAlert Color="BSColor.Success" IsDismissible="true" HasIcon="true" @ref="_alertRef" Dismissed="Dismissed">
@@ -87,11 +87,12 @@
                     <p></p>
                     @if (carga == true)
                     {
-                           <div class="loader"></div>
+                        <div class="loader"></div>
                     }
                     else if (carga == false)
                     {
-                        <BSButton Class="w-100 btn btn-lg" Color="BSColor.Success" Size="Size.ExtraExtraLarge" IsSubmit>  Iniciar</BSButton>
+                        <BSButton Class="w-100 btn btn-lg" Color="BSColor.Success" Size="Size.ExtraExtraLarge" IsSubmit>
+                            Iniciar</BSButton>
 
                     }
                     <p class="mt-5 mb-3 text-muted">Neo 2022</p>
@@ -128,7 +129,7 @@
     protected async Task HandleLogin(EditContext e)
     {
         mensaje = "";
-        user.Proyecto = "ReunionWeb";
+        user.Proyecto = "ReunionQuincenal";
         if (e.Validate())
         {
             carga = true;
@@ -141,7 +142,7 @@
                 if (ValidarToken == "NotFoundUser")
                 {
                     mensaje = "Verifique el usuario.";
-                    NotificationService.Notify(Notificar.Notificacion("advertencia", "Atención",mensaje));
+                    NotificationService.Notify(Notificar.Notificacion("advertencia", "Atención", mensaje));
 
                     carga = false;
                 }
@@ -154,24 +155,24 @@
                 }
                 else if (ValidarToken == "null")
                 {
-                   
-                    mensaje = "Este usuario no está registrado en este proyecto."; 
+
+                    mensaje = "Este usuario no está registrado en este proyecto.";
                     NotificationService.Notify(Notificar.Notificacion("error", "Atención", mensaje));
                     carga = false;
                 }
                 else
                 {
                     mensaje = "Accediendo...";
-                    
+
 
                     Console.WriteLine(ValidarToken);
-                    await LocalStorage.SetItemAsync("ReunionWebToken", ValidarToken);
+                    await LocalStorage.SetItemAsync("ReunionQuincenalToken", ValidarToken);
                     var authState = await AuthStateProvider.GetAuthenticationStateAsync();
                     var userA = authState.User;
                     claims = Enumerable.ToList(userA.Claims);
                     user = new UserLoginDto();
                     carga = false;
-                    mensaje = ""; 
+                    mensaje = "";
                     NavigationManager.NavigateTo("");
                 }
             }

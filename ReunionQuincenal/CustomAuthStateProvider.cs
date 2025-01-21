@@ -12,9 +12,9 @@ namespace ReunionWeb
         private readonly ILocalStorageService _localStorage;
         private readonly ProtectedLocalStorage _DataLocal;
         private readonly HttpClient _http;
-       
 
-   
+
+
 
         public CustomAuthStateProvider(ILocalStorageService localStorage, HttpClient http, ProtectedLocalStorage DataLocal)
         {
@@ -24,10 +24,10 @@ namespace ReunionWeb
         }
 
 
-        public override async  Task<AuthenticationState>  GetAuthenticationStateAsync()
+        public override async Task<AuthenticationState> GetAuthenticationStateAsync()
         {
-           string token = await _localStorage.GetItemAsStringAsync("ReunionWebToken");
-           
+            string token = await _localStorage.GetItemAsStringAsync("ReunionQuincenalToken");
+
 
             var identity = new ClaimsIdentity();
             _http.DefaultRequestHeaders.Authorization = null;
@@ -47,19 +47,19 @@ namespace ReunionWeb
 
         }
 
-        public static IEnumerable<Claim>ParseClaimsFromJwt(string jwt)
+        public static IEnumerable<Claim> ParseClaimsFromJwt(string jwt)
         {
             var payload = jwt.Split('.')[1];
-            var jsonBytes=ParseBase64WithoutPadding(payload);
+            var jsonBytes = ParseBase64WithoutPadding(payload);
             var keyValuePairs = JsonSerializer.Deserialize<Dictionary<string, object>>(jsonBytes);
             return keyValuePairs.Select(KeyValuePair => new Claim(KeyValuePair.Key, KeyValuePair.Value.ToString()));
         }
         private static byte[] ParseBase64WithoutPadding(string base64)
         {
-            switch(base64.Length % 4)
+            switch (base64.Length % 4)
             {
-                case 2: base64 +="=="; break;
-                case 3: base64 +="="; break;
+                case 2: base64 += "=="; break;
+                case 3: base64 += "="; break;
             }
             return Convert.FromBase64String(base64);
         }

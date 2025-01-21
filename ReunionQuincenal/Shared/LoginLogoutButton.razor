@@ -4,11 +4,13 @@
 
 <AuthorizeView>
     <Authorized>
-       <strong>¡Hola @context.User.Identity?.Name!</strong> 
-         <BSButton   Color="BSColor.Danger"  Size="Size.ExtraSmall" OnClick="Logout">  Cerrar Sesión <span class="oi oi-out"></span></BSButton>
+        <strong>¡Hola @context.User.Identity?.Name!</strong>
+        <BSButton Color="BSColor.Danger" Size="Size.ExtraSmall" OnClick="Logout"> Cerrar Sesión <span
+                class="oi oi-out"></span></BSButton>
     </Authorized>
     <NotAuthorized>
-                 <BSButton   Color="BSColor.Success"  Size="Size.ExtraSmall" OnClick="Login">  Iniciar Sesión <span class="oi oi-in"></span></BSButton>
+        <BSButton Color="BSColor.Success" Size="Size.ExtraSmall" OnClick="Login"> Iniciar Sesión <span
+                class="oi oi-in"></span></BSButton>
 
     </NotAuthorized>
 </AuthorizeView>
@@ -23,7 +25,7 @@
     {
 
         await LocalStorage.RemoveItemAsync("OdtValue");
-        await LocalStorage.RemoveItemAsync("ReunionWebToken");
+        await LocalStorage.RemoveItemAsync("ReunionQuincenalToken");
         await AuthStateProvider.GetAuthenticationStateAsync();
     }
 }
