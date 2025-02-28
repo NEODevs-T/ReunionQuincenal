@@ -141,9 +141,9 @@ public class APIReunionService : IAPIReunionService
         }
 
 
-        public async Task<List<CargoReuDTO>> GetAsistencia(string div, string empresa)
+        public async Task<List<CargoReuDTO>> GetAsistenciaQuincenal(string div, string empresa)
         {
-                url = $"{BaseUrlLineas}/GetAsistencia/{div}/{empresa}";
+                url = $"{BaseUrlLineas}/GetAsistenciaQuincenal/{div}/{empresa}";
                 cliente = _clientFactory.CreateClient();
                 return await cliente.GetFromJsonAsync<List<CargoReuDTO>>(url) ?? new List<CargoReuDTO>();
         }
@@ -276,7 +276,7 @@ public class APIReunionService : IAPIReunionService
 
 
 
-        //public async Task GetAsistencia(string div, string empresa)
+        //public async Task GetAsistenciaQuincenal(string div, string empresa)
         //{
 
         //    var result = await _http.GetFromJsonAsync<List<CargoReu>>($"http://localhost:5258/Lineas/Asistencia/{div}/{empresa}");

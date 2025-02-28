@@ -35,7 +35,7 @@ namespace ReunionWeb.Services
         Task<List<LineaVDTO>> GetLineas(int idDivision);
         Task<List<KsfDTO>> Getksf();
         Task<List<RespoReuDTO>> GetResReu();
-        Task<List<CargoReuDTO>> GetAsistencia(string div, string empresa);
+        Task<List<CargoReuDTO>> GetAsistenciaQuincenal(string div, string empresa);
         Task<List<AsistenReuDTO>> GetStatsAsist(string div, string empresa, string f1, string f2);
         Task<List<AsistenReuDTO>> GetListaAsist(string div, string empresa, string f1, string f2);
         Task<string> Postasistencia(List<AsistenReuDTO> asisten);

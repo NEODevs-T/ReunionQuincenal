@@ -376,7 +376,7 @@ else if (dataIsLoaded == 1 && porasis.Count() == 0)
                 dataIsLoaded = 1;
                 await AsistenciaReuData.GetListaAsist(Div, claims[5].Value, f1, f2);
                 await AsistenciaReuData.GetStatsAsist(Div, claims[5].Value, f1, f2);
-                await CargoReuData.GetAsistencia(Div, claims.FirstOrDefault(c => c.Type.Equals("Empresa"))?.Value);
+                await CargoReuData.GetAsistenciaQuincenal(Div, claims.FirstOrDefault(c => c.Type.Equals("Empresa"))?.Value);
 
                 listacargos = CargoReuData.cargoreuss;
                 listafiltradabloque = AsistenciaReuData.StatsAsisDtos;
