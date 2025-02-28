@@ -34,7 +34,7 @@ public class PizarraData : IPizarraData
     public ReunionDTO reuniondia { get; set; } = new ReunionDTO();
     public List<ReunionDTO> reudiatablas { get; set; } = new List<ReunionDTO>();
     public List<CalendarioTrabajoDTO> calentrabajo { get; set; } = new List<CalendarioTrabajoDTO>();
-    public List<CambiReuVDTO> listaCambiReu { get; set; } = new List<CambiReuVDTO>();
+    public List<ReunionDTO> listaCambiReu { get; set; } = new List<ReunionDTO>();
 
 
     public async Task<List<CalendarioTrabajoDTO>> GetTrabajosCalendario(string pais, string centro, string division)
@@ -82,17 +82,29 @@ public class PizarraData : IPizarraData
 
     }
 
-    public async Task<List<CambiReuVDTO>> GetPendientesQuincenal2(string idcentro, string iddiv){
+        public async Task<List<ReunionDTO>> GetPendientesQuincenal2(string idcentro, string iddiv)
+    {
         url = $"{BaseUrl}/GetPendientesQuincenal2/{idcentro}/{iddiv}";
-        
-        List<CambiReuVDTO> listaCambiReus = await _http.GetFromJsonAsync<List<CambiReuVDTO>>(url) ?? new List<CambiReuVDTO>();
-        
-        listaCambiReu = listaCambiReus.GroupBy(x => x.IdReuDia)
-                .Where(g => g.Count() >= 3)
-                .Select(g => g.Last())
-                .ToList();        
-        
-        return listaCambiReu;
+        reudiatablas = await _http.GetFromJsonAsync<List<ReunionDTO>>(url) ?? new List<ReunionDTO>();
+        // reudiatablas = reudiatablas.OrderByDescending(fecha => fecha.RdfecReu).ToList();
+        return reudiatablas;
+    }
+
+            public async Task<List<ReunionDTO>> GetPendientesdeDiariaAQuincenal(string idcentro, string iddiv)
+    {
+        url = $"{BaseUrl}/GetPendientesdeDiariaAQuincenal/{idcentro}/{iddiv}";
+        reudiatablas = await _http.GetFromJsonAsync<List<ReunionDTO>>(url) ?? new List<ReunionDTO>();
+        // reudiatablas = reudiatablas.OrderByDescending(fecha => fecha.RdfecReu).ToList();
+        return reudiatablas;
+    }
+
+
+            public async Task<List<ReunionDTO>> GetReunionesPorCodigodeCompra(string idcentro, string iddiv)
+    {
+        url = $"{BaseUrl}/GetReunionesPorCodigodeCompra/{idcentro}/{iddiv}";
+        reudiatablas = await _http.GetFromJsonAsync<List<ReunionDTO>>(url) ?? new List<ReunionDTO>();
+        // reudiatablas = reudiatablas.OrderByDescending(fecha => fecha.RdfecReu).ToList();
+        return reudiatablas;
     }
 
     //Update Discrepancia
