@@ -1,0 +1,360 @@
+@page "/vencidos"
+
+@inject IAsistenciaReuData AsistenciaReuData
+@inject IAvisadorData AvisadorData
+@inject ICargoReuData CargoReuData
+@inject IKsfData KsfData
+@inject IPizarraData PizarraData
+@inject IRespoReuData RespoReuData
+@inject IMaestraData MaestraData
+@inject HttpClient Http
+@inject AuthenticationStateProvider AuthStateProvider
+@inject ILocalStorageService LocalStorage
+@inject NotificationService NotificationService
+
+@attribute [Authorize(Roles = "Admin, AdminChempro, SupIntendente, SupIntendenteGeneral,SuperAdmin")]
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>vencidos</title>
+</head>
+
+<body>
+    <h3>Vencidos Diaria</h3>
+    @* ccc *@
+    <div class="box-reuform">
+        <div class="box-reuCent">
+            <label for="">Centro
+                <BSInput InputType="InputType.Select" class="Form-imput" @onchange="BuscarDivision"
+                    @bind-Value="idCent">
+                    <option value="0">Selecione un Centro</option>
+                    @if (MaestraData.centro != null)
+                    {
+                        @foreach (var d in MaestraData.centro)
+                        {
+                            <option value="@d.IdCentro">@d.Centro</option>
+
+                        }
+                    }
+                </BSInput>
+            </label>
+        </div>
+        <div class="box-reuDiv">
+            <label for="">Division
+                <BSInput InputType="InputType.Select" class="Form-imput linea" @bind-Value="idDiv">
+                    <option value="0">Selecione una Division</option>
+                    @if (MaestraData.centro != null)
+                    {
+                        @foreach (var d in MaestraData.divisions)
+                        {
+                            <option value="@d.IdDivision">@d.Ndivision</option>
+
+                        }
+                    }
+                </BSInput>
+            </label>
+        </div>
+        @* <div class="box-reutipo">
+            <label for="">Busqueda
+                <BSInput InputType="InputType.Select" class="Form-imput linea" @bind-Value="tipo">
+                    <option value="0">Selecione que Buscar</option>
+                    @if (MaestraData.centro != null)
+                    {
+                        <option value="1">Pendientes Quincenal</option>
+                        <option value="2">KSF Reunion Quincenal</option>
+                        <option value="3">Codigo 3</option>
+
+                    }
+                </BSInput>
+            </label>
+        </div> *@
+
+        <div class="botton-Disc">
+            <button @onclick="buscar" type="submit" id="btn-disc" class="btn btn-primary mb-3">Buscar</button>
+        </div>
+    </div>
+    @if (band == true)
+    {
+
+        @if (PizarraData.reudiatablas.Count() == 0 && confirmacion == false)
+        {
+            <div class="loader"></div>
+        }
+        else if (PizarraData.reudiatablas.Count() > 0 && confirmacion == true)
+        {
+            <RadzenDataGrid @ref="reunion" AllowFiltering="true" FilterPopupRenderMode="PopupRenderMode.OnDemand"
+                class="tabla-radzen" AllowPaging="true" PageSize="10" AllowSorting="true" Data="@PizarraData.reudiatablas"
+                TItem="ReunionDTO">
+                <Columns>
+                    <RadzenDataGridColumn Width="5%" TItem="ReunionDTO" Title="Linea" Filterable="false" Sortable="false"
+                        TextAlign="TextAlign.Center">
+                        <Template Context="data">
+                            <RadzenText class="mb-0 tipografia">@data.Rdarea</RadzenText>
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn Width="5%" TItem="ReunionDTO" Title="C. Equipo" Filterable="false" Sortable="false"
+                        TextAlign="TextAlign.Center">
+                        <Template Context="data">
+                            <RadzenText class="mb-0 tipografia">@data.RdcodEq</RadzenText>
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn Width="5%" TItem="ReunionDTO" Title="Discrepancia" Filterable="false" Sortable="false"
+                        TextAlign="TextAlign.Center">
+                        <Template Context="data">
+                            <RadzenText class="mb-0 tipografia">@data.Rddisc</RadzenText>
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn Width="5%" TItem="ReunionDTO" Title="Plan de Accion" Filterable="false"
+                        Sortable="false" TextAlign="TextAlign.Center">
+                        <Template Context="data">
+                            <RadzenText class="mb-0 tipografia">@data.RdplanAcc</RadzenText>
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn Width="5%" TItem="ReunionDTO" Title="F. Reunion" Filterable="false" Sortable="false"
+                        TextAlign="TextAlign.Center">
+                        <Template Context="data">
+                            <RadzenText class="mb-0 tipografia">@data.RdfecReu.ToString("dd/MM/yyyy")</RadzenText>
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn Width="5%" TItem="ReunionDTO" Title="F. Trabajo" Filterable="false" Sortable="false"
+                        TextAlign="TextAlign.Center">
+                        <Template Context="data">
+                            <RadzenText class="mb-0 tipografia">@data.RdfecTra.ToString("dd/MM/yyyy")</RadzenText>
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn Width="5%" TItem="ReunionDTO" Title="Acciones" Filterable="false" Sortable="false"
+                        TextAlign="TextAlign.Center">
+                        <Template Context="data">
+                            @if (libro == 0)
+                            {
+                                @* <RadzenButton Icon="delete" Size="ButtonSize.Small" Click="@(() => Rechazada(data))" /> *@
+                            }
+                            @* <RadzenButton Icon="add" Size="ButtonSize.Small" Click="@(() => Add(data))" /> *@
+                        </Template>
+                    </RadzenDataGridColumn>
+                </Columns>
+            </RadzenDataGrid>
+        }
+        else if (PizarraData.reudiatablas.Count() == 0 && confirmacion == true)
+        {
+<div style="text-align: center; padding: 20px; font-size: 18px; color: gray;">
+    <p>No hay registros disponibles</p>
+</div>
+        }
+
+    }
+</body>
+<style>
+    .box-reuform {
+        padding-top: 10px;
+        display: flex;
+        justify-content: flex-start;
+        /* O flex-start para alinear a la izquierda */
+        align-items: center;
+        /* height: 100vh; */
+    }
+
+
+    .box-reuCent {
+        margin: 10px;
+    }
+
+    .tabla-radzen {
+        border-radius: 10px;
+        box-shadow: 0px 0px 5px #0003;
+
+    }
+
+    .box-reuDiv {
+        margin: 10px;
+        @* position: relative; *@
+        /* o absolute, dependiendo de tus necesidades */
+        bottom: 10px;
+        /* Ajusta según sea necesario */
+        left: 20px;
+        /* Ajusta según sea necesario */
+    }
+
+    .box-reutipo {
+        margin: 10px;
+    }
+
+    .botton-Disc {
+        padding: 20px;
+        padding-top: 40px;
+    }
+
+    #btn-disc {
+        background-color: #00aa7b;
+        border: none;
+        color: white;
+        padding: 10px 20px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin: 4px 2px;
+        cursor: pointer;
+        box-shadow: 0px 0px 5px #0003;
+        border-radius: 5px;
+        transition: background-color 0.3s ease;
+    }
+
+    #btn-disc:hover {
+        background-color: #00b356;
+    }
+
+    .Form-imput {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 6px 8px;
+        border: none #777;
+        box-shadow: 0px 0px 5px #0003;
+        border: 1px solid #777;
+        /* border-left: 2px solid #666; */
+        /* border-radius: 5px; */
+        background-color: transparent;
+        color: #000;
+        margin: 3px;
+        border-radius: 5px;
+    }
+
+    .linea {
+        width: 165px;
+    }
+</style>
+
+</html>
+
+@code {
+    int idCent = 0;
+    int idDiv = 0;
+    string estado { get; set; }
+    bool band = false;
+    public DateTime fecha1;
+    public DateTime fecha2;
+    private List<Claim> claims { get; set; }
+    private string mensaje = "";
+    public RadzenDataGrid<ReunionDTO> reunion { get; set; } = new RadzenDataGrid<ReunionDTO>();
+    private NotifiRadzen Notificar = new NotifiRadzen();
+    bool confirmacion;
+    int tipo = 1;
+    int libro = 0;
+
+    private async Task CreateData()
+
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        claims = Enumerable.ToList(user.Claims);
+
+    }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        fecha1 = DateTime.Now;
+        fecha2 = DateTime.Now;
+        await CreateData();
+
+        PizarraData.reudiatablas = new List<ReunionDTO>();
+        if (claims != null && claims.Count > 1 && (claims[1]?.Value == "Admin" || claims[1]?.Value == "SuperAdmin"))
+        {
+
+            await MaestraData.GetCentrosxEmpresa("All" + claims[10].Value);
+        }
+        else
+        {
+            await MaestraData.GetCentrosxEmpresa(claims[11].Value);
+        }
+    }
+    protected async Task BuscarDivision(ChangeEventArgs e)
+    {
+        idCent = int.Parse(e.Value.ToString());
+        idDiv = 0;
+        try
+        {
+            if (idCent != 0)
+            {
+                MaestraData.divisions = await MaestraData.ObtenerDivisionDelCentro(idCent);
+            }
+        }
+        catch (Exception ex)
+        {
+            mensaje = "Error: " + ex.Message;
+        }
+    }
+
+    protected async Task buscar()
+    {
+        if (idCent != 0 && idDiv != 0)
+        {
+            if (tipo == 1)
+            {
+                band = true;
+                PizarraData.reudiatablas = new List<ReunionDTO>();
+                confirmacion = false;
+                string idCentro = idCent.ToString();
+                string IdDivision = idDiv.ToString();
+                PizarraData.reudiatablas = await PizarraData.GetReunionesTrabajoVencidas(idCentro, IdDivision);
+                PizarraData.reudiatablas.Select(x => x.RdfecReu.ToString("dd/MM/yyyy")).ToList();
+                confirmacion = true;
+                libro = 0;
+            }
+        } 
+        else
+        {
+            mensaje = "Verifique todos los campos";
+            NotificationService.Notify(Notificar.Notificacion("advertencia", mensaje, ""));
+
+        }
+    }
+
+    
+
+
+    protected async Task Add(ReunionDTO e)
+{
+    ReunionDTO registro = e;
+    registro.IdTipReu = 3;
+    registro.RdfecReu = DateTime.Now.Date;
+    bool validacion = await PizarraData.UpdateDiscrepancia3(registro, registro.IdReuDia);
+
+    if (validacion == true)
+    {
+        mensaje = "Se agregó correctamente a la Reunión Quincenal";
+        NotificationService.Notify(Notificar.Notificacion("exito", mensaje, ""));
+        await buscar();
+    }
+    else
+    {
+        mensaje = "No pudo ser Agregada";
+        NotificationService.Notify(Notificar.Notificacion("advertencia", mensaje, ""));
+    }
+    
+}
+
+    protected async Task Rechazada(ReunionDTO e)
+    {
+        ReunionDTO registro = e;
+        registro.IdTipReu = 3;
+        registro.Rdstatus = "Rechazada";
+        bool validacion = await PizarraData.UpdateDiscrepancia3(registro, registro.IdReuDia);
+        if (validacion == true)
+        {
+            mensaje = "La discrepancia a sido rechazada";
+            NotificationService.Notify(Notificar.Notificacion("exito", mensaje, ""));
+            await buscar();
+        }
+        else
+        {
+            mensaje = "No pudo ser rechazada";
+            NotificationService.Notify(Notificar.Notificacion("advertencia", mensaje, ""));
+        }
+    }
+
+}

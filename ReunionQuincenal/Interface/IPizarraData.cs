@@ -30,4 +30,7 @@ interface IPizarraData
 
     Task<List<ReunionDTO>> GetReunionesPorCodigodeCompra(string idcentro, string iddiv);
     Task<List<ReunionDTO>> GetPendientesdeDiariaAQuincenal(string idcentro, string iddiv);
+
+    Task<List<ReunionDTO>> GetReunionesTrabajoVencidas(string idcentro, string iddiv);
+
 }

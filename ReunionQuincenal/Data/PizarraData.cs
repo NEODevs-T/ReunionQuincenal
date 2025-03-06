@@ -98,6 +98,14 @@ public class PizarraData : IPizarraData
         return reudiatablas;
     }
 
+            public async Task<List<ReunionDTO>> GetReunionesTrabajoVencidas(string idcentro, string iddiv)
+    {
+        url = $"{BaseUrl}/GetReunionesTrabajoVencidas/{idcentro}/{iddiv}";
+        reudiatablas = await _http.GetFromJsonAsync<List<ReunionDTO>>(url) ?? new List<ReunionDTO>();
+        // reudiatablas = reudiatablas.OrderByDescending(fecha => fecha.RdfecReu).ToList();
+        return reudiatablas;
+    }
+
 
             public async Task<List<ReunionDTO>> GetReunionesPorCodigodeCompra(string idcentro, string iddiv)
     {
