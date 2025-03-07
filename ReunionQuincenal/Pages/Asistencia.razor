@@ -236,18 +236,19 @@ else if (dataIsLoaded == 1 && RespoReuData.resporeus.Count() == 0)
     }
 
 
-    protected async Task Save()
+protected async Task Save()
+{
+    int time = int.Parse(DateTime.Now.ToString("hh"));
+    bool validar = true; // Verifica si marcaron suplente pero no asistente
+    int conteo = 0; // Contador para verificar si todos quedaron en null
+
+    try
     {
-
-        int time = int.Parse(DateTime.Now.ToString("hh"));
-        bool validar = true;//chequar si marcaron suplente pero no asistente
-        int conteo = 0;//chequar si se dejaron tosos en null
-        try
+        if ((claims[4].Value == "Venezuela" && time > 8 && time < 10) || 
+            (claims[4].Value == "Colombia" && time > 8 && time < 11) || 
+            (claims[4].Value == "Guatemala" && time > 9 && time < 13) || 
+            (claims[4].Value == "Panamá" && time > 8 && time < 12))
         {
-            if ((claims[4].Value == "Venezuela" && time > 8 && time < 10) || (claims[4].Value == "Colombia" && time > 8 && time < 11) || (claims[4].Value == "Guatemala" && time > 9 && time < 13) || (claims[4].Value == "Panamá" && time > 8 && time < 12) )
-            {
-
-            
             if (bloque > 0)
             {
                 for (int i = listaAsistencia.Count - 1; i >= 0; i--)
@@ -259,60 +260,59 @@ else if (dataIsLoaded == 1 && RespoReuData.resporeus.Count() == 0)
                 }
             }
 
-                foreach (var item in listaAsistencia)
+            foreach (var item in listaAsistencia)
+            {
+                // Si ArSuplente es NULL, se asigna 0 (por defecto no es suplente)
+                if (item.ArSuplente == null)  
                 {
-                    if(item.ArAsistente==0 & item.ArSuplente==1)
-                    {
-                        validar = false;
-                    }
-                    if(item.ArAsistente==0)
-                    {
-                        conteo++;
-                    }
-                }
-                if (validar==false )
-                {
-
-                    NotificationService.Notify(Notificar.Notificacion("advertencia", "Atención", "Si hay un suplente debe marcar la asistencia."));
-                    
-                }
-                else if (conteo == listaAsistencia.Count)
-                {
-                    NotificationService.Notify(Notificar.Notificacion("advertencia", "Atención", "Todos los cargos estan inasistentes."));
-           
-                }
-                else
-                {
-                    mensaje = await AsistenciaReuData.Postasistencia(listaAsistencia);
-
-                    if (mensaje == "Registro Exitoso")
-                    {
-                        NotificationService.Notify(Notificar.Notificacion("exito", mensaje, ""));
-                    }
-                    else 
-                    {
-                         NotificationService.Notify(Notificar.Notificacion("error", "Atención", mensaje));
-                    }
-                    
-                    dataIsLoaded = 0;
-                   
+                    item.ArSuplente = 0;
                 }
 
+                if (item.ArAsistente == 0 & item.ArSuplente == 1)
+                {
+                    validar = false;
+                }
+                if (item.ArAsistente == 0)
+                {
+                    conteo++;
+                }
+            }
+
+            if (!validar)
+            {
+                NotificationService.Notify(Notificar.Notificacion("advertencia", "Atención", "Si hay un suplente debe marcar la asistencia."));
+            }
+            else if (conteo == listaAsistencia.Count)
+            {
+                NotificationService.Notify(Notificar.Notificacion("advertencia", "Atención", "Todos los cargos están inasistentes."));
             }
             else
             {
-               
-                NotificationService.Notify(Notificar.Notificacion("advertencia", "Atención", "Solo se puede registrar en horario de reunión"));
+                mensaje = await AsistenciaReuData.Postasistencia(listaAsistencia);
+
+                if (mensaje == "Registro Exitoso")
+                {
+                    NotificationService.Notify(Notificar.Notificacion("exito", mensaje, ""));
+                }
+                else 
+                {
+                    NotificationService.Notify(Notificar.Notificacion("error", "Atención", mensaje));
+                }
+
                 dataIsLoaded = 0;
-        
             }
         }
-        catch (Exception ex)
+        else
         {
-            NotificationService.Notify(Notificar.Notificacion("error", "Error al Insertar los datos, Intente de Nuevo", ex.Message));
-          
+            NotificationService.Notify(Notificar.Notificacion("advertencia", "Atención", "Solo se puede registrar en horario de reunión"));
+            dataIsLoaded = 0;
         }
     }
+    catch (Exception ex)
+    {
+        NotificationService.Notify(Notificar.Notificacion("error", "Error al Insertar los datos, Intente de Nuevo", ex.Message));
+    }
+}
 
 
 
