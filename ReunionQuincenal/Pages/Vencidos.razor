@@ -78,106 +78,169 @@
     </div>
     @if (band == true)
     {
+@if (PizarraData.reudiatablas.Count() == 0 && confirmacion == false)
+{
+    <div class="loader"></div>
+}
+else if (PizarraData.reudiatablas.Count() > 0 && confirmacion == true)
+{
+    <BSRow> <!-- Contenedor para los filtros -->
+        <BSCol Column="2">
+            <BSLabel><strong>Ksf</strong></BSLabel>
+            <BSInput InputType="InputType.Select" @bind-Value="IdKsf">
+                <option value="0">Todo</option>
+                @foreach (var d in KsfData.ksfs)
+                {
+                    <option value="@d.Idksf">@d.KsfNombre</option>
+                }
+            </BSInput>
+        </BSCol>
 
-        @if (PizarraData.reudiatablas.Count() == 0 && confirmacion == false)
-        {
-            <div class="loader"></div>
-        }
-        else if (PizarraData.reudiatablas.Count() > 0 && confirmacion == true)
-        {
-            <RadzenDataGrid @ref="reunion" AllowFiltering="true" FilterPopupRenderMode="PopupRenderMode.OnDemand"
-                class="tabla-radzen" AllowPaging="true" PageSize="10" AllowSorting="true" Data="@PizarraData.reudiatablas"
-                TItem="ReunionDTO">
-            <Columns>
-                <RadzenDataGridColumn Width="6%" TItem="ReunionDTO" Title="Area" Filterable="false" Sortable="false">
-                    <Template Context="data">
-                        <RadzenText class="mb-0 tipografia">@data.Rdarea</RadzenText>
-                    </Template>
-                </RadzenDataGridColumn>
-                <RadzenDataGridColumn Width="9%" TItem="ReunionDTO" Title="KSF" Filterable="false" Sortable="false">
-                    <Template Context="data">
-                        <RadzenText class="mb-0 tipografia">@data.Ksf</RadzenText>
-                    </Template>
-                </RadzenDataGridColumn>
-                <RadzenDataGridColumn Width="6%" TItem="ReunionDTO" Title="C. Equipo" Filterable="false" Sortable="false">
-                    <Template Context="data">
-                        <RadzenText class="mb-0 tipografia">@data.RdcodEq</RadzenText>
-                    </Template>
-                </RadzenDataGridColumn>
-                <!-- Discrepancia: Aumentado a 20% para mejor visualización -->
-                <RadzenDataGridColumn Width="20%" TItem="ReunionDTO" Title="Discrepancia" Filterable="false" Sortable="false">
-                    <Template Context="data">
-                        <RadzenText class="mb-0 tipografia wrap-text">@data.Rddisc</RadzenText>
-                    </Template>
-                </RadzenDataGridColumn>
-                <!-- Código: Reducido a 3% -->
-                <RadzenDataGridColumn Width="5%" TItem="ReunionDTO" Title="Código" Filterable="false" Sortable="false">
-                    <Template Context="data">
-                        <RadzenText class="mb-0 tipografia">@data.RdcodDis</RadzenText>
-                    </Template>
-                </RadzenDataGridColumn>
-                <!-- Plan de Acción: Aumentado a 20% -->
-                <RadzenDataGridColumn Width="15%" TItem="ReunionDTO" Title="Plan de Acción" Filterable="false" Sortable="false">
-                    <Template Context="data">
-                        <RadzenText class="mb-0 tipografia wrap-text">@data.RdplanAcc</RadzenText>
-                    </Template>
-                </RadzenDataGridColumn>
-                <!-- Tiempo: Reducido a 3% -->
-                <RadzenDataGridColumn Width="5%" TItem="ReunionDTO" Title="Tiempo" Filterable="false" Sortable="false">
-                    <Template Context="data">
-                        <RadzenText class="mb-0 tipografia">@data.Rdtiempo</RadzenText>
-                    </Template>
-                </RadzenDataGridColumn>
-                <RadzenDataGridColumn Width="8%" TItem="ReunionDTO" Title="Responsable" Filterable="false" Sortable="false">
-                    <Template Context="data">
-                        <RadzenText class="mb-0 tipografia">@data.Responsable</RadzenText>
-                    </Template>
-                </RadzenDataGridColumn>
-                <RadzenDataGridColumn Width="6%" TItem="ReunionDTO" Title="Estado" Filterable="false" Sortable="false">
-                    <Template Context="data">
-                        <RadzenText class="mb-0 tipografia">@data.Rdstatus</RadzenText>
-                    </Template>
-                </RadzenDataGridColumn>
-                <RadzenDataGridColumn Width="6%" TItem="ReunionDTO" Title="Requisición" Filterable="false" Sortable="false">
-                    <Template Context="data">
-                        <RadzenText class="mb-0 tipografia">@data.RdcodRequi</RadzenText>
-                    </Template>
-                </RadzenDataGridColumn>
-                <RadzenDataGridColumn Width="7%" TItem="ReunionDTO" Title="ODT" Filterable="false" Sortable="false">
-                    <Template Context="data">
-                        <RadzenText class="mb-0 tipografia">@data.Rdodt</RadzenText>
-                    </Template>
-                </RadzenDataGridColumn>
+        <BSCol Column="2">
+            <BSLabel><strong>Responsable</strong></BSLabel>
+            <BSInput InputType="InputType.Select" @bind-Value="idrespo">
+                <option value="0">Todo</option>
+                @foreach (var d in RespoReuData.resporeus)
+                {
+                    <option value="@d.IdResReu">@d.Rrnombre</option>
+                }
+            </BSInput>
+        </BSCol>
 
-                <RadzenDataGridColumn Width="7%" TItem="ReunionDTO" Title="F. Reunión" Filterable="false" Sortable="false">
-                    <Template Context="data">
-                        <RadzenText class="mb-0 tipografia">@data.RdfecReu.ToString("dd/MM/yyyy")</RadzenText>
-                    </Template>
-                </RadzenDataGridColumn>
-                <RadzenDataGridColumn Width="7%" TItem="ReunionDTO" Title="F. Trabajo" Filterable="false" Sortable="false">
-                    <Template Context="data">
-                        <RadzenText class="mb-0 tipografia">@data.RdfecTra.ToString("dd/MM/yyyy")</RadzenText>
-                    </Template>
-                </RadzenDataGridColumn>
-                <RadzenDataGridColumn Width="5%" TItem="ReunionDTO" Title="Acciones" Filterable="false" Sortable="false">
-                    <Template Context="data">
-                        @if (libro == 0)
-                        {
-                            @* <RadzenButton Icon="delete" Size="ButtonSize.Small" Click="@(() => Rechazada(data))" /> *@
-                        }
-                        <RadzenButton Icon="add" Size="ButtonSize.Small" Click="@(() => Add(data))" />
+        <BSCol Column="2">
+            <BSLabel><strong>Codigo</strong></BSLabel>
+            <BSInput InputType="InputType.Select" @bind-Value="Codigo">
+                <option value="Todo">Todo</option>
+                <option value="1">1- En Curso</option>
+                <option value="2">2- Próxima Parada</option>
+                <option value="3">3- Falta Repuesto</option>
+                <option value="4">4- Falta de Personal</option>
+                <option value="5">5- Eq. no Disponible</option>
+            </BSInput>
+        </BSCol>
+
+        <BSCol Column="2">
+                    <BSLabel><strong>Estado</strong></BSLabel>
+                    <BSInput InputType="InputType.Select" @bind-Value="Status">
+                        <option value="Todo">Todo</option>
+                        <option value="Pendiente">Pendiente</option>
+                        <option value="Pendiente-Responsable">Pendiente/Responsable</option>
+                        <option value="Listo">Listo</option>
+                        <option value="Cerrado">Cerrado</option>
+                        <option value="Vencidos">Vencidos</option>
+                    </BSInput>
+                </BSCol>
+            </BSRow>
+
+    <p></p>
+
+    <RadzenDataGrid @ref="reunion" AllowFiltering="true" FilterPopupRenderMode="PopupRenderMode.OnDemand"
+        class="tabla-radzen" AllowPaging="true" PageSize="10" AllowSorting="true"
+        Data="@(PizarraData.reudiatablas.Where(x => 
+            (IdKsf == 0 || x.Ksf == KsfData.ksfs.FirstOrDefault(k => k.Idksf == IdKsf)?.KsfNombre) &&
+            (idrespo == 0 || x.IdResReu == idrespo) &&
+            (Codigo == "Todo" || x.RdcodDis == Codigo) &&
+            (Status == "Todo" || x.Rdstatus == Status)))"
+        TItem="ReunionDTO">
+
+
+        <Columns>
+            <RadzenDataGridColumn Width="6%" TItem="ReunionDTO" Title="Area" Filterable="false" Sortable="false">
+                <Template Context="data">
+                    <RadzenText class="mb-0 tipografia">@data.Rdarea</RadzenText>
                 </Template>
-                </RadzenDataGridColumn>
-            </Columns>
-        </RadzenDataGrid>
+            </RadzenDataGridColumn>
 
-        }
-        else if (PizarraData.reudiatablas.Count() == 0 && confirmacion == true)
-        {
-<div style="text-align: center; padding: 20px; font-size: 18px; color: gray;">
-    <p>No hay registros disponibles</p>
-</div>
-        }
+            <RadzenDataGridColumn Width="7%" TItem="ReunionDTO" Title="KSF" Filterable="true" Sortable="true">
+                <Template Context="data">
+                    <RadzenText class="mb-0 tipografia">@data.Ksf</RadzenText>
+                </Template>
+            </RadzenDataGridColumn>
+
+            <RadzenDataGridColumn Width="6%" TItem="ReunionDTO" Title="C. Equipo" Filterable="false" Sortable="false">
+                <Template Context="data">
+                    <RadzenText class="mb-0 tipografia">@data.RdcodEq</RadzenText>
+                </Template>
+            </RadzenDataGridColumn>
+
+            <RadzenDataGridColumn Width="20%" TItem="ReunionDTO" Title="Discrepancia" Filterable="false" Sortable="false">
+                <Template Context="data">
+                    <RadzenText class="mb-0 tipografia wrap-text">@data.Rddisc</RadzenText>
+                </Template>
+            </RadzenDataGridColumn>
+
+            <RadzenDataGridColumn Width="5%" TItem="ReunionDTO" Title="Código" Filterable="false" Sortable="false">
+                <Template Context="data">
+                    <RadzenText class="mb-0 tipografia">@data.RdcodDis</RadzenText>
+                </Template>
+            </RadzenDataGridColumn>
+
+            <RadzenDataGridColumn Width="15%" TItem="ReunionDTO" Title="Plan de Acción" Filterable="false" Sortable="false">
+                <Template Context="data">
+                    <RadzenText class="mb-0 tipografia wrap-text">@data.RdplanAcc</RadzenText>
+                </Template>
+            </RadzenDataGridColumn>
+
+            <RadzenDataGridColumn Width="5%" TItem="ReunionDTO" Title="Tiempo" Filterable="false" Sortable="false">
+                <Template Context="data">
+                    <RadzenText class="mb-0 tipografia">@data.Rdtiempo</RadzenText>
+                </Template>
+            </RadzenDataGridColumn>
+
+            <RadzenDataGridColumn Width="8%" TItem="ReunionDTO" Title="Responsable" Filterable="false" Sortable="false">
+                <Template Context="data">
+                    <RadzenText class="mb-0 tipografia">@data.Responsable</RadzenText>
+                </Template>
+            </RadzenDataGridColumn>
+
+            <RadzenDataGridColumn Width="6%" TItem="ReunionDTO" Title="Estado" Filterable="false" Sortable="false">
+                <Template Context="data">
+                    <RadzenText class="mb-0 tipografia">@data.Rdstatus</RadzenText>
+                </Template>
+            </RadzenDataGridColumn>
+
+            <RadzenDataGridColumn Width="6%" TItem="ReunionDTO" Title="Requisición" Filterable="false" Sortable="false">
+                <Template Context="data">
+                    <RadzenText class="mb-0 tipografia">@data.RdcodRequi</RadzenText>
+                </Template>
+            </RadzenDataGridColumn>
+
+            <RadzenDataGridColumn Width="7%" TItem="ReunionDTO" Title="ODT" Filterable="false" Sortable="false">
+                <Template Context="data">
+                    <RadzenText class="mb-0 tipografia">@data.Rdodt</RadzenText>
+                </Template>
+            </RadzenDataGridColumn>
+
+            <RadzenDataGridColumn Width="7%" TItem="ReunionDTO" Title="F. Reunión" Filterable="false" Sortable="false">
+                <Template Context="data">
+                    <RadzenText class="mb-0 tipografia">@data.RdfecReu.ToString("dd/MM/yyyy")</RadzenText>
+                </Template>
+            </RadzenDataGridColumn>
+
+            <RadzenDataGridColumn Width="7%" TItem="ReunionDTO" Title="F. Trabajo" Filterable="false" Sortable="false">
+                <Template Context="data">
+                    <RadzenText class="mb-0 tipografia">@data.RdfecTra.ToString("dd/MM/yyyy")</RadzenText>
+                </Template>
+            </RadzenDataGridColumn>
+
+            <RadzenDataGridColumn Width="5%" TItem="ReunionDTO" Title="Acciones" Filterable="false" Sortable="false">
+                <Template Context="data">
+                    @if (libro == 0)
+                    {
+                        @* <RadzenButton Icon="delete" Size="ButtonSize.Small" Click="@(() => Rechazada(data))" /> *@
+                    }
+                    <RadzenButton Icon="add" Size="ButtonSize.Small" Click="@(() => Add(data))" />
+                </Template>
+            </RadzenDataGridColumn>
+        </Columns>
+    </RadzenDataGrid>
+}
+else if (PizarraData.reudiatablas.Count() == 0 && confirmacion == true)
+{
+    <div style="text-align: center; padding: 20px; font-size: 18px; color: gray;">
+        <p>No hay registros disponibles</p>
+    </div>
+}
 
     }
 </body>
@@ -292,6 +355,11 @@
     bool confirmacion;
     int tipo = 1;
     int libro = 0;
+    private int IdKsf = 0;
+    private int idrespo = 0;
+    private string Codigo { get; set; } = "Todo";
+    private string Status { get; set; } = "Todo"; //Status
+    
 
     private async Task CreateData()
 
@@ -356,6 +424,11 @@
                 PizarraData.reudiatablas.Select(x => x.RdfecReu.ToString("dd/MM/yyyy")).ToList();
                 confirmacion = true;
                 libro = 0;
+                IdKsf = 0; // Resetea el filtro de KSF
+                idrespo = 0; // Resetea el filtro Responsable
+                Codigo = "Todo"; // Resetea el filtro Código
+                Status = "Todo";
+                StateHasChanged(); // Refresca la interfaz para que aplique los cambios
             }
             foreach (var d in tabla)
                 {
@@ -370,6 +443,14 @@
 
         }
     }
+
+    @* private void ResetFiltros()
+{
+    IdKsf = 0;  // Resetea el filtro KSF
+    idrespo = 0; // Resetea el filtro Responsable
+    Codigo = "Todo"; // Resetea el filtro Código
+    StateHasChanged(); // Actualiza la UI
+} *@
 
     protected async Task Add(ReunionDTO e)
 {
