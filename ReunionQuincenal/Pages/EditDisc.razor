@@ -56,7 +56,7 @@
                          <BSInput InputType="InputType.Select" @bind-Value="DiscForm.Idksf">
 
                              <option value="">Seleccione...</option>
-                             @foreach (var d in KsfData.ksfs)
+                            @foreach (var d in KsfData.ksfs.Where(x => x.Idksf != 29 && x.Idksf != 6))
                             {
                                 <option value="@d.Idksf">@d.KsfNombre</option>
                             }
@@ -189,12 +189,27 @@
                                 <option value="3">3- Falta Repuesto</option>
                                 <option value="4">4- Falta de Personal</option>
                                 <option value="5">5- Eq. no Disponible</option>
-
-
                             </BSInput>
                         </BSCol>
                     }
+                     @if(DiscForm.RdcodDis == "3")
+                        {
+                            if (planificador == "Admin" || planificador == "Planificador" || planificador == "SuperAdmin")
+                            {
+                                <BSCol Column="2">
+                                    <BSLabel>Requisición</BSLabel>
+                                    <BSInput InputType="InputType.Number" @bind-Value="DiscForm.RdcodRequi" ValidateOnInput="true" />
+                                </BSCol>
 
+                            }  
+                            else{
+
+                                <BSCol Column="2">
+                                    <BSLabel>Requisición</BSLabel>
+                                    <BSInput InputType="InputType.Number" IsDisabled @bind-Value="DiscForm.RdcodRequi" ValidateOnInput="true" />
+                                </BSCol>
+                            }
+                        } 
 
                     <BSCol ColumnSmall="2">
                         <BSLabel>Status</BSLabel>
