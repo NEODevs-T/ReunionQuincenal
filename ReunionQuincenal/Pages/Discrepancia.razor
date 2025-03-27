@@ -164,10 +164,10 @@
             <BSInput InputType="InputType.Select" @bind-Value="Reuniondb.Idksf">
 
                 <option value="">Seleccione...</option>
-                @foreach (var d in KsfData.ksfs)
-                    { @if(d.KsfNombre != "Reunión Quincenal"){
-                        <option value="@d.Idksf">@d.KsfNombre</option>
-                    }
+                 @foreach (var d in KsfData.ksfs.Where(x => x.Idksf != 29 && x.Idksf != 6))
+                            {
+                                <option value="@d.Idksf">@d.KsfNombre</option>
+                            }
                 }
 
             </BSInput>
@@ -335,118 +335,112 @@
 
 
 
-    protected async Task Insert(EditContext d)
+protected async Task Insert(EditContext d)
+{
+    isDesactivado = true;
+    try
     {
-        isDesactivado = true;
-        //Reuniondb.Fecha = fecha;
-        try
+        Reuniondb.OrigenCal = "N/A";
+        Reuniondb.IdMaster = MaestraData.maestra.Where(x => x.IdLinea == idLin).FirstOrDefault().IdMaster;
+        Reuniondb.Rdarea = MaestraData.lineas.Where(x => x.IdLinea == idLin).FirstOrDefault().Linea;
+        Reuniondb.Rdstatus = "Pendiente";
+        Reuniondb.IdTipReu = reunionQuincenal;
+        Reuniondb.IdCausaCal = 1;
+        Reuniondb.RdfecCrea = DateTime.Now;
+        Reuniondb.IdPais = int.Parse(claims.FirstOrDefault(c => c.Type == "IdPais")?.Value);
+        Reuniondb.IdEmpresa = int.Parse(claims.FirstOrDefault(c => c.Type == "IdEmpresa")?.Value);
+        Reuniondb.Ksf = KsfData.ksfs.Where(k => k.Idksf == Reuniondb.Idksf).FirstOrDefault().KsfNombre;
+
+        //Guarda cod equipo si es por la lista
+        if (tipoequipo == "1")
         {
-            Reuniondb.OrigenCal = "N/A";
-            Reuniondb.IdMaster = MaestraData.maestra.Where(x => x.IdLinea == idLin).FirstOrDefault().IdMaster;
-            Reuniondb.Rdarea = MaestraData.lineas.Where(x => x.IdLinea == idLin).FirstOrDefault().Linea;
-            Reuniondb.Rdstatus = "Pendiente";
-            Reuniondb.IdTipReu = reunionQuincenal;
-            Reuniondb.IdCausaCal = 1;
-            Reuniondb.RdfecCrea = DateTime.Now;
-            Reuniondb.IdPais = int.Parse(claims.FirstOrDefault(c => c.Type == "IdPais")?.Value);
-            Reuniondb.IdEmpresa = int.Parse(claims.FirstOrDefault(c => c.Type == "IdEmpresa")?.Value);
+            Reuniondb.RdcodEq = selectedEquipoId;
+        }
 
-            //Guara cod equipo si es por la lista
-            if (tipoequipo == "1")
+        if (d.Validate())
+        {
+            // Asegurándonos de guardar solo la parte de la fecha, sin hora.
+            Reuniondb.RdfecReu = DateTime.Now.Date;  // Solo la fecha (sin hora)
+            Reuniondb.RdfecTra = fechatrabajo.Date;  // Solo la fecha (sin hora)
+
+            Reuniondb.Rdcentro = MaestraData.centro.Where(c => c.IdCentro == idCent).FirstOrDefault(c => c.IdCentro.Equals(idCent)).Centro;
+
+            //Asigno el id de la division al form
+            foreach (var e in MaestraData.divisions)
             {
-                Reuniondb.RdcodEq = selectedEquipoId;
-
+                if (idDiv == e.IdDivision)
+                {
+                    Reuniondb.Rddiv = e.Ndivision;
+                }
             }
 
-            if (d.Validate())
+            if (Reuniondb.Rdarea is null)
             {
-                Reuniondb.RdfecReu = (fechahoy = DateTime.Now);
-                Reuniondb.RdfecTra = fechatrabajo;
-                Reuniondb.Rdcentro = MaestraData.centro.Where(c => c.IdCentro == idCent).FirstOrDefault(c => c.IdCentro.Equals(idCent)).Centro;
-                //Asigno el id de la division al form
-                foreach (var e in MaestraData.divisions)
+                mensaje = "Seleccione el area.";
+                NotificationService.Notify(Notificar.Notificacion("advertencia", mensaje, ""));
+            }
+            else if (Reuniondb.Rddiv is null)
+            {
+                mensaje = "Seleccione la division.";
+                NotificationService.Notify(Notificar.Notificacion("advertencia", mensaje, ""));
+            }
+            else if (Reuniondb.Rddisc is null)
+            {
+                mensaje = "Llene la discrepancia";
+                NotificationService.Notify(Notificar.Notificacion("advertencia", mensaje, ""));
+            }
+            else if (Reuniondb.Rdstatus is null)
+            {
+                mensaje = "Seleccione status";
+                NotificationService.Notify(Notificar.Notificacion("advertencia", mensaje, ""));
+            }
+            else
+            {
+                CambStata = new CambStatDTO();
+                CambFech = new CambFecDTO();
+                regisReuDia = Reuniondb;
+
+                CambStata.Cbfecha = DateTime.Now;
+                CambStata.Cbstat = "Pendiente";
+                CambStata.Cbuser = claims[2].Value + " " + claims[3].Value;
+
+                CambFech.Cffec = DateTime.Now;
+                CambFech.CffecNew = DateTime.Now;
+                CambFech.Cfuser = claims[2].Value + " " + claims[3].Value;
+
+                AvisadorData.listaRegistro = new RegistroCambiosDTO(CambFech, CambStata, regisReuDia);
+
+                var result = await AvisadorData.InsertarRegistros(AvisadorData.listaRegistro);
+                if (result)
                 {
-                        if (idDiv == e.IdDivision)
-                        {
-                            Reuniondb.Rddiv = e.Ndivision;
-                        }
-                }
-
-                if (Reuniondb.Rdarea is null)
-                {
-
-                    mensaje = "Seleccione el area.";
-                    NotificationService.Notify(Notificar.Notificacion("advertencia", mensaje, ""));
-
-                }
-                else if (Reuniondb.Rddiv is null)
-                {
-                    mensaje = "Seleccione la division.";
-                    NotificationService.Notify(Notificar.Notificacion("advertencia", mensaje, ""));
-
-                }
-                else if (Reuniondb.Rddisc is null)
-                {
-                    mensaje = "Llene la discrepancia";
-                    NotificationService.Notify(Notificar.Notificacion("advertencia", mensaje, ""));
-
-                }
-
-                else if (Reuniondb.Rdstatus is null)
-                {
-                    mensaje = "Seleccione status";
-                    NotificationService.Notify(Notificar.Notificacion("advertencia", mensaje, ""));
-
+                    mensaje = "Registro Exitoso";
+                    Reuniondb = new ReunionDTO();
+                    CambStata = new CambStatDTO();
+                    CambFech = new CambFecDTO();
+                    idDiv = 0;
+                    equiposfiltro = null;
+                    selectedEquipoName = selectedEquipoId = null;
+                    fechatrabajo = DateTime.Today;
+                    NotificationService.Notify(Notificar.Notificacion("exito", mensaje, ""));
                 }
                 else
                 {
-                    CambStata = new CambStatDTO();
-                    CambFech = new CambFecDTO();
-                    regisReuDia = Reuniondb;
-
-                    CambStata.Cbfecha = DateTime.Now;
-                    CambStata.Cbstat = "Pendiente";
-                    CambStata.Cbuser = claims[2].Value + " " + claims[3].Value;
-
-
-                    CambFech.Cffec = DateTime.Now;
-                    CambFech.CffecNew = DateTime.Now;
-                    CambFech.Cfuser = claims[2].Value + " " + claims[3].Value;
-
-                    AvisadorData.listaRegistro = new RegistroCambiosDTO(CambFech, CambStata, regisReuDia);
-                    
-                    var result = await AvisadorData.InsertarRegistros(AvisadorData.listaRegistro);
-                    if (result)
-                    {
-                        mensaje = "Registro Exitoso";
-                        Reuniondb = new ReunionDTO();
-                        CambStata = new CambStatDTO();
-                        CambFech = new CambFecDTO();
-                        idDiv = 0;
-                        equiposfiltro = null;
-                        selectedEquipoName = selectedEquipoId = null;
-                        fechatrabajo = DateTime.Today;
-                        NotificationService.Notify(Notificar.Notificacion("exito", mensaje, ""));
-                    }
-                    else
-                    {
-                        NotificationService.Notify(Notificar.Notificacion("error", "Error al insertar, intente de nuevo.",""));
-                    }
+                    NotificationService.Notify(Notificar.Notificacion("error", "Error al insertar, intente de nuevo.", ""));
                 }
             }
         }
-        catch (Microsoft.EntityFrameworkCore.DbUpdateException ex)
-        {
-            NotificationService.Notify(Notificar.Notificacion("advertencia", "Error de conexión", "Error de conexión de datos.Intente de nuevo "));
-        }
-        catch (Exception ex)
-        {
-            NotificationService.Notify(Notificar.Notificacion("error", "Error inesperado.",  ex.Message));
-        }
-
-        isDesactivado = false;
+    }
+    catch (Microsoft.EntityFrameworkCore.DbUpdateException ex)
+    {
+        NotificationService.Notify(Notificar.Notificacion("advertencia", "Error de conexión", "Error de conexión de datos. Intente de nuevo "));
+    }
+    catch (Exception ex)
+    {
+        NotificationService.Notify(Notificar.Notificacion("error", "Error inesperado.", ex.Message));
     }
 
+    isDesactivado = false;
+}
 
     protected async Task Reset()
     {
