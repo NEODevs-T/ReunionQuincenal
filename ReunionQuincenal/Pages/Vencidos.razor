@@ -126,8 +126,6 @@ else if (PizarraData.reudiatablas.Count() > 0 && confirmacion == true)
                         <option value="Pendiente">Pendiente</option>
                         <option value="Pendiente-Responsable">Pendiente/Responsable</option>
                         <option value="Listo">Listo</option>
-                        <option value="Cerrado">Cerrado</option>
-                        <option value="Vencidos">Vencidos</option>
                     </BSInput>
                 </BSCol>
             </BSRow>
@@ -151,11 +149,11 @@ else if (PizarraData.reudiatablas.Count() > 0 && confirmacion == true)
                 </Template>
             </RadzenDataGridColumn>
 
-            <RadzenDataGridColumn Width="7%" TItem="ReunionDTO" Title="KSF" Filterable="true" Sortable="true">
+            @* <RadzenDataGridColumn Width="7%" TItem="ReunionDTO" Title="KSF" Filterable="true" Sortable="true">
                 <Template Context="data">
                     <RadzenText class="mb-0 tipografia">@data.Ksf</RadzenText>
                 </Template>
-            </RadzenDataGridColumn>
+            </RadzenDataGridColumn> *@
 
             <RadzenDataGridColumn Width="6%" TItem="ReunionDTO" Title="C. Equipo" Filterable="false" Sortable="false">
                 <Template Context="data">
@@ -169,11 +167,11 @@ else if (PizarraData.reudiatablas.Count() > 0 && confirmacion == true)
                 </Template>
             </RadzenDataGridColumn>
 
-            <RadzenDataGridColumn Width="5%" TItem="ReunionDTO" Title="Código" Filterable="false" Sortable="false">
+            @* <RadzenDataGridColumn Width="5%" TItem="ReunionDTO" Title="Código" Filterable="false" Sortable="false">
                 <Template Context="data">
                     <RadzenText class="mb-0 tipografia">@data.RdcodDis</RadzenText>
                 </Template>
-            </RadzenDataGridColumn>
+            </RadzenDataGridColumn> *@
 
             <RadzenDataGridColumn Width="15%" TItem="ReunionDTO" Title="Plan de Acción" Filterable="false" Sortable="false">
                 <Template Context="data">
@@ -181,11 +179,11 @@ else if (PizarraData.reudiatablas.Count() > 0 && confirmacion == true)
                 </Template>
             </RadzenDataGridColumn>
 
-            <RadzenDataGridColumn Width="5%" TItem="ReunionDTO" Title="Tiempo" Filterable="false" Sortable="false">
+            @* <RadzenDataGridColumn Width="5%" TItem="ReunionDTO" Title="Tiempo" Filterable="false" Sortable="false">
                 <Template Context="data">
                     <RadzenText class="mb-0 tipografia">@data.Rdtiempo</RadzenText>
                 </Template>
-            </RadzenDataGridColumn>
+            </RadzenDataGridColumn> *@
 
             <RadzenDataGridColumn Width="8%" TItem="ReunionDTO" Title="Responsable" Filterable="false" Sortable="false">
                 <Template Context="data">
@@ -193,11 +191,11 @@ else if (PizarraData.reudiatablas.Count() > 0 && confirmacion == true)
                 </Template>
             </RadzenDataGridColumn>
 
-            <RadzenDataGridColumn Width="6%" TItem="ReunionDTO" Title="Estado" Filterable="false" Sortable="false">
+            @* <RadzenDataGridColumn Width="6%" TItem="ReunionDTO" Title="Estado" Filterable="false" Sortable="false">
                 <Template Context="data">
                     <RadzenText class="mb-0 tipografia">@data.Rdstatus</RadzenText>
                 </Template>
-            </RadzenDataGridColumn>
+            </RadzenDataGridColumn> *@
 
             <RadzenDataGridColumn Width="6%" TItem="ReunionDTO" Title="Requisición" Filterable="false" Sortable="false">
                 <Template Context="data">
@@ -211,11 +209,11 @@ else if (PizarraData.reudiatablas.Count() > 0 && confirmacion == true)
                 </Template>
             </RadzenDataGridColumn>
 
-            <RadzenDataGridColumn Width="7%" TItem="ReunionDTO" Title="F. Reunión" Filterable="false" Sortable="false">
+            @* <RadzenDataGridColumn Width="7%" TItem="ReunionDTO" Title="F. Reunión" Filterable="false" Sortable="false">
                 <Template Context="data">
                     <RadzenText class="mb-0 tipografia">@data.RdfecReu.ToString("dd/MM/yyyy")</RadzenText>
                 </Template>
-            </RadzenDataGridColumn>
+            </RadzenDataGridColumn> *@
 
             <RadzenDataGridColumn Width="7%" TItem="ReunionDTO" Title="F. Trabajo" Filterable="false" Sortable="false">
                 <Template Context="data">
