@@ -63,7 +63,7 @@
                     <option value="0">Selecione que Buscar</option>
                     @if (MaestraData.centro != null)
                     {
-                        <option value="1">Pendientes Quincenal</option>
+                        <option value="1">Pendientes Diaria</option>
                         <option value="2">KSF Reunion Quincenal</option>
                         <option value="3">Falta Repuesto</option>
 
@@ -122,7 +122,7 @@
                     <RadzenDataGridColumn Width="5%" TItem="ReunionDTO" Title="Acciones" Filterable="false" Sortable="false"
                         TextAlign="TextAlign.Center">
                         <Template Context="data">
-                            @if (libro == 0)
+                            @if (libro == 1)
                             {
                                 <RadzenButton Icon="delete" Size="ButtonSize.Small" Click="@(() => Rechazada(data))" />
                             }
