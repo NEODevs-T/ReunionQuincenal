@@ -119,6 +119,12 @@
                             <RadzenText class="mb-0 tipografia">@data.RdfecReu.ToString("dd/MM/yyyy")</RadzenText>
                         </Template>
                     </RadzenDataGridColumn>
+                    <RadzenDataGridColumn Width="5%" TItem="ReunionDTO" Title="F. Trabajo" Filterable="false" Sortable="false"
+                        TextAlign="TextAlign.Center">
+                        <Template Context="data">
+                            <RadzenText class="mb-0 tipografia">@data.RdfecTra.ToString("dd/MM/yyyy")</RadzenText>
+                        </Template>
+                    </RadzenDataGridColumn>
                     <RadzenDataGridColumn Width="5%" TItem="ReunionDTO" Title="Acciones" Filterable="false" Sortable="false"
                         TextAlign="TextAlign.Center">
                         <Template Context="data">
