@@ -102,6 +102,7 @@ Mantenimiento,Calidad,Seguridad,Efluentes, PendientesChempro, MttoAdmin")]*@
                     <BSTD>Área</BSTD>
                     <BSTD>Ksf</BSTD>
                     <BSTD>Código de Equipo</BSTD>
+                    <BSTD>Nombre del Equipo</BSTD>
                     <BSTD ColSpan="4">Discrepancia</BSTD>
                     <BSTD>Código</BSTD>
                     <BSTD>Plan de Acción</BSTD>
@@ -135,6 +136,7 @@ Mantenimiento,Calidad,Seguridad,Efluentes, PendientesChempro, MttoAdmin")]*@
                                 <BSTD>@d.Rdarea</BSTD>
                                 <BSTD>@KsfData.ksfs.Where(x => x.Idksf == d.Idksf).FirstOrDefault().KsfNombre</BSTD>
                                 <BSTD>@d.RdcodEq</BSTD>
+                                <BSTD>@(string.IsNullOrWhiteSpace(d.EnombreEam) ? "Equipo Inexistente" : d.EnombreEam)</BSTD>
                                 <BSTD ColSpan="4">@d.Rddisc.ToUpper()</BSTD>
                                 <BSTD>@d.RdcodDis</BSTD>
                                 @if (@d.RdplanAcc is not null)

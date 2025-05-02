@@ -171,6 +171,12 @@
                 </Template>
             </RadzenDataGridColumn>
 
+            <RadzenDataGridColumn TItem="ReunionDTO" Title="Nombre del Equipo" Frozen="true" Property="RdcodEq" Width="80px">
+                <Template>
+                    @(string.IsNullOrWhiteSpace(context.EnombreEam) ? "EQUIPO NO ENCONTRADO" : context.EnombreEam)
+                </Template>
+            </RadzenDataGridColumn>
+
             <RadzenDataGridColumn TItem="ReunionDTO" Title="KSF" Property="Ksf" Width="80px">
                 <Template>
                     @context.Ksf

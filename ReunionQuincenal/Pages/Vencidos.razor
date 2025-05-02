@@ -155,10 +155,17 @@ else if (PizarraData.reudiatablas.Count() > 0 && confirmacion == true)
                 </Template>
             </RadzenDataGridColumn> *@
 
-            <RadzenDataGridColumn Width="6%" TItem="ReunionDTO" Title="C. Equipo" Filterable="false" Sortable="false">
+            <RadzenDataGridColumn Width="6%" TItem="ReunionDTO" Title="Codigo Equipo" Filterable="false" Sortable="false">
                 <Template Context="data">
                     <RadzenText class="mb-0 tipografia">@data.RdcodEq</RadzenText>
                 </Template>
+            </RadzenDataGridColumn>
+
+            <RadzenDataGridColumn Width="10%" TItem="ReunionDTO" Title="Nombre Equipo" Filterable="false" Sortable="false"
+                        TextAlign="TextAlign.Center">
+                        <Template Context="data">
+                            <RadzenText class="mb-0 tipografia">@(string.IsNullOrWhiteSpace(data.EnombreEam) ? "EQUIPO NO ENCONTRADO" : data.EnombreEam)</RadzenText>
+                        </Template>
             </RadzenDataGridColumn>
 
             <RadzenDataGridColumn Width="20%" TItem="ReunionDTO" Title="Discrepancia" Filterable="false" Sortable="false">

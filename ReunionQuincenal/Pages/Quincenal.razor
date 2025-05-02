@@ -101,6 +101,12 @@
                             <RadzenText class="mb-0 tipografia">@data.RdcodEq</RadzenText>
                         </Template>
                     </RadzenDataGridColumn>
+                    <RadzenDataGridColumn Width="5%" TItem="ReunionDTO" Title="C. Equipo" Filterable="false" Sortable="false"
+                        TextAlign="TextAlign.Center">
+                        <Template Context="data">
+                            <RadzenText class="mb-0 tipografia">@(string.IsNullOrWhiteSpace(data.EnombreEam) ? "EQUIPO NO ENCONTRADO" : data.EnombreEam)</RadzenText>
+                        </Template>
+                    </RadzenDataGridColumn>
                     <RadzenDataGridColumn Width="5%" TItem="ReunionDTO" Title="Discrepancia" Filterable="false" Sortable="false"
                         TextAlign="TextAlign.Center">
                         <Template Context="data">

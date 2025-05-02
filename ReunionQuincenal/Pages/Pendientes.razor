@@ -197,6 +197,7 @@ else
                     <BSTD>Área</BSTD>
                     <BSTD>Ksf</BSTD>
                     <BSTD>C. Equipo</BSTD>
+                    <BSTD>Nombre del Equipo</BSTD>
                     <BSTD Class="col-5">Discrepancia</BSTD>
                     <BSTD>Código</BSTD>
                     <BSTD Class="col-4">Plan de Acción</BSTD>
@@ -234,6 +235,7 @@ else
                                             <BSTD>@d.Rdarea</BSTD>
                                                 <BSTD>@KsfData.ksfs.Where(x => x.Idksf == d.Idksf).FirstOrDefault().KsfNombre</BSTD>
                                                 <BSTD>@d.RdcodEq</BSTD>
+                                                <BSTD>@(string.IsNullOrWhiteSpace(d.EnombreEam) ? "EQUIPO NO ENCONTRADO" : d.EnombreEam)</BSTD>
                                                 <BSTD>@d.Rddisc.ToUpperInvariant()</BSTD>
                                                 <BSTD>@d.RdcodDis</BSTD>
                                                 <BSTD Class="textotabla">@d.RdplanAcc</BSTD>
