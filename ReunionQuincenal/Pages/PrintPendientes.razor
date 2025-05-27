@@ -241,13 +241,13 @@
                 await APIReunionService.GetCentrosxEmpresa("All" + claims.FirstOrDefault(c => c.Type.Contains("IdEmpresa"))?.Value);
                 break;
 
-            case "SupIntendenteGeneral":
-                UsrAdmin = "SupIntendenteGeneral";
+            case "SemiAdmin":
+                UsrAdmin = "SemiAdmin";
                 await APIReunionService.GetCentrosxEmpresa(claims.FirstOrDefault(c => c.Type.Contains("IdCentro"))?.Value);
                 break;
 
             case "Planificador":
-            case "SupIntendente":
+            case "SuperUser":
                 await APIReunionService.GetCentrosxEmpresa(claims.FirstOrDefault(c => c.Type.Contains("IdCentro"))?.Value);
                 break;
 

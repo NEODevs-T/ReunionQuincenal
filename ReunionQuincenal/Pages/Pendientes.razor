@@ -590,13 +590,13 @@ else if (dataIsLoaded == 2 && PizarraData.reudiatablas.Count() == 0)
                 await MaestraData.GetCentrosxEmpresa("All" + claims.FirstOrDefault(c => c.Type.Contains("IdEmpresa"))?.Value);
                 break;
 
-            case "SupIntendenteGeneral":
-                UsrAdmin = "SupIntendenteGeneral";
+            case "SemiAdmin":
+                UsrAdmin = "SemiAdmin";
                 await MaestraData.GetCentrosxEmpresa(claims.FirstOrDefault(c => c.Type.Contains("IdCentro"))?.Value);
                 break;
 
             case "Planificador":
-            case "SupIntendente":
+            case "SuperUser":
                 await MaestraData.GetCentrosxEmpresa(claims.FirstOrDefault(c => c.Type.Contains("IdCentro"))?.Value);
                 break;
             case "Auditores":

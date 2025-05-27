@@ -13,9 +13,6 @@
 @inject NotificationService NotificationService
 
 
-@*@attribute [Authorize(Roles = "Admin,AdminChempro, SupIntendente,SupIntendenteGeneral,SuperAdmin, Planificador,
-Mantenimiento,Calidad,Seguridad,Efluentes, PendientesChempro, MttoAdmin")]*@
-
 <h3>Formato de Reunión</h3>
 
 
@@ -112,7 +109,7 @@ Mantenimiento,Calidad,Seguridad,Efluentes, PendientesChempro, MttoAdmin")]*@
                     <BSTD>Requisición</BSTD>
                     <BSTD>ODT</BSTD>
                     <BSTD>Fecha del Trabajo</BSTD>@*Fecha de listo el trabajo*@
-                    @if (Rol == "Admin" | Rol == "AdminChempro" | Rol == "SupIntendente" | Rol == "SupIntendenteGeneral")
+                    @if (Rol == "Admin" | Rol == "AdminChempro" | Rol == "SuperUser" | Rol == "SemiAdmin")
                     {
                         <BSTD></BSTD>
 
@@ -175,7 +172,7 @@ Mantenimiento,Calidad,Seguridad,Efluentes, PendientesChempro, MttoAdmin")]*@
                                 }
                                 <BSTD>@d.Rdodt</BSTD>
                                 <BSTD>@d.RdfecTra.ToString("dd/MM/yyyy") </BSTD>
-                                @if (Rol == "Admin" | Rol == "AdminChempro" | Rol == "SupIntendente" | Rol == "SupIntendenteGeneral")
+                                @if (Rol == "Admin" | Rol == "AdminChempro" | Rol == "SuperUser" | Rol == "SemiAdmin")
                                 {
                                     <BSTD>
                                         <button class="btn btn-success" @onclick="(() => Editar(d.IdReuDia))"><i

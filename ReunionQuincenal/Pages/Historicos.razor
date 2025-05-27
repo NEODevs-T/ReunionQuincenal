@@ -304,46 +304,6 @@ else if (dataIsLoaded == 2 && tabla.Count() == 0)
 
         var rol = claims.FirstOrDefault(c => c.Type.Contains("role"))?.Value;
 
-        // if (rol == "Admin" || rol== "SuperAdmin")
-        // {
-        // UsrAdmin = rol;
-        // await APIReunionService.GetCentrosxEmpresa("All" + claims[10].Value);
-
-        // }
-        // else if (rol== "SupIntendenteGeneral")
-        // {
-        // UsrAdmin = rol;
-        // await APIReunionService.GetCentrosxEmpresa(claims[11].Value);
-        // }
-        // else if ( rol == "SupIntendente" || rol== "Planificador")
-        // {
-        // await APIReunionService.GetCentrosxEmpresa(claims[11].Value);
-        // }
-        // else if (rol == "MttoAdmin")
-        // {
-        // UsrRol = "Mtto";
-        // await APIReunionService.GetCentrosxEmpresa("All" + claims[10].Value);
-        // }
-        // else if (rol == "SeguridadAdmin")
-        // {
-        // UsrRol = "SeguridadAdmin";
-        // await APIReunionService.GetCentrosxEmpresa("All" + claims[10].Value);
-        // }
-        // else
-        // {
-        // if (rol == "Mantenimiento")
-        // {
-        // UsrRol = "Mtto";
-        // }
-        // else
-        // {
-        // UsrRol = rol;
-        // }
-
-        // await APIReunionService.GetCentrosxEmpresa(claims[11].Value);
-
-        // }
-
         //TODO: Crear logica con funcion qur retorne esto.se usa en hoistoricos tambien
         switch (claims.FirstOrDefault(c => c.Type.Contains("role"))?.Value)
         {
@@ -353,13 +313,13 @@ else if (dataIsLoaded == 2 && tabla.Count() == 0)
                 await MaestraData.GetCentrosxEmpresa("All" + claims.FirstOrDefault(c => c.Type.Contains("IdEmpresa"))?.Value);
                 break;
 
-            case "SupIntendenteGeneral":
-                UsrAdmin = "SupIntendenteGeneral";
+            case "SemiAdmin":
+                UsrAdmin = "SemiAdmin";
                 await MaestraData.GetCentrosxEmpresa(claims.FirstOrDefault(c => c.Type.Contains("IdCentro"))?.Value);
                 break;
 
             case "Planificador":
-            case "SupIntendente":
+            case "SuperUser":
                 await MaestraData.GetCentrosxEmpresa(claims.FirstOrDefault(c => c.Type.Contains("IdCentro"))?.Value);
                 break;
 
