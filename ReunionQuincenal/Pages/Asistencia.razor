@@ -244,11 +244,11 @@ protected async Task Save()
 
     try
     {
-        if ((claims[4].Value == "Venezuela" && time > 8 && time < 10) || 
+        @* if ((claims[4].Value == "Venezuela" && time > 8 && time < 10) || 
             (claims[4].Value == "Colombia" && time > 8 && time < 11) || 
             (claims[4].Value == "Guatemala" && time > 9 && time < 13) || 
             (claims[4].Value == "Panamá" && time > 8 && time < 12))
-        {
+        { *@
             if (bloque > 0)
             {
                 for (int i = listaAsistencia.Count - 1; i >= 0; i--)
@@ -301,12 +301,12 @@ protected async Task Save()
 
                 dataIsLoaded = 0;
             }
-        }
+        @* }
         else
         {
             NotificationService.Notify(Notificar.Notificacion("advertencia", "Atención", "Solo se puede registrar en horario de reunión"));
             dataIsLoaded = 0;
-        }
+        } *@
     }
     catch (Exception ex)
     {
