@@ -12,4 +12,5 @@ interface ICargoReuData
 {
     List<CargoReuDTO> cargoreuss { get; set; }
     Task<List<CargoReuDTO>> GetAsistenciaQuincenal(string div, string empresa);
+    Task<List<CargoReuDTO>> GetCargosReunion();
 }

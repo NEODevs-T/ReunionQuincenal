@@ -2,12 +2,14 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Mvc;
 using ReunionWeb.ReunionDiaria.DTOs;
 
-
+using ReunionWeb.Data;
 using static System.Net.WebRequestMethods;
 using ReunionWeb.DTOs.Maestra;
 using ReunionWeb.Interface;
 
 namespace ReunionWeb.Data;
+
+
 
 public class AsistenciaReuData : IAsistenciaReuData
 {
@@ -30,6 +32,8 @@ public class AsistenciaReuData : IAsistenciaReuData
     private readonly IHttpClientFactory _clientFactory;
     public List<AsistenReuDTO> asistenreus { get; set; } = new List<AsistenReuDTO>();
     public List<StatsAsisDto> StatsAsisDtos { get; set; } = new List<StatsAsisDto>();
+    public List<AsistenReuPorcetanjeDTO> asistenreuspor { get; set; } = new List<AsistenReuPorcetanjeDTO>();
+
 
     public async Task<List<StatsAsisDto>> GetStatsAsist(string div, string empresa, string f1, string f2)
     {
@@ -64,12 +68,6 @@ public class AsistenciaReuData : IAsistenciaReuData
     {
         url = $"{BaseUrl}/GetPorcentajeAsistenciaQuincenal?fechaInicio={Uri.EscapeDataString(fechaInicio)}&fechaFin={Uri.EscapeDataString(fechaFin)}&empresa={Uri.EscapeDataString(empresa)}&area={Uri.EscapeDataString(area)}";
         cliente = _clientFactory.CreateClient();
-        return await cliente.GetFromJsonAsync<PorcentajeAsistenciaDiariaResponseDTO>(url);
+        return await cliente.GetFromJsonAsync<PorcentajeAsistenciaQuincenalResponseDTO>(url);
     }
-}
-
-public class PorcentajeAsistenciaQuincenalResponseDTO
-{
-    public double PorcentajeGlobal { get; set; }
-    public List<AsistenReuPorcetanjeDTO> DetallePorCargo { get; set; }
 }

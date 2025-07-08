@@ -27,6 +27,7 @@ public class CargoReuData : ICargoReuData
     private string url { get; set; } = "";
     private readonly IHttpClientFactory _clientFactory;
     public List<CargoReuDTO> cargoreuss { get; set; } = new List<CargoReuDTO>();
+    
 
 
     public async Task<List<CargoReuDTO>> GetAsistenciaQuincenal(string div, string empresa)
@@ -34,6 +35,11 @@ public class CargoReuData : ICargoReuData
         url = $"{BaseUrl}/GetAsistenciaQuincenal/{div}/{empresa}";
         cliente = _clientFactory.CreateClient();
         return cargoreuss = await cliente.GetFromJsonAsync<List<CargoReuDTO>>(url) ?? new List<CargoReuDTO>();
+    }
+
+    public async Task<List<CargoReuDTO>> GetCargosReunion()
+    {
+        return await _http.GetFromJsonAsync<List<CargoReuDTO>>("http://neo.paveca.com.ve/apineomaster/api/AsistenciaReu/GetCargoReuDiaria");
     }
 
 }

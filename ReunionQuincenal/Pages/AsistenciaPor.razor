@@ -1,0 +1,263 @@
+@page "/asisReuPor"
+
+@using Radzen
+@using System.Linq
+@inject IAsistenciaReuData AsistenciaReuData
+@inject ICargoReuData CargoReuData
+@inject NotificationService NotificationService
+@attribute [Authorize(Roles = "Admin, AdminChempro, SuperUser, SemiAdmin, SuperAdmin")]
+
+<h3>Porcentaje de Asistencia</h3>
+
+<RadzenTemplateForm Data="@this">
+    <RadzenRow>
+        <RadzenColumn Width="150px">
+            <RadzenLabel Text="Fecha Inicial" />
+            <RadzenDatePicker @bind-Value="fechaInicio" DateFormat="dd-MM-yyyy" Style="width: 100%;" Max="@DateTime.Today" />
+        </RadzenColumn>
+        <RadzenColumn Width="150px">
+            <RadzenLabel Text="Fecha Final" />
+            <RadzenDatePicker @bind-Value="fechaFin" DateFormat="dd-MM-yyyy" Style="width: 100%;" Max="@DateTime.Today" />
+        </RadzenColumn>
+        <RadzenColumn Width="200px">
+            <RadzenLabel Text="Empresa" />
+            <RadzenDropDown @bind-Value="empresa" Data="@empresas" TextProperty="Nombre" ValueProperty="Id" Style="width: 100%;" Placeholder="Seleccione una empresa"
+                            Change="@(args => OnEmpresaChanged(args))" />
+        </RadzenColumn>
+        <RadzenColumn Width="200px">
+            <RadzenLabel Text="Área" />
+            <RadzenDropDown @bind-Value="area" Data="@areas" TextProperty="Nombre" ValueProperty="Id" Style="width: 100%;" Placeholder="Seleccione un centro" Disabled="@((string.IsNullOrEmpty(empresa)) || !areas.Any())" />
+        </RadzenColumn>
+        <RadzenColumn Width="200px">
+            <RadzenCheckBox @bind-Value="diasExcepcionalesLaborables" TValue="bool" />
+            <RadzenLabel Text="¿Días excepcionales laborables?" Style="margin-left: 8px;" />
+        </RadzenColumn>
+        <RadzenColumn Width="150px">
+            <RadzenLabel Text="Agregar Evento Externo (Fecha)" />
+            <RadzenDatePicker @bind-Value="fechaEventoTemporal"
+                              DateFormat="dd-MM-yyyy"
+                              Min="@DateTime.Today"
+                              Change="@(args => AgregarEventoExterno())"
+                              DisabledDates="@eventosExternosFechas"
+                              Style="width: 100%;" />
+            <RadzenLabel Text="Fechas seleccionadas:" style="margin-top: 8px;" />
+            <ul>
+                @foreach (var fecha in eventosExternosFechas.OrderBy(f => f))
+                {
+                    <li>
+                        @fecha.ToString("dd-MM-yyyy")
+                        <RadzenButton Icon="close" ButtonStyle="ButtonStyle.Danger" Size="ButtonSize.Small"
+                                      Click="@(args => EliminarEventoExterno(fecha))" style="margin-left:5px;" />
+                    </li>
+                }
+            </ul>
+        </RadzenColumn>
+        <RadzenColumn Width="150px" Style="display: flex; align-items: end;">
+            <RadzenButton Text="Consultar"
+                          Click="@(async () => await Consultar())"
+                          Style="width: 100%; background-color: #28a745; color: white;"
+                          Icon="search"
+                          Disabled="@(fechaInicio > fechaFin || fechaInicio == default || fechaFin == default || string.IsNullOrEmpty(empresa) || string.IsNullOrEmpty(area))" />
+        </RadzenColumn>
+    </RadzenRow>
+</RadzenTemplateForm>
+
+@if (dataIsLoaded == 1)
+{
+    <div style="text-align:center; margin-top:20px;">
+        <RadzenProgressBar Mode="@ProgressBarMode.Indeterminate" Style="width:300px;" />
+        <p>Cargando datos, por favor espere...</p>
+    </div>
+}
+
+@if (dataIsLoaded == 2 && registros != null)
+{
+    @if (registros.Any())
+    {
+        <RadzenLabel Text="Filtrar por cargo:" Style="margin-right:10px;" />
+        <RadzenTextBox @bind-Value="filtroCargo"
+                       Placeholder="Buscar cargo..."
+                       Style="margin:15px 0 10px 0; width:250px;"
+                       Change="@(args => FiltrarCargo())" />
+
+        <div style="margin-bottom:10px;">
+            <b>Porcentaje Global:</b>
+            <span style="color:@GetColor(porcentajeGlobal)">
+                @porcentajeGlobal.ToString("0.00")%
+            </span>
+        </div>
+
+        @if (registrosFiltrados != null && !registrosFiltrados.Any() && !string.IsNullOrEmpty(filtroCargo))
+        {
+            <div style="color:red; margin-bottom:10px;">No existe ese cargo.</div>
+        }
+
+        <RadzenDataGrid Data="@registrosFiltrados"
+                        TItem="AsistenReuPorcetanjeDTO"
+                        ShowPagingSummary="true"
+                        PageSize="10"
+                        Responsive="true"
+                        AllowFiltering="false"
+                        AllowSorting="true"
+                        EmptyText="">
+            <Columns>
+                <RadzenDataGridColumn TItem="AsistenReuPorcetanjeDTO" Property="Nombre" Title="Cargo" Frozen="true" />
+                <RadzenDataGridColumn TItem="AsistenReuPorcetanjeDTO" Property="ReunionesProgramadas" Title="Reuniones Programadas" />
+                <RadzenDataGridColumn TItem="AsistenReuPorcetanjeDTO" Property="ReunionesAsistidas" Title="Reuniones Asistidas">
+                    <FooterTemplate>
+                        <b>Total: @registrosFiltrados.Sum(x => x.ReunionesAsistidas)</b>
+                    </FooterTemplate>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="AsistenReuPorcetanjeDTO" Property="PorcentajeAsistencia" Title="Porcentaje Asistencia">
+                    <Template Context="data">
+                        <span title="Porcentaje de asistencia"
+                              style="color:@GetColor(data.PorcentajeAsistencia); font-weight:bold;">
+                            @data.PorcentajeAsistencia.ToString("0.00")%
+                            @if (data.PorcentajeAsistencia >= 90)
+                            {
+                                <RadzenIcon Icon="check_circle" Style="color:green;vertical-align:middle;" />
+                            }
+                            else if (data.PorcentajeAsistencia < 60)
+                            {
+                                <RadzenIcon Icon="error" Style="color:red;vertical-align:middle;" />
+                            }
+                        </span>
+                    </Template>
+                </RadzenDataGridColumn>
+            </Columns>
+        </RadzenDataGrid>
+    }
+    else
+    {
+        <div style="margin-top:20px;">No hay registros para los filtros seleccionados.</div>
+    }
+}
+
+@code {
+    private DateTime fechaInicio = DateTime.Now;
+    private DateTime fechaFin = DateTime.Now;
+    public string area { get; set; } = "";
+    public string empresa { get; set; } = "";
+    private bool diasExcepcionalesLaborables = false;
+    private string eventosExternosInput = "";
+    private DateTime? fechaEventoTemporal;
+    private List<DateTime> eventosExternosFechas = new(); 
+    private string filtroCargo = "";
+    private List<AsistenReuPorcetanjeDTO> registrosFiltrados = new();
+    private List<Empresa> empresas = new();
+    private List<Area> areas = new();
+    private List<CargoReuDTO> cargosReunion = new();
+    private List<AsistenReuPorcetanjeDTO> registros;
+    private double porcentajeGlobal = 0;
+    private int dataIsLoaded = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        cargosReunion = await CargoReuData.GetCargosReunion();
+
+        empresas = cargosReunion
+            .Select(c => c.Crempresa)
+            .Distinct()
+            .Select(e => new Empresa { Id = e, Nombre = e })
+            .ToList();
+
+        areas = new List<Area>();
+    }
+
+    private void OnEmpresaChanged(object value)
+    {
+        empresa = value?.ToString() ?? "";
+        area = "";
+
+        if (string.IsNullOrEmpty(empresa))
+        {
+            areas = new List<Area>();
+        }
+        else
+        {
+            areas = cargosReunion
+                .Where(c => c.Crempresa == empresa)
+                .Select(c => c.Crarea)
+                .Distinct()
+                .Select(a => new Area { Id = a, Nombre = a })
+                .ToList();
+        }
+
+        StateHasChanged();
+    }
+
+    private void AgregarEventoExterno()
+    {
+        if (fechaEventoTemporal.HasValue)
+        {
+            eventosExternosFechas.Add(fechaEventoTemporal.Value);
+            fechaEventoTemporal = null;
+        }
+    }
+
+    private void EliminarEventoExterno(DateTime fecha)
+    {
+        eventosExternosFechas.Remove(fecha);
+    }
+
+    private async Task Consultar()
+    {
+        dataIsLoaded = 1;
+        StateHasChanged();
+
+        try
+        {
+            List<string> eventosExternos = eventosExternosFechas
+                .Select(f => f.ToString("dd-MM-yyyy"))
+                .ToList();
+
+            var response = await AsistenciaReuData.GetPorcentajeAsistenciaResponse(
+                fechaInicio.ToString("dd-MM-yyyy"),
+                fechaFin.ToString("dd-MM-yyyy"),
+                empresa,
+                area,
+                diasExcepcionalesLaborables
+            );
+
+            registros = response?.DetallePorCargo ?? new List<AsistenReuPorcetanjeDTO>();
+            porcentajeGlobal = response?.PorcentajeGlobal ?? 0;
+            FiltrarCargo();
+        }
+        catch (Exception ex)
+        {
+            NotificationService.Notify(NotificationSeverity.Error, "Error", "No se pudo obtener los datos: " + ex.Message);
+            registros = new List<AsistenReuPorcetanjeDTO>();
+            registrosFiltrados = new List<AsistenReuPorcetanjeDTO>();
+            porcentajeGlobal = 0;
+        }
+
+        dataIsLoaded = 2;
+        StateHasChanged();
+    }
+
+    private void FiltrarCargo()
+    {
+        if (string.IsNullOrEmpty(filtroCargo))
+        {
+            registrosFiltrados = registros?.ToList() ?? new List<AsistenReuPorcetanjeDTO>();
+        }
+        else
+        {
+            registrosFiltrados = registros?.Where(x => x.Nombre.Contains(filtroCargo, StringComparison.OrdinalIgnoreCase)).ToList()
+                                ?? new List<AsistenReuPorcetanjeDTO>();
+        }
+    }
+
+    private string GetColor(double porcentaje)
+    {
+        if (porcentaje >= 90)
+            return "green";
+        else if (porcentaje >= 60)
+            return "orange";
+        else
+            return "red";
+    }
+
+    public class Empresa { public string Id { get; set; } public string Nombre { get; set; } }
+    public class Area { public string Id { get; set; } public string Nombre { get; set; } }
+}
