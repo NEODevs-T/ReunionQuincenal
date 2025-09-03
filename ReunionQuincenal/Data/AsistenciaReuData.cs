@@ -63,11 +63,14 @@ public class AsistenciaReuData : IAsistenciaReuData
     }
 
     public async Task<PorcentajeAsistenciaQuincenalResponseDTO> GetPorcentajeAsistenciaResponse(
-    string fechaInicio, string fechaFin, string empresa, string area,
-    bool diasExcepcionalesLaborables = false)
+    string fechaMesAño, string empresa, string area)
     {
-        url = $"{BaseUrl}/GetPorcentajeAsistenciaQuincenal?fechaInicio={Uri.EscapeDataString(fechaInicio)}&fechaFin={Uri.EscapeDataString(fechaFin)}&empresa={Uri.EscapeDataString(empresa)}&area={Uri.EscapeDataString(area)}";
-        cliente = _clientFactory.CreateClient();
+        var url = $"{BaseUrl}/GetPorcentajeAsistenciaQuincenal?" +
+                $"fechaMesAño={Uri.EscapeDataString(fechaMesAño)}&" +
+                $"empresa={Uri.EscapeDataString(empresa)}&" +
+                $"area={Uri.EscapeDataString(area)}";
+        var cliente = _clientFactory.CreateClient();
         return await cliente.GetFromJsonAsync<PorcentajeAsistenciaQuincenalResponseDTO>(url);
     }
+
 }

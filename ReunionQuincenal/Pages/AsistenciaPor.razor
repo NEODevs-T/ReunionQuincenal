@@ -3,6 +3,7 @@
 @using Radzen
 @using System.Linq
 @inject IAsistenciaReuData AsistenciaReuData
+@inject AuthenticationStateProvider AuthStateProvider
 @inject ICargoReuData CargoReuData
 @inject NotificationService NotificationService
 @attribute [Authorize(Roles = "Admin, AdminChempro, SuperUser, SemiAdmin, SuperAdmin")]
@@ -12,12 +13,8 @@
 <RadzenTemplateForm Data="@this">
     <RadzenRow>
         <RadzenColumn Width="200px">
-            <RadzenLabel Text="Fecha Inicial" />
-            <RadzenDatePicker @bind-Value="fechaInicio" DateFormat="dd-MM-yyyy" Style="width: 100%;" Max="@DateTime.Today" />
-        </RadzenColumn>
-        <RadzenColumn Width="200px">
-            <RadzenLabel Text="Fecha Final" />
-            <RadzenDatePicker @bind-Value="fechaFin" DateFormat="dd-MM-yyyy" Style="width: 100%;" Max="@DateTime.Today" />
+            <RadzenLabel Text="Fecha" />
+            <RadzenDatePicker @bind-Value="fechaMesAño" DateFormat="MM-yyyy" Style="width: 100%;" Max="@DateTime.Today" />
         </RadzenColumn>
         <RadzenColumn Width="250px">
             <RadzenLabel Text="Empresa" />
@@ -30,10 +27,10 @@
         </RadzenColumn>
         <RadzenColumn Width="150px" Style="display: flex; align-items: flex-start; padding-top: 30px;">
             <RadzenButton Text="Consultar"
-                  Click="@(async () => await Consultar())"
-                  Style="width: 100%; background-color: #28a745; color: white;"
-                  Icon="search"
-                  Disabled="@(fechaInicio > fechaFin || fechaInicio == default || fechaFin == default || string.IsNullOrEmpty(empresa) || string.IsNullOrEmpty(area))" />
+                    Click="@(async () => await Consultar())"
+                    Style="width: 100%; background-color: #28a745; color: #ffffff;"
+                    Icon="search"
+                    Disabled="@(fechaMesAño == default || string.IsNullOrEmpty(empresa) || string.IsNullOrEmpty(area))" />
             </RadzenColumn>
         </RadzenRow>
     </RadzenTemplateForm>
@@ -47,9 +44,14 @@
 {
     <RadzenLabel Text="Filtrar por cargo:" Style="margin-right:10px;" />
     <RadzenTextBox @bind-Value="filtroCargo"
-                   Placeholder="Buscar cargo..."
-                   Style="margin:15px 0 10px 0; width:250px;"
-                   Change="@(args => FiltrarCargo())" />
+                    Placeholder="Buscar cargo..."
+                    Style="margin:15px 0 10px 0; width:250px;"
+                    Change="@(args => FiltrarCargo())" />
+    <RadzenButton Text="Buscar Cargo"
+                    Icon="search"
+                    ButtonStyle="ButtonStyle.Secondary"
+                    Style="margin-bottom: 10px;"
+                    Click="FiltrarCargo" />
 }
 @if (registros != null && registros.Any())
 {
@@ -87,7 +89,7 @@
             <RadzenDataGridColumn TItem="AsistenReuPorcetanjeDTO" Property="PorcentajeAsistencia" Title="Porcentaje Asistencia">
                 <Template Context="data">
                     <span title="Porcentaje de asistencia"
-                          style="color:@GetColor(data.PorcentajeAsistencia); font-weight:bold;">
+                        style="color:@GetColor(data.PorcentajeAsistencia); font-weight:bold;">
                         @data.PorcentajeAsistencia.ToString("0.00")%
                         @if (data.PorcentajeAsistencia >= 90)
                         {
@@ -110,31 +112,39 @@
 }    
 
 @code {
-    private DateTime fechaInicio = DateTime.Now;
-    private DateTime fechaFin = DateTime.Now;
+    private DateTime fechaMesAño = DateTime.Now;
     public string area { get; set; } = "";
     public string empresa { get; set; } = "";
-   // private bool diasExcepcionalesLaborables = false;
-   // private DateTime? fechaEventoTemporal;
-//private List<DateTime> eventosExternosFechas = new();
     private string filtroCargo = "";
     private List<AsistenReuPorcetanjeDTO> registrosFiltrados = new();
     private List<AsistenReuPorcetanjeDTO> registros;
     private double porcentajeGlobal = 0;
     private List<Empresa> empresas = new();
     private List<Area> areas = new();
-    private List<CargoReuDTO> cargosReunion = new();
+    private List<CarReuDTO> cargosReunion = new();
     private int dataIsLoaded = 0;
+    private List<Claim> claims;
+
     protected override async Task OnInitializedAsync()
     {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        claims = user.Claims.ToList();
+
+        string? idEmpresaUsuario = claims.FirstOrDefault(c => c.Type.Contains("Empresa"))?.Value;
+
         cargosReunion = await CargoReuData.GetCargosReunion();
+
         empresas = cargosReunion
-            .Select(c => c.Crempresa)
+            .Where(c => c.Empresa.Contains(idEmpresaUsuario))
+            .Select(c => c.Empresa)
             .Distinct()
             .Select(e => new Empresa { Id = e, Nombre = e })
             .ToList();
+
         areas = new List<Area>();
     }
+
     private void OnEmpresaChanged(object value)
     {
         empresa = value?.ToString() ?? "";
@@ -146,50 +156,15 @@
         else
         {
             areas = cargosReunion
-                .Where(c => c.Crempresa == empresa)
-                .Select(c => c.Crarea)
+                .Where(c => c.Empresa == empresa)
+                .Select(c => c.Centro)
                 .Distinct()
                 .Select(a => new Area { Id = a, Nombre = a })
                 .ToList();
         }
         StateHasChanged();
     }
-/*async Task AbrirDialogoDiasNoLaborables(bool value)
-{
-    diasExcepcionalesLaborables = value;
 
-    if (value)
-    {
-        var result = await DialogService.OpenAsync<DiasNoLaborablesDialog>(
-            "Días No Laborables",
-            new Dictionary<string, object>
-            {
-                { "FechasIniciales", eventosExternosFechas }
-            },
-            new DialogOptions
-            {
-                Width = "500px",
-                Height = "auto",
-                CloseDialogOnOverlayClick = false
-            });
-
-        if (result is List<DateTime> fechas)
-        {
-            eventosExternosFechas = fechas;
-        }
-    }
-}
-    void AgregarEventoExterno()
-    {
-        if (fechaEventoTemporal.HasValue && !eventosExternosFechas.Contains(fechaEventoTemporal.Value.Date))
-        {
-            eventosExternosFechas.Add(fechaEventoTemporal.Value.Date);
-        }
-    }
-    void EliminarEventoExterno(DateTime fecha)
-    {
-        eventosExternosFechas.Remove(fecha);
-    }*/
     private async Task Consultar()
     {
         dataIsLoaded = 1;
@@ -197,8 +172,7 @@
         try
         {
             var response = await AsistenciaReuData.GetPorcentajeAsistenciaResponse(
-                fechaInicio.ToString("dd-MM-yyyy"),
-                fechaFin.ToString("dd-MM-yyyy"),
+                fechaMesAño.ToString("MM-yyyy"),
                 empresa,
                 area
         );
@@ -232,13 +206,10 @@ private void FiltrarCargo()
 
 void LimpiarFiltros()
 {
-    fechaInicio = DateTime.Today;
-    fechaFin = DateTime.Today;
+    fechaMesAño = DateTime.Today;
     empresa = string.Empty;
     area = string.Empty;
     filtroCargo = string.Empty;
-   // diasExcepcionalesLaborables = false;
-   // eventosExternosFechas.Clear();
     registros = null;
     registrosFiltrados = null;
 }
