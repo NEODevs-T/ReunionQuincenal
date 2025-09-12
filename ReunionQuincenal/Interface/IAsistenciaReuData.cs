@@ -18,5 +18,5 @@ interface IAsistenciaReuData
     Task<List<StatsAsisDto>> GetStatsAsist(string div, string empresa, string f1, string f2);
     Task<List<AsistenReuDTO>> GetListaAsist(string div, string empresa, string f1, string f2);
     Task<PorcentajeAsistenciaQuincenalResponseDTO> GetPorcentajeAsistenciaResponse(
-    string fechaMesAño, string empresa, string area);
+    string mesAñoInicio, string mesAñoFin, string empresa, string area);
 }

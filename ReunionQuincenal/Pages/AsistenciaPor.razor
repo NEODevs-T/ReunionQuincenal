@@ -12,9 +12,13 @@
 
 <RadzenTemplateForm Data="@this">
     <RadzenRow>
+             <RadzenColumn Width="200px">
+            <RadzenLabel Text="Fecha Inicial" />
+            <RadzenDatePicker @bind-Value="mesAñoInicio" DateFormat="MM-yyyy" Style="width: 100%;" Max="@DateTime.Today" />
+        </RadzenColumn>
         <RadzenColumn Width="200px">
-            <RadzenLabel Text="Fecha" />
-            <RadzenDatePicker @bind-Value="fechaMesAño" DateFormat="MM-yyyy" Style="width: 100%;" Max="@DateTime.Today" />
+            <RadzenLabel Text="Fecha Final" />
+            <RadzenDatePicker @bind-Value="mesAñoFin" DateFormat="MM-yyyy" Style="width: 100%;" Max="@DateTime.Today" />
         </RadzenColumn>
         <RadzenColumn Width="250px">
             <RadzenLabel Text="Empresa" />
@@ -30,7 +34,7 @@
                     Click="@(async () => await Consultar())"
                     Style="width: 100%; background-color: #28a745; color: #ffffff;"
                     Icon="search"
-                    Disabled="@(fechaMesAño == default || string.IsNullOrEmpty(empresa) || string.IsNullOrEmpty(area))" />
+                    Disabled="@(mesAñoInicio > mesAñoFin || mesAñoInicio == default || mesAñoFin == default || string.IsNullOrEmpty(empresa) || string.IsNullOrEmpty(area))" />
             </RadzenColumn>
         </RadzenRow>
     </RadzenTemplateForm>
@@ -112,7 +116,8 @@
 }    
 
 @code {
-    private DateTime fechaMesAño = DateTime.Now;
+    private DateTime mesAñoInicio = DateTime.Now;
+    private DateTime mesAñoFin = DateTime.Now;
     public string area { get; set; } = "";
     public string empresa { get; set; } = "";
     private string filtroCargo = "";
@@ -172,7 +177,8 @@
         try
         {
             var response = await AsistenciaReuData.GetPorcentajeAsistenciaResponse(
-                fechaMesAño.ToString("MM-yyyy"),
+                mesAñoInicio.ToString("MM-yyyy"),
+                mesAñoFin.ToString("MM-yyyy"),
                 empresa,
                 area
         );
@@ -206,7 +212,8 @@ private void FiltrarCargo()
 
 void LimpiarFiltros()
 {
-    fechaMesAño = DateTime.Today;
+    mesAñoInicio = DateTime.Today;
+    mesAñoFin = DateTime.Today;
     empresa = string.Empty;
     area = string.Empty;
     filtroCargo = string.Empty;
