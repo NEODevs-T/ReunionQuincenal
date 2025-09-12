@@ -110,7 +110,7 @@
                     <BSTD>Requisición</BSTD>
                     <BSTD>ODT</BSTD>
                     <BSTD>Fecha del Trabajo</BSTD>@*Fecha de listo el trabajo*@
-                    @if (Rol == "Admin" | Rol == "AdminChempro" | Rol == "SuperUser" | Rol == "SemiAdmin")
+                    @if (Rol == "Admin" | Rol == "AdminChempro" | Rol == "SuperUser" | Rol == "PrimeUser" | Rol == "SemiAdmin")
                     {
                         <BSTD></BSTD>
 
@@ -173,7 +173,7 @@
                                 }
                                 <BSTD>@d.Rdodt</BSTD>
                                 <BSTD>@d.RdfecTra.ToString("dd/MM/yyyy") </BSTD>
-                                @if (Rol == "Admin" | Rol == "AdminChempro" | Rol == "SuperUser" | Rol == "SemiAdmin")
+                                @if (Rol == "Admin" | Rol == "AdminChempro" | Rol == "SuperUser" | Rol == "PrimeUser" | Rol == "SemiAdmin")
                                 {
                                     <BSTD>
                                         <button class="btn btn-success" @onclick="(() => Editar(d.IdReuDia))"><i
@@ -260,7 +260,7 @@ else if (dataIsLoaded == 2 && PizarraData.reudiatablas.Count() == 0)
         Rol = claims.FirstOrDefault(c => c.Type.Contains("role"))?.Value;
 
 
-        if (Rol == "Admin" || Rol == "SuperAdmin" || Rol == "MttoAdmin" || Rol == "SeguridadAdmin" || Rol == "CalidadAdmin" ||
+        if (Rol == "Admin" || Rol == "SuperAdmin" || Rol == "PrimeUser" || Rol == "MttoAdmin" || Rol == "SeguridadAdmin" || Rol == "CalidadAdmin" ||
         Rol == "Auditores")
         {
             // await apiclass.GetCentros("All");

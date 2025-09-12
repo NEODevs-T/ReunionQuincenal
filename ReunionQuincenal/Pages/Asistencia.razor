@@ -10,7 +10,7 @@
 @inject AuthenticationStateProvider AuthStateProvider
 @inject ILocalStorageService LocalStorage
 @inject NotificationService NotificationService
-@attribute [Authorize(Roles = "Admin, AdminChempro, SuperUser, SemiAdmin, SuperAdmin")]
+@attribute [Authorize(Roles = "Admin, AdminChempro, SuperUser, PrimeUser, SemiAdmin, SuperAdmin")]
 
 <h3>Asistencia</h3>
 <p></p>
@@ -185,7 +185,7 @@ else if (dataIsLoaded == 1 && RespoReuData.resporeus.Count() == 0)
 
         await CreateData();
         UsrRol = claims.FirstOrDefault(c => c.Type.Contains("role"))?.Value;
-        if (UsrRol == "Admin" | UsrRol == "SuperAdmin")
+        if (UsrRol == "Admin" | UsrRol == "SuperAdmin" | UsrRol == "PrimeUser")
         {
 
             await MaestraData.GetCentrosxEmpresa("All" + claims.FirstOrDefault(c => c.Type.Contains("IdEmpresa"))?.Value);

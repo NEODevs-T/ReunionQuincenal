@@ -10,7 +10,7 @@
 <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
     <nav class="flex-column">
 
-        <AuthorizeView Roles="Admin,AdminChempro, SuperUser, SemiAdmin">
+        <AuthorizeView Roles="Admin,AdminChempro, SuperUser, PrimeUser, SemiAdmin">
 
             <Authorized>
                 <div class="nav-item px-3">
@@ -103,7 +103,7 @@
             </NotAuthorized>
 
         </AuthorizeView>
-        <AuthorizeView Roles="Admin,AdminChempro, SuperUser,SemiAdmin,MttoAdmin">
+        <AuthorizeView Roles="Admin,AdminChempro, SuperUser,PrimeUser,SemiAdmin,MttoAdmin">
             <Authorized>
 
                 @* <div class="nav-item px-3">
