@@ -122,7 +122,7 @@ else if (dataIsLoaded == 2 && PizarraData.calentrabajo.Count() == 0)
 
         var rol = claims.FirstOrDefault(c => c.Type.Contains("role"))?.Value;
 
-        if (rol == "Admin" || rol == "SuperAdmin" || rol == "MttoAdmin" || rol == "SeguridadAdmin" || rol == "Auditores" || rol
+        if (rol == "Admin" || rol == "SuperAdmin" || rol == "PrimeUser" || rol == "MttoAdmin" || rol == "SeguridadAdmin" || rol == "Auditores" || rol
         == "CalidadAdmin")
         {
 

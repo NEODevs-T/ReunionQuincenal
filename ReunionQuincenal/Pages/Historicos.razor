@@ -310,6 +310,7 @@ else if (dataIsLoaded == 2 && tabla.Count() == 0)
         {
             case "Admin":
             case "SuperAdmin":
+            case "PrimeUser":
                 UsrAdmin = "SuperAdmin";
                 await MaestraData.GetCentrosxEmpresa("All" + claims.FirstOrDefault(c => c.Type.Contains("IdEmpresa"))?.Value);
                 break;
