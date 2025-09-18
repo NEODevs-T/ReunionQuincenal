@@ -1,31 +1,59 @@
 ﻿@inject NavigationManager NavigationManager
 @inject ILocalStorageService LocalStorage
 @inject AuthenticationStateProvider AuthStateProvider
+@inject ILocalStorageService LocalStorage
+
+@using System.Globalization
+@using ReunionWeb.Resources
 
 <AuthorizeView>
     <Authorized>
-        <strong>¡Hola @context.User.Identity?.Name!</strong>
-        <BSButton Color="BSColor.Danger" Size="Size.ExtraSmall" OnClick="Logout"> Cerrar Sesión <span
-                class="oi oi-out"></span></BSButton>
+       <strong>¡@ValidationMessages.Hola @context.User.Identity?.Name!</strong> 
+         <BSButton   Color="BSColor.Danger"  Size="Size.ExtraSmall" OnClick="Logout">  @ValidationMessages.CerrarSesion <span class="oi oi-out"></span></BSButton>
     </Authorized>
     <NotAuthorized>
-        <BSButton Color="BSColor.Success" Size="Size.ExtraSmall" OnClick="Login"> Iniciar Sesión <span
-                class="oi oi-in"></span></BSButton>
+                 <BSButton   Color="BSColor.Success"  Size="Size.ExtraSmall" OnClick="Login">  @ValidationMessages.IniciarSesion <span class="oi oi-in"></span></BSButton>
 
     </NotAuthorized>
 </AuthorizeView>
 
 
 @code {
+                [CascadingParameter]
+    private Task<AuthenticationState>? authenticationState { get; set; }
+    private int idPais { get; set; }
+    private List<Claim> claims { get; set; }
+
+    private async Task CreateData()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        claims = user.Claims.ToList();
+
+        var idPaisClaim = claims.FirstOrDefault(c => c.Type == "IdPais")?.Value;
+        if (int.TryParse(idPaisClaim, out int paisTemp))
+        {
+            idPais = paisTemp;
+            var culture = new System.Globalization.CultureInfo(paisTemp == 5 ? "en" : "es");
+            System.Globalization.CultureInfo.DefaultThreadCurrentCulture = culture;
+            System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = culture;
+            await LocalStorage.SetItemAsync("userCulture", culture.Name);
+        }
+    }
+
     void Login()
     {
         NavigationManager.NavigateTo("login");
     }
     async Task Logout()
     {
-
         await LocalStorage.RemoveItemAsync("OdtValue");
         await LocalStorage.RemoveItemAsync("ReunionQuincenalToken");
         await AuthStateProvider.GetAuthenticationStateAsync();
+        var cultureName = await LocalStorage.GetItemAsync<string>("userCulture");
+        string redirectUrl = cultureName == "en" 
+            ? $"{NavigationManager.BaseUri}en/home" 
+            : $"{NavigationManager.BaseUri}es/inicio";
+        NavigationManager.NavigateTo(redirectUrl, forceLoad: true);
     }
 }

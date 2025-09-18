@@ -1,6 +1,10 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager Nav
+
+<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
-        <small class="text-muted"> Powered By </small><img src="./images/LogoNeo.png" alt="PAVECA" width="60px" />
+        <small class="text-muted"> Powered By </small>
+        <img src="./images/LogoNeo.png" alt="PAVECA" width="60px" />
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -10,126 +14,150 @@
 <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
     <nav class="flex-column">
 
-        <AuthorizeView Roles="Admin,AdminChempro, SuperUser, PrimeUser, SemiAdmin">
-
+        <AuthorizeView Roles="Admin,AdminChempro,SuperUser, PrimeUser,SemiAdmin">
             <Authorized>
                 <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                    <NavLink class="nav-link" href="@($"{Nav.BaseUri}{homeHref}")" Match="NavLinkMatch.All">
                         <span class="oi oi-home" aria-hidden="true"></span> <strong>Home</strong>
                     </NavLink>
                 </div>
                 <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="discrepancia">
-                        <span class="oi oi-warning" aria-hidden="true"></span> <strong>Discrepancias</strong>
+                    <NavLink class="nav-link" href="@($"{Nav.BaseUri}{discrepanciaHref}")">
+                        <span class="oi oi-warning" aria-hidden="true"></span> <strong>@labelDiscrepancias</strong>
                     </NavLink>
                 </div>
                 <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="Turno">
-                        <span class="oi oi-briefcase" aria-hidden="true"></span> <strong>Consolidacion</strong>
-                    </NavLink>
-                </div>
-
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="pendientes">
-                        <span class="oi oi-tags" aria-hidden="true"></span> <strong>Asuntos</strong>
-                    </NavLink>
-                </div>
-
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="asistencia">
-                        <span class="oi oi-list" aria-hidden="true"></span> <strong>Asistencia</strong> 
-                    </NavLink>
-                </div
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="porcentajeasistencia" ActiveClass="active">
-                        <span class="oi oi-graph" aria-hidden="true"></span> Porcentaje Asistencia
+                    <NavLink class="nav-link" href="@($"{Nav.BaseUri}{turnoHref}")">
+                        <span class="oi oi-briefcase" aria-hidden="true"></span> <strong>@labelConsolidacion</strong>
                     </NavLink>
                 </div>
                 <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="@($"{Nav.BaseUri}{pendientesHref}")">
+                        <span class="oi oi-tags" aria-hidden="true"></span> <strong>@labelAsuntos</strong>
+                    </NavLink>
+                </div>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="@($"{Nav.BaseUri}{asistenciaHref}")">
+                        <span class="oi oi-list" aria-hidden="true"></span> <strong>@labelAsistencia</strong>
+                    </NavLink>
+                </div>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="@($"{Nav.BaseUri}{porcentajeAsistenciaHref}")">
+                        <span class="oi oi-graph" aria-hidden="true"></span> @labelPorcentajeAsistencia
+                    </NavLink>
+                </div>
+                                <div class="nav-item px-3">
                     <NavLink class="nav-link" href="vencidos">
-                        <i class="bi bi-calendar2-x-fill me-3 fs-5"></i> <strong>Vencidos</strong>
-                    </NavLink>
-                </div>
-
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="reunion">
-                        <span class="oi oi-people" aria-hidden="true"></span> <strong>Pizarra</strong> 
+                        <i class="bi bi-calendar2-x-fill me-3 fs-5"></i> <strong>@labelVencidos</strong>
                     </NavLink>
                 </div>
                 <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="historicos">
-                        <span class="oi oi-spreadsheet" aria-hidden="true"></span> <strong>Históricos</strong> 
+                    <NavLink class="nav-link" href="@($"{Nav.BaseUri}{reunionHref}")">
+                        <span class="oi oi-people" aria-hidden="true"></span> <strong>@labelPizarra</strong>
                     </NavLink>
                 </div>
                 <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="calendario">
-                        <span class=" oi oi-calendar" aria-hidden="true"></span> <strong>Calendario</strong> 
+                    <NavLink class="nav-link" href="@($"{Nav.BaseUri}{historicosHref}")">
+                        <span class="oi oi-spreadsheet" aria-hidden="true"></span> <strong>@labelHistoricos</strong>
                     </NavLink>
                 </div>
-
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="@($"{Nav.BaseUri}{calendarioHref}")">
+                        <span class="oi oi-calendar" aria-hidden="true"></span> <strong>@labelCalendario</strong>
+                    </NavLink>
+                </div>
             </Authorized>
-
 
             <NotAuthorized>
                 <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                        <span class="oi oi-home" aria-hidden="true"></span> <strong>Home</strong> 
-                    </NavLink>
-                </div>
-
-
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="pendientes">
-                        <span class="oi oi-tags" aria-hidden="true"></span> <strong>Asuntos</strong> 
-                    </NavLink>
-                </div>
-
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="reunion">
-                        <span class="oi oi-people" aria-hidden="true"></span> <strong>Pizarra</strong> 
+                    <NavLink class="nav-link" href="@($"{Nav.BaseUri}{homeHref}")" Match="NavLinkMatch.All">
+                        <span class="oi oi-home" aria-hidden="true"></span> <strong>Home</strong>
                     </NavLink>
                 </div>
                 <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="historicos">
-                        <span class="oi oi-spreadsheet" aria-hidden="true"></span> <strong>Históricos</strong>
+                    <NavLink class="nav-link" href="@($"{Nav.BaseUri}{pendientesHref}")">
+                        <span class="oi oi-tags" aria-hidden="true"></span> <strong>@labelAsuntos</strong>
                     </NavLink>
                 </div>
                 <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="calendario">
-                        <span class=" oi oi-calendar" aria-hidden="true"></span> <strong>Calendario</strong> 
+                    <NavLink class="nav-link" href="@($"{Nav.BaseUri}{reunionHref}")">
+                        <span class="oi oi-people" aria-hidden="true"></span> <strong>@labelPizarra</strong>
                     </NavLink>
                 </div>
-
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="@($"{Nav.BaseUri}{historicosHref}")">
+                        <span class="oi oi-spreadsheet" aria-hidden="true"></span> <strong>@labelHistoricos</strong>
+                    </NavLink>
+                </div>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="@($"{Nav.BaseUri}{calendarioHref}")">
+                        <span class="oi oi-calendar" aria-hidden="true"></span> <strong>@labelCalendario</strong>
+                    </NavLink>
+                </div>
             </NotAuthorized>
-
-        </AuthorizeView>
-        <AuthorizeView Roles="Admin,AdminChempro, SuperUser,PrimeUser,SemiAdmin,MttoAdmin">
-            <Authorized>
-
-                @* <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="stats_asistencia">
-                        <span class="oi oi-graph" aria-hidden="true"></span> <strong>%Asistencias</strong> 
-                    </NavLink>
-                </div> *@
-            </Authorized>
         </AuthorizeView>
 
-        @* <AuthorizeView Roles="Admin,AdminChempro,SuperAdmin">
-            <Authorized>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="addequipo">
-                        <span class="oi oi-wrench" aria-hidden="true"></span> Equipos
-                    </NavLink>
-                </div>
-            </Authorized>
-        </AuthorizeView> *@
     </nav>
 </div>
 
 @code {
     private bool collapseNavMenu = true;
-
     private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+    private string labelDiscrepancias = "Discrepancias";
+    private string labelAsuntos = "Asuntos";
+    private string labelAsistencia = "Asistencia";
+    private string labelCalendario = "Calendario";
+    private string labelConsolidacion = "Consolidación";
+    private string labelPorcentajeAsistencia = "Porcentaje Asistencia";
+    private string labelPizarra = "Pizarra";
+    private string labelHistoricos = "Históricos";
+    private string labelVencidos = "Vencidos";
+    private string homeHref = "es/inicio";
+    private string discrepanciaHref = "es/discrepancia";
+    private string pendientesHref = "es/pendientes";
+    private string asistenciaHref = "es/asistencia";
+    private string porcentajeAsistenciaHref = "es/porcentajeasistencia";
+    private string reunionHref = "es/reunion";
+    private string historicosHref = "es/historicos";
+    private string calendarioHref = "es/calendario";
+    private string vencidosHref = "es/vencidos";
+    private string turnoHref = "es/turno";
+    private const int TrinidadYTobago = 5;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity is not null && user.Identity.IsAuthenticated)
+        {
+            int.TryParse(user.FindFirst(c => c.Type == "IdPais")?.Value, out int idPais);
+
+            if (idPais == TrinidadYTobago)
+            {
+                labelDiscrepancias = "Add Issue";
+                labelAsuntos = "List of Issues";
+                labelConsolidacion = "Consolidation";
+                labelAsistencia = "Attendance";
+                labelPorcentajeAsistencia = "Attendance Percentage";
+                labelPizarra = "Whiteboard";
+                labelHistoricos = "Historical";
+                labelCalendario = "Calendar";
+                labelVencidos = "Expired";
+
+                homeHref = "en/home";
+                discrepanciaHref = "en/issue";
+                pendientesHref = "en/remaining";
+                asistenciaHref = "en/attendance";
+                porcentajeAsistenciaHref = "en/attendancepercentage";
+                reunionHref = "en/meeting";
+                historicosHref = "en/historical";
+                calendarioHref = "en/calendar";
+                turnoHref = "en/shift";
+                vencidosHref = "en/expired";
+            }
+        }
+    }
 
     private void ToggleNavMenu()
     {
