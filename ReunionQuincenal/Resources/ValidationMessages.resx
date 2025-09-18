@@ -182,5 +182,6 @@
 <data name="ErrorP" xml:space="preserve"><value>Si el problema persiste, recargue la página.</value></data>
 <data name="ERevisar" xml:space="preserve"><value>Revise los datos</value></data>
 <data name="FechaMenor" xml:space="preserve"><value>La fecha de trabajo no puede ser menor a la fecha de reunión.</value></data>
+<data name="VencidasDiaria" xml:space="preserve"><value>Vencidas Diaria</value></data>
 </root>
 

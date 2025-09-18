@@ -175,6 +175,7 @@ namespace ReunionWeb.Resources
         public static string ErrorP => _resourceManager.GetString("ErrorP", CultureInfo.CurrentUICulture);
         public static string ERevisar => _resourceManager.GetString("ERevisar", CultureInfo.CurrentUICulture);
         public static string FechaMenor => _resourceManager.GetString("FechaMenor", CultureInfo.CurrentUICulture);
+        public static string VencidasDiaria => _resourceManager.GetString("VencidasDiaria", CultureInfo.CurrentUICulture);
 
         public static string MapResponsableKey(string nombre)
         {

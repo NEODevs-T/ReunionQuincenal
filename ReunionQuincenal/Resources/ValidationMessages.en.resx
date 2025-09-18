@@ -182,4 +182,5 @@
 <data name="ErrorP" xml:space="preserve"><value>If the problem persists, please reload the page.</value></data>
 <data name="ERevisar" xml:space="preserve"><value>Please check the data.</value></data>
 <data name="FechaMenor" xml:space="preserve"><value>The work date cannot be earlier than the meeting date.</value></data>
+<data name="VencidasDiaria" xml:space="preserve"><value>Daily Overdue</value></data>
 </root>
