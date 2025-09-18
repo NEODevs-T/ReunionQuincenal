@@ -211,7 +211,7 @@
     protected async Task HandleLogin(EditContext e)
     {
         mensaje = "";
-        user.Proyecto = "ReunionDiaria";
+        user.Proyecto = "ReunionQuincenal";
         var culture = idioma == 1 ? new CultureInfo("es") : new CultureInfo("en");
         CultureInfo.DefaultThreadCurrentCulture = culture;
         CultureInfo.DefaultThreadCurrentUICulture = culture;
@@ -271,7 +271,7 @@
                         mensaje = "Accessing...";
                     }
                     Console.WriteLine(ValidarToken);
-                    await LocalStorage.SetItemAsync("ReunionDiariaToken", ValidarToken);
+                    await LocalStorage.SetItemAsync("ReunionQuincenalToken", ValidarToken);
                     var authState = await AuthStateProvider.GetAuthenticationStateAsync();
                     var userA = authState.User;
                     claims = Enumerable.ToList(userA.Claims);
