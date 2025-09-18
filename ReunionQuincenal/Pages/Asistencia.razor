@@ -1,4 +1,5 @@
-﻿@page "/asistencia"
+﻿@page "/es/asistencia"
+@page "/en/attendance"
 
 @inject IAsistenciaReuData AsistenciaReuData
 @inject IAvisadorData AvisadorData
@@ -10,9 +11,12 @@
 @inject AuthenticationStateProvider AuthStateProvider
 @inject ILocalStorageService LocalStorage
 @inject NotificationService NotificationService
-@attribute [Authorize(Roles = "Admin, AdminChempro, SuperUser, PrimeUser, SemiAdmin, SuperAdmin")]
 
-<h3>Asistencia</h3>
+@using ReunionWeb.Resources
+@using System.Globalization
+@attribute [Authorize(Roles = "Admin, AdminChempro, SupIntendente, PrimeUser, SupIntendenteGeneral, SuperAdmin")]
+
+<h3>@ValidationMessages.Asistencia</h3>
 <p></p>
 
 
@@ -37,7 +41,7 @@
         </BSCol>
 
         <BSCol ColumnSmall="3">
-            <BSButton IsOutlined Color="BSColor.Success" Size="Size.ExtraSmall" @onclick="Get">   Asistentes  <span class="oi oi-check"></span></BSButton>
+            <BSButton IsOutlined Color="BSColor.Success" Size="Size.ExtraSmall" @onclick="Get">   @ValidationMessages.Asistentes  <span class="oi oi-check"></span></BSButton>
         </BSCol>
 
     </BSRow>
@@ -54,7 +58,7 @@
     @if (listaAsistencia.Where(c => c.Cargo.Crbloque == 1).Count() > 0)
     {
         <BSCol Column="4">
-            <BSLabel>Bloque: @bloque</BSLabel>
+            <BSLabel>@ValidationMessages.Bloque: @bloque</BSLabel>
             <BSInput InputType="InputType.Range" step="1" min="1" max="3" @bind-Value="bloque" />
         </BSCol>
     }
@@ -63,9 +67,9 @@
         <BSTable IsResponsive="true" IsStriped="true" IsBordered="true">
             <BSTHead Class="cabecera">
                 <BSTR>
-                    <BSTD>Personal</BSTD>
-                    <BSTD>Presencia</BSTD>
-                    <BSTD>Suplencia</BSTD>
+                    <BSTD>@ValidationMessages.Personal</BSTD>
+                    <BSTD>@ValidationMessages.Presencia</BSTD>
+                    <BSTD>@ValidationMessages.Suplencia</BSTD>
                 </BSTR>
             </BSTHead>
             <BSTBody>
@@ -128,7 +132,7 @@
             </BSTBody>
 
         </BSTable>
-        <BSButton IsOutlined Color="BSColor.Success" Size="Size.ExtraSmall" @onclick="Save">   Guardar  <span class="oi oi-check"></span></BSButton>
+        <BSButton IsOutlined Color="BSColor.Success" Size="Size.ExtraSmall" @onclick="Save">   @ValidationMessages.Guardar  <span class="oi oi-check"></span></BSButton>
     </BSCol>
 
 
@@ -136,7 +140,7 @@
 else if (CargoReuData.cargoreuss.Count() == 0 && dataIsLoaded == 2)
 {
         <div style="text-align: center; padding: 20px; font-size: 18px; color: gray;">
-            <p>No se ha cargado personal a este centro.</p>
+            <p>@ValidationMessages.NoCargadoP</p>
         </div>
 }
 else if (dataIsLoaded == 1 && RespoReuData.resporeus.Count() == 0)
@@ -164,6 +168,7 @@ else if (dataIsLoaded == 1 && RespoReuData.resporeus.Count() == 0)
     private string Div { get; set; }
     private int bloque { get; set; } = 0;//Indica el Bloque de reunion a llenar asistencia
     private List<AsistenReuDTO> listaAsistencia { get; set; }
+    private int idPais {get; set;} 
 
 
 
@@ -175,6 +180,16 @@ else if (dataIsLoaded == 1 && RespoReuData.resporeus.Count() == 0)
         var authState = await AuthStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
         claims = Enumerable.ToList(user.Claims);
+
+        var idPaisClaim = claims.FirstOrDefault(c => c.Type == "IdPais")?.Value;
+        if (int.TryParse(idPaisClaim, out int paisTemp))
+        {
+            idPais = paisTemp;
+            var culture = new System.Globalization.CultureInfo(paisTemp == 5 ? "en" : "es");
+            System.Globalization.CultureInfo.DefaultThreadCurrentCulture = culture;
+            System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = culture;
+            await LocalStorage.SetItemAsync("userCulture", culture.Name);
+        }
 
 
     }
@@ -280,23 +295,23 @@ protected async Task Save()
 
             if (!validar)
             {
-                NotificationService.Notify(Notificar.Notificacion("advertencia", "Atención", "Si hay un suplente debe marcar la asistencia."));
+                NotificationService.Notify(Notificar.Notificacion("advertencia", ValidationMessages.Atencion, ValidationMessages.SSuplente));
             }
             else if (conteo == listaAsistencia.Count)
             {
-                NotificationService.Notify(Notificar.Notificacion("advertencia", "Atención", "Todos los cargos están inasistentes."));
+                NotificationService.Notify(Notificar.Notificacion("advertencia", ValidationMessages.Atencion, ValidationMessages.TCargos));
             }
             else
             {
                 mensaje = await AsistenciaReuData.Postasistencia(listaAsistencia);
-
-                if (mensaje == "Registro Exitoso")
+                
+                if (mensaje == ValidationMessages.RExitoso)
                 {
                     NotificationService.Notify(Notificar.Notificacion("exito", mensaje, ""));
                 }
                 else 
                 {
-                    NotificationService.Notify(Notificar.Notificacion("exito", "Registro Exitoso", ""));
+                    NotificationService.Notify(Notificar.Notificacion("exito", ValidationMessages.RExitoso, ""));
                 }
 
                 dataIsLoaded = 0;
@@ -304,13 +319,13 @@ protected async Task Save()
         @* }
         else
         {
-            NotificationService.Notify(Notificar.Notificacion("advertencia", "Atención", "Solo se puede registrar en horario de reunión"));
+            NotificationService.Notify(Notificar.Notificacion("advertencia", ValidationMessages.Atencion, ValidationMessages.RHorario));
             dataIsLoaded = 0;
         } *@
     }
     catch (Exception ex)
     {
-        NotificationService.Notify(Notificar.Notificacion("error", "Error al Insertar los datos, Intente de Nuevo", ex.Message));
+            NotificationService.Notify(Notificar.Notificacion("error", ValidationMessages.EDato, ex.Message));
     }
 }
 
