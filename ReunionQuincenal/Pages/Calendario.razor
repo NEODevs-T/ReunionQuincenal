@@ -1,4 +1,5 @@
-@page "/calendario"
+@page "/es/calendario"
+@page "/en/calendar"
 @using Radzen.Blazor.Rendering;
 @inject DialogService DialogService
 @inject IAsistenciaReuData AsistenciaReuData
@@ -13,7 +14,11 @@
 @inject AuthenticationStateProvider AuthStateProvider
 @inject ILocalStorageService LocalStorage
 
+@using ReunionWeb.Resources
+@using System.Globalization
 
+
+<h3>@ValidationMessages.Calendario</h3>
 <BSContainer>
 
     @if (MaestraData.centro.Count() == 0)
@@ -24,9 +29,9 @@
     {
         <BSRow>
             <BSCol Column="3" ColumnSmall="2">
-                <BSLabel>Centro</BSLabel>
+                <BSLabel>@ValidationMessages.Centro</BSLabel>
                 <BSInput InputType="InputType.Select" @onchange="BuscarDivision"  @bind-Value="IdCentro">
-                    <option value="0">Seleccione</option>
+                    <option value="0">@ValidationMessages.Seleccione</option>
                     @foreach (var d in MaestraData.centro)
                     {
                         <option value="@d.IdCentro">@d.Centro</option>
@@ -39,25 +44,25 @@
 
 
             <BSCol Column="3" ColumnSmall="2">
-                <BSLabel>División</BSLabel>
+                <BSLabel>@ValidationMessages.Division</BSLabel>
                 <BSInput InputType="InputType.Select" @bind-Value="IdDiv">
-                    <option value="0">Seleccione</option>
+                    <option value="0">@ValidationMessages.Seleccione</option>
                     @foreach (var d in MaestraData.divisions)
                     {
                             <option value="@d.IdDivision">@d.Ndivision</option>
                     }
-                    <option value="0">Todo</option>
+                    <option value="0">@ValidationMessages.Todo</option>
                 </BSInput>
-                <BSFeedback For="@(() => IdDiv)" ValidMessage="Correcto." />
+                <BSFeedback For="@(() => IdDiv)" ValidMessage="@ValidationMessages.Correcto" />
             </BSCol>
 
 
             <BSCol ColumnSmall="2">
                 <BSRow>
-                    <BSLabel>Aceptar</BSLabel>
+                    <BSLabel>@ValidationMessages.Aceptar</BSLabel>
                 </BSRow>
                 <BSButton IsOutlined Color="BSColor.Success" Size="Size.ExtraSmall" @onclick="(() => Get(IdCentro,IdDiv))">
-                    Consultar <span class="oi oi-check"></span></BSButton>
+                    @ValidationMessages.Consultar <span class="oi oi-check"></span></BSButton>
             </BSCol>
 
         </BSRow>
@@ -72,12 +77,12 @@
 {
 
     <RadzenScheduler Data="@data" TItem="DataItem" StartProperty="Start" SelectedIndex="1" style="height: 630px;"
-        EndProperty="End" TodayText="Hoy" TextProperty="Text" AppointmentRender=@OnAppointmentRender>
-        <RadzenDayView Text="Día" />
-        <RadzenWeekView Text="Semana" />
-        <RadzenMonthView Text="Mes" />
-        <RadzenYearPlannerView Text="Planifcación" />
-        <RadzenYearView Text="Año" />
+        EndProperty="End" TodayText="@ValidationMessages.Hoy" TextProperty="Text" AppointmentRender=@OnAppointmentRender>
+        <RadzenDayView Text="@ValidationMessages.Dia" />
+        <RadzenWeekView Text="@ValidationMessages.Semana" />
+        <RadzenMonthView Text="@ValidationMessages.Mes" />
+        <RadzenYearPlannerView Text="@ValidationMessages.Planificacion" />
+        <RadzenYearView Text="@ValidationMessages.Año" />
     </RadzenScheduler>
 }
 
@@ -88,7 +93,7 @@ else if (dataIsLoaded == 1 && PizarraData.calentrabajo.Count() == 0)
 else if (dataIsLoaded == 2 && PizarraData.calentrabajo.Count() == 0)
 {
         <div style="text-align: center; padding: 20px; font-size: 18px; color: gray;">
-                <p>No hay datos para esta fecha.</p>
+                <p>@ValidationMessages.NoHayDatos</p>
         </div>
         }
 
