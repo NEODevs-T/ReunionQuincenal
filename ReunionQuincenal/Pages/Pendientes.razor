@@ -160,9 +160,8 @@ else
                     <option value=0>@ValidationMessages.Todo</option>
                     @foreach (var d in RespoReuData.resporeus)
                     {
-
-                        <option value="@d.IdResReu">@d.Rrnombre</option>
-
+                        <option value="@d.IdResReu">@ValidationMessages.ResourceManager.GetString(ValidationMessages
+                            .MapResponsableKey(d.Rrnombre),CultureInfo.CurrentUICulture)</option>
                     }
                 </BSInput>
             </BSCol>
@@ -174,11 +173,11 @@ else
                 <BSInput InputType="InputType.Select" IsDisabled=@valueodt @bind-Value="IdKsf">
 
                     <option value="0">@ValidationMessages.Todo</option>
-                    @foreach (var d in KsfData.ksfs)
+                    @foreach (var d in KsfData.ksfs.Where(x => x.Idksf != 6))
                     {
-                        <option value="@d.Idksf">@d.KsfNombre</option>
+                        var texto = usuarioActual.idPais == 5? d.KsfEnglish : d.KsfNombre;
+                        <option value="@d.Idksf">@texto</option>
                     }
-
                 </BSInput>
             </BSCol>
 
