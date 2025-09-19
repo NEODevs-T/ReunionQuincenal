@@ -163,7 +163,7 @@ td > .pendiente, .pendiente, tr > .pendiente, span > .pendiente {
 
 /* FIN RADZEN SCHEDULER es EL CALENDARIO*/
 
-/*notificación radzen*/
+/*notificaciï¿½n radzen*/
 .rz-notification-message.rz-growl {
     position: fixed !important;
     width: 35% !important;
@@ -288,3 +288,14 @@ textarea {
     .blazor-error-boundary::after {
         content: "An error has occurred."
     }
+
+    .scroll-container {
+    overflow-x: auto;
+    width: 100%;
+}
+
+.fixed-grid .rz-datatable-table {
+    min-width: 2400px;
+}
+
+
