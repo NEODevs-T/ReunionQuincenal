@@ -53,6 +53,7 @@ namespace ReunionWeb.Resources
         public static string Estado => _resourceManager.GetString("Estado", CultureInfo.CurrentUICulture);
         public static string Exito => _resourceManager.GetString("Exito", CultureInfo.CurrentUICulture);
         public static string FReunion => _resourceManager.GetString("FReunion", CultureInfo.CurrentUICulture);
+        public static string FTrabajo => _resourceManager.GetString("FTrabajo", CultureInfo.CurrentUICulture);
         public static string FechaDeReunion => _resourceManager.GetString("FechaDeReunion", CultureInfo.CurrentUICulture);
         public static string FechaDelCambio => _resourceManager.GetString("FechaDelCambio", CultureInfo.CurrentUICulture);
         public static string Filtrar => _resourceManager.GetString("Filtrar", CultureInfo.CurrentUICulture);
@@ -162,7 +163,7 @@ namespace ReunionWeb.Resources
         public static string NoRechazada => _resourceManager.GetString("NoRechazada", CultureInfo.CurrentUICulture);
         public static string DiscrepanciaRechazada => _resourceManager.GetString("DiscrepanciaRechazada", CultureInfo.CurrentUICulture);
         public static string NoAgregada => _resourceManager.GetString("NoAgregada", CultureInfo.CurrentUICulture);
-        public static string ReunionDiariaAgregada => _resourceManager.GetString("ReunionDiariaAgregada", CultureInfo.CurrentUICulture);
+        public static string ReunionQuincenalAgregada => _resourceManager.GetString("ReunionQuincenalAgregada", CultureInfo.CurrentUICulture);
         public static string VerifiqueCampos => _resourceManager.GetString("VerifiqueCampos", CultureInfo.CurrentUICulture);
         public static string Dia => _resourceManager.GetString("Dia", CultureInfo.CurrentUICulture);
         public static string Semana => _resourceManager.GetString("Semana", CultureInfo.CurrentUICulture);
@@ -176,6 +177,9 @@ namespace ReunionWeb.Resources
         public static string ERevisar => _resourceManager.GetString("ERevisar", CultureInfo.CurrentUICulture);
         public static string FechaMenor => _resourceManager.GetString("FechaMenor", CultureInfo.CurrentUICulture);
         public static string VencidasDiaria => _resourceManager.GetString("VencidasDiaria", CultureInfo.CurrentUICulture);
+        public static string PendientesDiaria => _resourceManager.GetString("PendientesDiaria", CultureInfo.CurrentUICulture);
+        public static string ReunionQuincenal => _resourceManager.GetString("ReunionQuincenal", CultureInfo.CurrentUICulture);
+        public static string PendienteFaltaRepuesto => _resourceManager.GetString("PendienteFaltaRepuesto", CultureInfo.CurrentUICulture);
 
         public static string MapResponsableKey(string nombre)
         {

@@ -53,6 +53,7 @@
 <data name="Estado" xml:space="preserve"><value>Estado</value></data>
 <data name="Exito" xml:space="preserve"><value>exito</value></data>
 <data name="FReunion" xml:space="preserve"><value>F. Reunión</value></data>
+<data name="FTrabajo" xml:space="preserve"><value>F. Trabajo</value></data>
 <data name="FechaDeReunion" xml:space="preserve"><value>Fecha de Reunión</value></data>
 <data name="FechaDelCambio" xml:space="preserve"><value>Fecha del Cambio</value></data>
 <data name="Filtrar" xml:space="preserve"><value>Filtrar</value></data>
@@ -170,7 +171,7 @@
 <data name="NoRechazada" xml:space="preserve"><value>No pudo ser rechazada</value></data>
 <data name="DiscrepanciaRechazada" xml:space="preserve"><value>La discrepancia a sido rechazada</value></data>
 <data name="NoAgregada" xml:space="preserve"><value>No pudo ser Agregada</value></data>
-<data name="ReunionDiariaAgregada" xml:space="preserve"><value>Se agregó correctamente a la Reunión diaria</value></data>
+<data name="ReunionQuincenalAgregada" xml:space="preserve"><value>Se agregó correctamente a la Reunión quincenal</value></data>
 <data name="VerifiqueCampos" xml:space="preserve"><value>Verifique todos los campos</value></data>
 <data name="Dia" xml:space="preserve"><value>Día</value></data>
 <data name="Semana" xml:space="preserve"><value>Semana</value></data>
@@ -183,5 +184,8 @@
 <data name="ERevisar" xml:space="preserve"><value>Revise los datos</value></data>
 <data name="FechaMenor" xml:space="preserve"><value>La fecha de trabajo no puede ser menor a la fecha de reunión.</value></data>
 <data name="VencidasDiaria" xml:space="preserve"><value>Vencidas Diaria</value></data>
+<data name="PendientesDiaria" xml:space="preserve"><value>Pendientes Diaria</value></data>
+<data name="ReunionQuincenal" xml:space="preserve"><value>Reunion Quincenal</value></data>
+<data name="PendienteFaltaRepuesto" xml:space="preserve"><value>Pendiente Falta Repuesto</value></data>
 </root>
 
