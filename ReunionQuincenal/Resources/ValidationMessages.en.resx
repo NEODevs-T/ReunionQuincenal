@@ -187,4 +187,5 @@
 <data name="PendientesDiaria" xml:space="preserve"><value>Pending Daily</value></data>
 <data name="ReunionQuincenal" xml:space="preserve"><value>Bimonthly Meeting</value></data>
 <data name="PendienteFaltaRepuesto" xml:space="preserve"><value>Awaiting Spare Part</value></data>
+<data name="FormatoDeReunion" xml:space="preserve"><value>Meeting Format</value></data>
 </root>

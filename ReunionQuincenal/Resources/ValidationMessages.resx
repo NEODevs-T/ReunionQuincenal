@@ -187,5 +187,6 @@
 <data name="PendientesDiaria" xml:space="preserve"><value>Pendientes Diaria</value></data>
 <data name="ReunionQuincenal" xml:space="preserve"><value>Reunion Quincenal</value></data>
 <data name="PendienteFaltaRepuesto" xml:space="preserve"><value>Pendiente Falta Repuesto</value></data>
+<data name="FormatoDeReunion" xml:space="preserve"><value>Formato de Reunión</value></data>
 </root>
 
