@@ -188,4 +188,5 @@
 <data name="ReunionQuincenal" xml:space="preserve"><value>Bimonthly Meeting</value></data>
 <data name="PendienteFaltaRepuesto" xml:space="preserve"><value>Awaiting Spare Part</value></data>
 <data name="FormatoDeReunion" xml:space="preserve"><value>Meeting Format</value></data>
+<data name="Horas" xml:space="preserve"><value>Hours</value></data>
 </root>

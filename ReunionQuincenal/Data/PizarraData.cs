@@ -172,54 +172,25 @@ public class PizarraData : IPizarraData
 
     }
 
-    public async Task<bool> UpdateDiscrepancia2(ReunionDTO d, int id, int tipo, string f1, string f2, string estado, string linea)
+    public async Task<(bool success, string centro, string division)> UpdateDiscrepancia2(ReunionDTO d, int id)
     {
-        bool band = false;
-        url = $"{BaseUrl}/UpdateDiscrepancia2/{id}";
-        cliente.Timeout = TimeSpan.FromMinutes(5);
-        cliente = _clientFactory.CreateClient();
-        mensaje = await cliente.PutAsJsonAsync(url, d);
+        var client = _clientFactory.CreateClient();
+        string url = $"{BaseUrl}/UpdateDiscrepancia2/{id}";
+        var response = await client.PutAsJsonAsync(url, d);
 
-        try
+        if (response.IsSuccessStatusCode)
         {
-            string div = "", centro = "";
-            if (mensaje.IsSuccessStatusCode)
+            bool band = await response.Content.ReadFromJsonAsync<bool>();
+            if (band)
             {
-                band = await mensaje.Content.ReadFromJsonAsync<bool>();
-                CentroDivisionDTO centrodiv = new CentroDivisionDTO();
-                centrodiv = await GetCentroDivi(d.Rdcentro, d.Rddiv, 1);
-                centro = centrodiv.IdCentro.ToString();
-                div = centrodiv.IdDivision.ToString();
+                var centrodiv = await GetCentroDivi(d.Rdcentro, d.Rddiv, 1);
+                return (true, centrodiv.IdCentro.ToString(), centrodiv.IdDivision.ToString());
             }
-
-            if (band == true)
-            {
-                if (tipo == 0)
-                {
-                    _navigationManager.NavigateTo($"pendientes/{centro}/{div}/{linea}/{f1}/{f2}/{tipo}/{estado}", forceLoad: true);
-                }
-                else if (tipo == 1)
-                {
-                    _navigationManager.NavigateTo($"reunion/{centro}/{div}/Re/{f1}/{f2}/{tipo}/Reunion", forceLoad: true);
-                }
-                else if (tipo == 2)
-                {
-                    _navigationManager.NavigateTo($"pendientes/{centro}/{div}/{linea}/{f1}/{f2}/{tipo}/{estado}", forceLoad: true);
-                }
-
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-
         }
-        catch (Exception ex)
-        {
-            return false;
-        }
+
+        return (false, "", "");
     }
+
     
         public async Task<bool> UpdateDiscrepancia3(ReunionDTO d, int id)
     {

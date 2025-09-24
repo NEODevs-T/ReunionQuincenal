@@ -99,7 +99,7 @@
 <data name="Presencia" xml:space="preserve"><value>Presencia</value></data>
 <data name="RExitoso" xml:space="preserve"><value>Registro Exitoso.</value></data>
 <data name="RHorario" xml:space="preserve"><value>Solo se puede registrar en horario de reunión.</value></data>
-<data name="Reload" xml:space="preserve"><value>Por favor recargue la página.</value></data>
+<data name="Reload" xml:space="preserve"><value>Por favor, recargue la página.</value></data>
 <data name="RequiredPassword" xml:space="preserve"><value>Por favor ingrese la contraseña.</value></data>
 <data name="RequiredUserName" xml:space="preserve"><value>Por favor ingrese el usuario.</value></data>
 <data name="Responsable" xml:space="preserve"><value>Responsable</value></data>
@@ -188,5 +188,6 @@
 <data name="ReunionQuincenal" xml:space="preserve"><value>Reunion Quincenal</value></data>
 <data name="PendienteFaltaRepuesto" xml:space="preserve"><value>Pendiente Falta Repuesto</value></data>
 <data name="FormatoDeReunion" xml:space="preserve"><value>Formato de Reunión</value></data>
+<data name="Horas" xml:space="preserve"><value>Horas</value></data>
 </root>
 

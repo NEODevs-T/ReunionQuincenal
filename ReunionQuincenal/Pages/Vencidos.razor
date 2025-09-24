@@ -453,7 +453,7 @@ else if (PizarraData.reudiatablas.Count() == 0 && confirmacion == true)
         } 
         else
         {
-            mensaje = ValidationMessage.NoRechazada;
+            mensaje = ValidationMessages.NoRechazada;
             NotificationService.Notify(Notificar.Notificacion("advertencia", mensaje, ""));
 
         }
@@ -477,13 +477,13 @@ else if (PizarraData.reudiatablas.Count() == 0 && confirmacion == true)
 
     if (validacion == true)
     {
-        mensaje = ValidationMessage.ReunionQuincenalAgregada;
+        mensaje = ValidationMessages.ReunionQuincenalAgregada;
         NotificationService.Notify(Notificar.Notificacion("exito", mensaje, ""));
         await buscar();
     }
     else
     {
-        mensaje = ValidationMessage.NoAgregada;
+        mensaje = ValidationMessages.NoAgregada;
         NotificationService.Notify(Notificar.Notificacion("advertencia", mensaje, ""));
     }
     
@@ -497,13 +497,13 @@ else if (PizarraData.reudiatablas.Count() == 0 && confirmacion == true)
         bool validacion = await PizarraData.UpdateDiscrepancia3(registro, registro.IdReuDia);
         if (validacion == true)
         {
-            mensaje = ValidationMessage.DiscrepanciaRechazada;
+            mensaje = ValidationMessages.DiscrepanciaRechazada;
             NotificationService.Notify(Notificar.Notificacion("exito", mensaje, ""));
             await buscar();
         }
         else
         {
-            mensaje = ValidationMessage.NoRechazada;
+            mensaje = ValidationMessages.NoRechazada;
             NotificationService.Notify(Notificar.Notificacion("advertencia", mensaje, ""));
         }
     }
