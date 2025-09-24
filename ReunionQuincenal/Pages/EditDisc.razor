@@ -1,4 +1,5 @@
-﻿@page "/EditDisc/{id:int}/{tipo:int}/{linea}/{f1}/{f2}/{est}"
+﻿@page "/es/EditDisc/{id:int}/{tipo:int}/{linea}/{f1}/{f2}/{est}"
+@page "/en/EditDisc/{id:int}/{tipo:int}/{linea}/{f1}/{f2}/{est}"
 @inject NotificationService NotificationService
 @inject IAsistenciaReuData AsistenciaReuData
 @inject IAvisadorData AvisadorData
@@ -10,8 +11,12 @@
 @inject NavigationManager NavigationManager
 @inject AuthenticationStateProvider AuthStateProvider
 @inject ILocalStorageService LocalStorage
+@inject UsuarioContexto UsuarioContexto
 
-<h3>Editar Discrepancia</h3>
+@using System.Globalization
+@using ReunionWeb.Resources
+
+<h3>@ValidationMessages.EditarDiscrepancia</h3>
 
 <h4></h4>
 <AuthorizeView Roles="Admin,AdminChempro, SuperUser, PrimeUser">
@@ -29,25 +34,25 @@
                 <BSRow>
 
                     <BSCol Column="2">
-                        <BSLabel>Centro</BSLabel>
+                        <BSLabel>@ValidationMessages.Centro</BSLabel>
                         <BSInput InputType="InputType.Text" IsDisabled @bind-Value="DiscForm.Rdcentro" />
 
-                         <BSFeedback For="@(() => DiscForm.Rdcentro)" ValidMessage="Correcto." />
+                         <BSFeedback For="@(() => DiscForm.Rdcentro)" ValidMessage="@ValidationMessages.Correcto" />
                      </BSCol>
 
 
                      <BSCol Column="2">
-                         <BSLabel>División</BSLabel>
+                         <BSLabel>@ValidationMessages.Division</BSLabel>
                          <BSInput InputType="InputType.Text" IsDisabled @bind-Value="DiscForm.Rddiv">
                          </BSInput>
-                         <BSFeedback For="@(() => DiscForm.Rddiv)" ValidMessage="Correcto." />
+                         <BSFeedback For="@(() => DiscForm.Rddiv)" ValidMessage="@ValidationMessages.Correcto" />
                      </BSCol>
 
                      <BSCol Column="2">
-                         <BSLabel>Área</BSLabel>
+                         <BSLabel>@ValidationMessages.Area</BSLabel>
                          <BSInput InputType="InputType.Text" IsDisabled @bind-Value="DiscForm.Rdarea">
                          </BSInput>
-                         <BSFeedback For="@(() => DiscForm.Rdarea)" ValidMessage="Correcto." />
+                         <BSFeedback For="@(() => DiscForm.Rdarea)" ValidMessage="@ValidationMessages.Correcto" />
                      </BSCol>
 
 
@@ -55,20 +60,21 @@
                          <BSLabel>Ksf</BSLabel>
                          <BSInput InputType="InputType.Select" @bind-Value="DiscForm.Idksf">
 
-                             <option value="">Seleccione...</option>
-                            @foreach (var d in KsfData.ksfs.Where(x => x.Idksf != 29 && x.Idksf != 6))
+                             <option value="">@ValidationMessages.Seleccione...</option>
+                            @foreach (var d in KsfData.ksfs.Where(x => x.Idksf != 6))
                             {
-                                <option value="@d.Idksf">@d.KsfNombre</option>
+                                var texto = usuarioActual.idPais == 5? d.KsfEnglish : d.KsfNombre;
+                                <option value="@d.Idksf">@texto</option>
                             }
 
                         </BSInput>
-                        <BSFeedback For="@(() => DiscForm.Idksf)" ValidMessage="Correcto." />
+                        <BSFeedback For="@(() => DiscForm.Idksf)" ValidMessage="@ValidationMessages.Correcto" />
                     </BSCol>
 
                     <BSCol Column="3">
-                        <BSLabel>C. Equipo</BSLabel>
+                        <BSLabel>@ValidationMessages.CodigoDeEquipo</BSLabel>
                         <BSInput InputType="InputType.Text" @bind-Value="DiscForm.RdcodEq" ValidateOnInput="true" />
-                        <BSFeedback For="@(() => DiscForm.RdcodEq)" ValidMessage="Correcto." />
+                        <BSFeedback For="@(() => DiscForm.RdcodEq)" ValidMessage="@ValidationMessages.Correcto" />
                     </BSCol>
 
 
@@ -76,9 +82,9 @@
                 <p></p>
                 <BSRow>
                     <BSCol Column="6">
-                        <BSLabel>Discrepancia</BSLabel>
+                        <BSLabel>@ValidationMessages.Discrepancia</BSLabel>
                         <BSInput InputType="InputType.TextArea" @bind-Value="DiscForm.Rddisc" />
-                        <BSFeedback For="@(() => DiscForm.Rddisc)" ValidMessage="Correcto." />
+                        <BSFeedback For="@(() => DiscForm.Rddisc)" ValidMessage="@ValidationMessages.Correcto" />
                     </BSCol>
                 </BSRow>
                 <p></p>
@@ -87,14 +93,14 @@
                     @if (tipo == 0 || tipo == 2)
                     {
                         <BSCol Column="6">
-                            <BSLabel>Plan de Acción</BSLabel>
+                            <BSLabel>@ValidationMessages.PlanDeAccion</BSLabel>
                             <BSInput InputType="InputType.Text" @bind-Value="DiscForm.RdplanAcc" />
                         </BSCol>
                     }
                     else
                     {
                         <BSCol Column="6">
-                            <BSLabel>Plan de Acción</BSLabel>
+                            <BSLabel>@ValidationMessages.PlanDeAccion</BSLabel>
                             <BSInput InputType="InputType.Text" @bind-Value="DiscForm.RdplanAcc" />
                         </BSCol>
                     }
@@ -109,7 +115,7 @@
                     @if (tipo == 0 || tipo == 2)
                     {
                         <BSCol Column="2">
-                            <BSLabel>Tiempo (Horas)</BSLabel>
+                            <BSLabel>@ValidationMessages.Tiempo (@ValidationMessages.Horas)</BSLabel>
                             <BSInput InputType="InputType.Number" IsDisabled @bind-Value="DiscForm.Rdtiempo" />
                      </BSCol>
 
@@ -117,7 +123,7 @@
                     else
                     {
                         <BSCol Column="2">
-                            <BSLabel>Tiempo (Horas)</BSLabel>
+                            <BSLabel>@ValidationMessages.Tiempo (@ValidationMessages.Horas)</BSLabel>
                             <BSInput InputType="InputType.Number" @bind-Value="DiscForm.Rdtiempo" />
                         </BSCol>
                     }
@@ -126,35 +132,36 @@
                     @if (tipo == 0 || tipo == 2)
                     {
                         <BSCol Column="2">
-                            <BSLabel>Fecha del Trabajo</BSLabel>
+                            <BSLabel>@ValidationMessages.FechaDelTrabajo</BSLabel>
                             <BSInput InputType="InputType.Date" IsDisabled @bind-Value="DiscForm.RdfecTra" />
                      </BSCol>
                     }
                     else
                     {
                         <BSCol Column="2">
-                            <BSLabel>Fecha del Trabajo</BSLabel>
+                            <BSLabel>@ValidationMessages.FechaDelTrabajo</BSLabel>
                             <BSInput InputType="InputType.Date" @bind-Value="DiscForm.RdfecTra" />
                         </BSCol>
                     }
 
                     <BSCol ColumnSmall="2">
-                        <BSLabel>Responsable</BSLabel>
+                        <BSLabel>@ValidationMessages.Responsable</BSLabel>
                         <BSInput InputType="InputType.Select" @bind-Value="DiscForm.IdResReu">
-                            <option value="">Seleccione...</option>
+                            <option value="">@ValidationMessages.Seleccione...</option>
                             @foreach (var d in RespoReuData.resporeus)
                             {
-                                <option value="@d.IdResReu">@d.Rrnombre</option>
+                                <option value="@d.IdResReu">@ValidationMessages.ResourceManager.GetString(ValidationMessages
+                                    .MapResponsableKey(d.Rrnombre),CultureInfo.CurrentUICulture)
+                                </option>
                             }
-
                         </BSInput>
-                        <BSFeedback For="@(() => DiscForm.IdResReu)" ValidMessage="Correcto." />
+                        <BSFeedback For="@(() => DiscForm.IdResReu)" ValidMessage="@ValidationMessages.Correcto" />
                     </BSCol>
 
                     @if (tipo == 0 || tipo == 2)
                     {
                         <BSCol Column="2">
-                            <BSLabel>Fecha Reunión</BSLabel>
+                            <BSLabel>@ValidationMessages.FechaDeReunion</BSLabel>
                             <BSInput InputType="InputType.Date" @bind-Value="DiscForm.RdfecReu" ValidateOnInput="true" />
                         </BSCol>
                     }
@@ -165,15 +172,15 @@
                     @if (tipo == 0 || tipo == 2)
                     {
                         <BSCol ColumnSmall="2">
-                            <BSLabel>Código</BSLabel>
+                            <BSLabel>@ValidationMessages.Codigo</BSLabel>
                             <BSInput InputType="InputType.Select" IsDisabled @bind-Value="DiscForm.RdcodDis">
-                             <option value="">Seleccione...</option>
-                             <option value="1">1- En Curso</option>
-                             <option value="2">2- Próxima Parada</option>
-                             <option value="3">3- Falta Repuesto</option>
-                             <option value="4">4- Falta de Personal</option>
-                             <option value="5">5- Eq. no Disponible</option>
-                             <option value="6">6- Parada Mayor</option>
+                             <option value="">@ValidationMessages.Seleccione...</option>
+                             <option value="1">1- @ValidationMessages.EnCurso</option>
+                             <option value="2">2- @ValidationMessages.ProximaParada</option>
+                             <option value="3">3- @ValidationMessages.FaltaRepuesto</option>
+                             <option value="4">4- @ValidationMessages.FaltaDePersonal</option>
+                             <option value="5">5- @ValidationMessages.EquipoNoDisponible</option>
+                             <option value="6">6- @ValidationMessages.ParadaMayor</option>
 
 
                          </BSInput>
@@ -182,15 +189,15 @@
                     else
                     {
                         <BSCol ColumnSmall="2">
-                            <BSLabel>Código</BSLabel>
+                            <BSLabel>@ValidationMessages.Codigo</BSLabel>
                             <BSInput InputType="InputType.Select" @bind-Value="DiscForm.RdcodDis">
-                                <option value="">Seleccione...</option>
-                                <option value="1">1- En Curso</option>
-                                <option value="2">2- Próxima Parada</option>
-                                <option value="3">3- Falta Repuesto</option>
-                                <option value="4">4- Falta de Personal</option>
-                                <option value="5">5- Eq. no Disponible</option>
-                                <option value="6">6- Parada Mayor</option> 
+                                <option value="">@ValidationMessages.Seleccione...</option>
+                                <option value="1">1- @ValidationMessages.EnCurso</option>
+                                <option value="2">2- @ValidationMessages.ProximaParada</option>
+                                <option value="3">3- @ValidationMessages.FaltaRepuesto</option>
+                                <option value="4">4- @ValidationMessages.FaltaDePersonal</option>
+                                <option value="5">5- @ValidationMessages.EquipoNoDisponible</option>
+                                <option value="6">6- @ValidationMessages.ParadaMayor</option> 
                             </BSInput>
                         </BSCol>
                     }
@@ -199,7 +206,7 @@
                             if (planificador == "Admin" || planificador == "Planificador" || planificador == "SuperAdmin")
                             {
                                 <BSCol Column="2">
-                                    <BSLabel>Requisición</BSLabel>
+                                    <BSLabel>@ValidationMessages.Requisicion</BSLabel>
                                     <BSInput InputType="InputType.Number" @bind-Value="DiscForm.RdcodRequi" ValidateOnInput="true" />
                                 </BSCol>
 
@@ -207,7 +214,7 @@
                             else{
 
                                 <BSCol Column="2">
-                                    <BSLabel>Requisición</BSLabel>
+                                    <BSLabel>@ValidationMessages.Requisicion</BSLabel>
                                     <BSInput InputType="InputType.Number" IsDisabled @bind-Value="DiscForm.RdcodRequi" ValidateOnInput="true" />
                                 </BSCol>
                             }
@@ -219,24 +226,24 @@
 
                             @if (tipo == 0 || tipo == 2)
                             {
-                                <option value="Listo">Listo</option>
-                                <option value="Cerrado">Cerrado</option>
+                                <option value="Listo">@ValidationMessages.Listo</option>
+                                <option value="Cerrado">@ValidationMessages.Cerrado</option>
 
                             }
                             else
                             {
-                                <option value="Revisar">Revisar</option>
+                                <option value="Revisar">@ValidationMessages.Revisar</option>
                             }
                             @if (DiscForm.Rdodt is not null)
                             {
-                                <option value="Pendiente/Responsable">Pendiente/Responsable</option>
+                                <option value="Pendiente/Responsable">@ValidationMessages.Pendiente / @ValidationMessages.Responsable</option>
                             }
                             else
                             {
-                                <option value="Pendiente">Pendiente</option>
+                                <option value="Pendiente">@ValidationMessages.Pendiente</option>
                             }
 
-                            <BSFeedback For="@(() => DiscForm.Rdstatus)" ValidMessage="Correcto." />
+                            <BSFeedback For="@(() => DiscForm.Rdstatus)" ValidMessage="@ValidationMessages.Correcto" />
                         </BSInput>
                     </BSCol>
 
@@ -262,8 +269,8 @@
                 <p></p>
                 <p></p>
                 <BSCol Column="12">
-                    <BSButton Color="BSColor.Success" Size="Size.ExtraSmall" IsSubmit>  Guardar <span class="oi oi-check"></span></BSButton>
-                 <BSButton Color="BSColor.Danger" Size="Size.ExtraSmall" OnClick=Back>  Atras <span class="oi oi-arrow-left"></span></BSButton>
+                    <BSButton Color="BSColor.Success" Size="Size.ExtraSmall" IsSubmit>  @ValidationMessages.Guardar <span class="oi oi-check"></span></BSButton>
+                 <BSButton Color="BSColor.Danger" Size="Size.ExtraSmall" OnClick=Back>  @ValidationMessages.Atras <span class="oi oi-arrow-left"></span></BSButton>
 
              </BSCol>
          </BSForm>
@@ -285,19 +292,19 @@
                 <BSRow>
 
                     <BSCol Column="3">
-                        <BSLabel>Centro</BSLabel>
+                        <BSLabel>@ValidationMessages.Centro</BSLabel>
                         <BSInput InputType="InputType.Text" IsDisabled @bind-Value="DiscForm.Rdcentro" />
                      </BSCol>
 
 
                      <BSCol Column="2">
-                         <BSLabel>División</BSLabel>
+                         <BSLabel>@ValidationMessages.Division</BSLabel>
                          <BSInput InputType="InputType.Text" IsDisabled @bind-Value="DiscForm.Rddiv">
                          </BSInput>
                      </BSCol>
 
                      <BSCol Column="2">
-                         <BSLabel>Área</BSLabel>
+                         <BSLabel>@ValidationMessages.Area</BSLabel>
                          <BSInput InputType="InputType.Text" IsDisabled @bind-Value="DiscForm.Rdarea">
                          </BSInput>
                      </BSCol>
@@ -306,17 +313,18 @@
 
                      <BSInput InputType="InputType.Select" hidden @bind-Value="DiscForm.Idksf">
 
-                         <option value="">Seleccione...</option>
-                         @foreach (var d in KsfData.ksfs)
-                        {
-                            <option value="@d.Idksf">@d.KsfNombre</option>
-                        }
+                         <option value="">@ValidationMessages.Seleccione...</option>
+                            @foreach (var d in KsfData.ksfs.Where(x => x.Idksf != 6))
+                            {
+                                var texto = usuarioActual.idPais == 5? d.KsfEnglish : d.KsfNombre;
+                                <option value="@d.Idksf">@texto</option>
+                            }
 
                     </BSInput>
 
 
                     <BSCol Column="2">
-                        <BSLabel>C. Equipo</BSLabel>
+                        <BSLabel>@ValidationMessages.CodigoDeEquipo</BSLabel>
                         <BSInput InputType="InputType.Text" IsDisabled @bind-Value="DiscForm.RdcodEq" />
                      </BSCol>
 
@@ -325,14 +333,14 @@
                  <p></p>
                  <BSRow>
                      <BSCol Column="6">
-                         <BSLabel>Discrepancia</BSLabel>
+                         <BSLabel>@ValidationMessages.Discrepancia</BSLabel>
                          <BSInput InputType="InputType.Text" @bind-Value="DiscForm.Rddisc" />
                      </BSCol>
                  </BSRow>
                  <BSRow>
 
                      <BSCol Column="6">
-                         <BSLabel>Plan de Acción</BSLabel>
+                         <BSLabel>@ValidationMessages.PlanDeAccion</BSLabel>
                          <BSInput InputType="InputType.Text" @bind-Value="DiscForm.RdplanAcc" />
                      </BSCol>
                  </BSRow>
@@ -349,7 +357,7 @@
                      @if (planificador == "Admin" || planificador == "Planificador" || planificador == "SuperAdmin")
                     {
                         <BSCol Column="2">
-                            <BSLabel>Fecha del Trabajo</BSLabel>
+                            <BSLabel>@ValidationMessages.FechaDelTrabajo</BSLabel>
                             <BSInput InputType="InputType.Date" @bind-Value="DiscForm.RdfecTra" />
                         </BSCol>
 
@@ -357,19 +365,21 @@
                     else
                     {
                         <BSCol Column="2">
-                            <BSLabel>Fecha del Trabajo</BSLabel>
+                            <BSLabel>@ValidationMessages.FechaDelTrabajo</BSLabel>
                             <BSInput InputType="InputType.Date" @bind-Value="DiscForm.RdfecTra" />
                         </BSCol>
                     }
 
 
                     <BSCol ColumnSmall="2">
-                        <BSLabel>Responsable</BSLabel>
+                        <BSLabel>@ValidationMessages.Responsable</BSLabel>
                         <BSInput InputType="InputType.Select" IsDisabled @bind-Value="DiscForm.IdResReu">
-                             <option value="">Seleccione...</option>
-                             @foreach (var d in RespoReuData.resporeus)
+                             <option value="">@ValidationMessages.Seleccione...</option>
+                            @foreach (var d in RespoReuData.resporeus)
                             {
-                                <option value="@d.IdResReu">@d.Rrnombre</option>
+                                <option value="@d.IdResReu">@ValidationMessages.ResourceManager.GetString(ValidationMessages
+                                    .MapResponsableKey(d.Rrnombre),CultureInfo.CurrentUICulture)
+                                </option>
                             }
                         </BSInput>
 
@@ -378,15 +388,15 @@
 
 
                     <BSCol ColumnSmall="2">
-                        <BSLabel>Código</BSLabel>
+                        <BSLabel>@ValidationMessages.Codigo</BSLabel>
                         <BSInput InputType="InputType.Select" @bind-Value="DiscForm.RdcodDis">
-                            <option value="">Seleccione...</option>
-                            <option value="1">1- En Curso</option>
-                            <option value="2">2- Próxima Parada</option>
-                            <option value="3">3- Falta Repuesto</option>
-                            <option value="4">4- Falta de Personal</option>
-                            <option value="5">5- Eq. no Disponible</option>
-                            <option value="6">6- Parada Mayor</option>
+                            <option value="">@ValidationMessages.Seleccione...</option>
+                            <option value="1">1- @ValidationMessages.EnCurso</option>
+                            <option value="2">2- @ValidationMessages.ProximaParada</option>
+                            <option value="3">3- @ValidationMessages.FaltaRepuesto</option>
+                            <option value="4">4- @ValidationMessages.FaltaDePersonal</option>
+                            <option value="5">5- @ValidationMessages.EquipoNoDisponible</option>
+                            <option value="6">6- @ValidationMessages.ParadaMayor</option>
                         </BSInput>
                     </BSCol>
 
@@ -400,17 +410,17 @@
 
                                     @if (tipo == 0 || tipo == 2)
                             {
-                                <option value="Listo">Listo</option>
-                                <option value="Pendiente/Responsable">Pendiente/Responsable</option>
+                                <option value="Listo">@ValidationMessages.Listo</option>
+                                <option value="Pendiente/Responsable">@ValidationMessages.Pendiente / @ValidationMessages.Responsable</option>
 
                             }
                             else
                             {
-                                <option value="Revisar">Revisar</option>
+                                <option value="Revisar">@ValidationMessages.Revisar</option>
                             }
 
-                            <option value="Pendiente">Pendiente</option>
-                            <BSFeedback For="@(() => DiscForm.Rdstatus)" ValidMessage="Correcto." />
+                            <option value="Pendiente">@ValidationMessages.Pendiente</option>
+                            <BSFeedback For="@(() => DiscForm.Rdstatus)" ValidMessage="@ValidationMessages.Correcto" />
                         </BSInput>
                     </BSCol>
                         }
@@ -422,9 +432,9 @@
                                 <BSCol ColumnSmall="2">
                                     <BSLabel>Status</BSLabel>
                                     <BSInput InputType="InputType.Select" @bind-Value="DiscForm.Rdstatus">
-                                        <option value="Cerrado">Cerrado</option>
+                                        <option value="Cerrado">@ValidationMessages.Cerrado</option>
 
-                                        <BSFeedback For="@(() => DiscForm.Rdstatus)" ValidMessage="Correcto." />
+                                        <BSFeedback For="@(() => DiscForm.Rdstatus)" ValidMessage="@ValidationMessages.Correcto" />
                                     </BSInput>
                                 </BSCol>
                             }
@@ -436,15 +446,15 @@
 
                                         @if (tipo == 0 || tipo == 2)
                             {
-                                <option value="Listo">Listo</option>
+                                <option value="Listo">@ValidationMessages.Listo</option>
                             }
                             else
                             {
-                                <option value="Revisar">Revisar</option>
+                                <option value="Revisar">@ValidationMessages.Revisar</option>
                             }
 
-                            <option value="Pendiente">Pendiente</option>
-                            <BSFeedback For="@(() => DiscForm.Rdstatus)" ValidMessage="Correcto." />
+                            <option value="Pendiente">@ValidationMessages.Pendiente</option>
+                            <BSFeedback For="@(() => DiscForm.Rdstatus)" ValidMessage="@ValidationMessages.Correcto" />
                         </BSInput>
                     </BSCol>
                             }
@@ -475,8 +485,8 @@
                 <p></p>
                 <p></p>
                 <BSCol Column="12">
-                    <BSButton Color="BSColor.Success" Size="Size.ExtraSmall" IsSubmit>  Guardar <span class="oi oi-check"></span></BSButton>
-                 <BSButton Color="BSColor.Danger" Size="Size.ExtraSmall" OnClick=Back>  Atras <span class="oi oi-arrow-left"></span></BSButton>
+                    <BSButton Color="BSColor.Success" Size="Size.ExtraSmall" IsSubmit>  @ValidationMessages.Guardar <span class="oi oi-check"></span></BSButton>
+                 <BSButton Color="BSColor.Danger" Size="Size.ExtraSmall" OnClick=Back>  @ValidationMessages.Atras <span class="oi oi-arrow-left"></span></BSButton>
              </BSCol>
          </BSForm>
         }
@@ -493,15 +503,15 @@
 
 @if (CambiosFecha.Count() > 0)
 {
-    <p> Cambios de  Fecha de Trabajo Restantes: @(5 - CambiosFecha.Count()) </p>
+    <p> @ValidationMessages.CambiosDeFechaDeTrabajoRestantes @(5 - CambiosFecha.Count()) </p>
     <div style="width: 40vw;">
         <BSTable IsResponsive="true" IsStriped="true" IsBordered="true">
             <BSTHead Class="cabecera">
                 <BSTR>
                     <BSTD>#</BSTD>
-                    <BSTD>Fecha del Cambio</BSTD>
-                    <BSTD>Nueva Fecha de Trabajo</BSTD>
-                    <BSTD>Usuario</BSTD>
+                    <BSTD>@ValidationMessages.FechaDelCambio</BSTD>
+                    <BSTD>@ValidationMessages.NuevaFechaDeTrabajo</BSTD>
+                    <BSTD>@ValidationMessages.Usuario</BSTD>
                 </BSTR>
             </BSTHead>
             <BSTBody>
@@ -555,6 +565,7 @@
     private DateTime? camFec;//Variable para verificar si es el usuario cambio la Fecha;
 
     private List<Claim> claims { get; set; }//obtener datos del token
+    private Usuario? usuarioActual;
 
 
 
@@ -567,7 +578,7 @@
 
     protected override async Task OnParametersSetAsync()
     {
-
+        usuarioActual = await UsuarioContexto.ObtenerUsuarioActualAsync();
         await CreateData();
         loader = true;
         Emp = claims[5].Value;
@@ -592,21 +603,28 @@
         string backdiv = DiscForm.Rddiv;
 
         CentroDivisionDTO centrodiv = await PizarraData.GetCentroDivi(backcentro, backdiv, 1);
+        string lang = usuarioActual.idPais == 5 ? "en" : "es";
+        string accion = centrodiv.IdCentro.ToString();
+        string division = centrodiv.IdDivision.ToString();
+        string lineaFinal = linea ?? "Todo";
+        string f1Final = f1 ?? DateTime.Today.ToString("dd-MM-yyyy");
+        string f2Final = f2 ?? DateTime.Today.ToString("dd-MM-yyyy");
+        string estFinal = est ?? "Todo";
 
-        if (tipo == 0)
-        {
+        string ruta = "";
 
-            NavigationManager.NavigateTo($"pendientes/{centrodiv.IdCentro}/{centrodiv.IdDivision}/{linea}/{f1}/{f2}/{tipo}/{est}", forceLoad: true);
-        }
-        else if (tipo == 2)
+        if (tipo == 0 || tipo == 2)
         {
-            NavigationManager.NavigateTo($"pendientes/{centrodiv.IdCentro}/{centrodiv.IdDivision}/{linea}/{f1}/{f2}/{tipo}/{est}", forceLoad: true);
+            ruta = $"{lang}/{(lang == "en" ? "remaining" : "pendientes")}/{accion}/{division}/{lineaFinal}/{f1Final}/{f2Final}/{tipo}/{estFinal}";
         }
         else
         {
-            NavigationManager.NavigateTo($"reunion/{centrodiv.IdCentro}/{centrodiv.IdDivision}/Re/{f1}/{f2}/{tipo}/{est}", forceLoad: true);
+            ruta = $"{lang}/{(lang == "en" ? "meeting" : "reunion")}/{accion}/{division}/{lineaFinal}/{f1Final}/{f2Final}/{tipo}/{estFinal}";
         }
+
+        NavigationManager.NavigateTo(ruta, true);
     }
+    
     async Task Editar()
     {
         try
@@ -617,15 +635,15 @@
             {
                 if (CambiosFecha.Count() >= 5 & camFec != DiscForm.RdfecTra)
                 {
-                    NotificationService.Notify(Notificar.Notificacion("error", "Atención", "Alcanzó el límite de cambios de Fecha de Trabajo."));
+                    NotificationService.Notify(Notificar.Notificacion("error", ValidationMessages.Atencion, ValidationMessages.Limite));
                 }
                 else if (String.IsNullOrEmpty(DiscForm.RdplanAcc) && DiscForm.Rdstatus == "Cerrado")
                 {
-                    NotificationService.Notify(Notificar.Notificacion("advertencia", "Atención", "No se puede cerrar sin Plan de Acción."));
+                    NotificationService.Notify(Notificar.Notificacion("advertencia", ValidationMessages.Atencion, ValidationMessages.NPA1));
                 }
                 else if (PlanOld != DiscForm.RdplanAcc && String.IsNullOrEmpty(DiscForm.RdplanAcc))
                 {
-                    NotificationService.Notify(Notificar.Notificacion("advertencia", "Atención", "No se guardar con Plan de Acción vacío."));
+                    NotificationService.Notify(Notificar.Notificacion("advertencia", ValidationMessages.Atencion, ValidationMessages.NPA2));
                     DiscForm.RdplanAcc = PlanOld;
                 }
                 else
@@ -671,21 +689,43 @@
 
                     await AvisadorData.InsertCambioStatus(CambStat);
                     await AvisadorData.InsertCambioFec(CambFec);
-                    cambio = await PizarraData.UpdateDiscrepancia2(DiscForm, (int)Id, (int)tipo, f1, f2, est, linea);
+                    var resultado = await PizarraData.UpdateDiscrepancia2(DiscForm, (int)Id);
+                    cambio = resultado.success;
+                    // Obtener centro y división para navegación
+                    var centrodiv = await PizarraData.GetCentroDivi(DiscForm.Rdcentro, DiscForm.Rddiv, 1);
+                    string centro = centrodiv.IdCentro.ToString();
+                    string division = centrodiv.IdDivision.ToString();
 
+                    string lang = usuarioActual.idPais == 5 ? "en" : "es";
+                    string f1Final = f1 ?? DateTime.Today.ToString("dd-MM-yyyy");
+                    string f2Final = f2 ?? DateTime.Today.ToString("dd-MM-yyyy");
+                    string estFinal = est ?? "Todo";
+                    string lineaFinal = linea ?? "Todo";
 
+                    string ruta = "";
+
+                    if ((int)tipo == 0 || (int)tipo == 2)
+                    {
+                        ruta = $"{lang}/{(lang == "en" ? "remaining" : "pendientes")}/{centro}/{division}/{lineaFinal}/{f1Final}/{f2Final}/{tipo}/{estFinal}";
+                    }
+                    else if ((int)tipo == 1)
+                    {
+                        ruta = $"{lang}/{(lang == "en" ? "meeting" : "reunion")}/{centro}/{division}/Re/{f1Final}/{f2Final}/{tipo}/Reunion";
+                    }
+
+                    NavigationManager.NavigateTo(ruta, true);
                 }
             }
 
             else
             {
-                NotificationService.Notify(Notificar.Notificacion("advertencia", "Revise los datos", "La fecha de trabajo no puede ser menor a la fecha de reunión."));
+                NotificationService.Notify(Notificar.Notificacion("advertencia", ValidationMessages.ERevisar, ValidationMessages.FechaMenor));
 
             }
 
             if (cambio == false)
             {
-                NotificationService.Notify(Notificar.Notificacion("advertencia", "Falló el registro, intente de nuevo.", "Si el problema persiste,  recargue la página."));
+                NotificationService.Notify(Notificar.Notificacion("advertencia", ValidationMessages.FalloR, ValidationMessages.ErrorP));
 
             }
 
@@ -693,13 +733,9 @@
         catch (Exception ex)
         {
 
-            NotificationService.Notify(Notificar.Notificacion("error", "Ocurrió un error inesperado.", "Por favor,  recargue la página."));//LLamar notificacion con el objeto de logic
+            NotificationService.Notify(Notificar.Notificacion("error", ValidationMessages.ErrorInesp, ValidationMessages.Reload));//LLamar notificacion con el objeto de logic
 
         }
 
     }
-
-
-
-
-}
+}    

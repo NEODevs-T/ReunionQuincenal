@@ -1,6 +1,144 @@
 ﻿@inject AuthenticationStateProvider AuthStateProvider
+@inject NavigationManager Navigation
 @page "/"
+@page "/es/inicio"
+@page "/en/home"
 
+
+@if (idPais == TrinidadYTobago)
+{
+<PageTitle>Index</PageTitle>
+
+<div class="p-4 text-white text-center position-relative" style="background: linear-gradient(90deg, #003300, #006600);">
+    <h1 class="fw-bold">BIMONTHLY MEETING NEO</h1>
+    <div class="position-absolute w-100" style="height: 5px; bottom: 0; background: linear-gradient(to right, transparent, white, transparent);"></div>
+</div>
+
+<div class="boxhome p-4 shadow-lg rounded mt-3 position-relative" 
+     style="background-color: #f1f1f1; border-left: 5px solid #004d00;">
+    <div class="d-flex align-items-center">
+        <div class="flex-grow-1">
+            <h3 class="fw-bold text-dark">Meeting to ensure stability of the production process</h3>
+            <p class="text-secondary">📌 Follow-up on action plans and effective coordination.</p>
+        </div>
+        <img src="./images/LogoGris.png" width="120px" class="ms-3"/>
+</div>
+
+<style>
+    /* Estilos generales para mejorar la presentación */
+    .boxhome {
+        transition: all 0.3s ease-in-out;
+    }
+
+    .boxhome:hover {
+        background-color: #e0e0e0;
+    }
+</style>
+
+<div class="boxhome">	
+<BSCarousel HasControls="true" HasIndicators="true" >
+    <BSCarouselItem Interval="0" >
+
+        <img src="./images/vision.png" width="100%" height="90%"/>
+
+    </BSCarouselItem>
+    <BSCarouselItem Interval="0">
+        <img src="./images/valores.png" width="100%" height="90%"/>
+
+    </BSCarouselItem>   
+
+        }
+@*  <BSCarouselItem>
+        <svg class="bd-placeholder-img bd-placeholder-img-lg d-block w-100" width="800" height="400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Third slide" preserveAspectRatio="xMidYMid slice" focusable="false">
+            <rect width="100%" height="100%" fill="#555"></rect><text x="50%" y="50%" fill="#333" dy=".3em">Third slide</text>
+        </svg>
+        <BSCarouselCaption Class="d-none d-md-block">
+            <h5>Third slide label</h5>
+            <p>Some representative placeholder content for the third slide.</p>
+        </BSCarouselCaption>
+    </BSCarouselItem> *@
+	
+</BSCarousel>
+
+</div>
+
+<p></p>
+<p></p>
+  
+
+<div class="boxhome p-4 shadow-lg rounded" style="background-color: #ffffff; border-left: 5px solid #005f5f;">
+    <h4 class="fw-bold text-uppercase" style="color: #004d00; border-bottom: 2px solid #004d00; display: inline-block; padding-bottom: 5px;">
+        Programming/Reprogramming Codes for Action Plans
+    </h4>
+
+    <div class="mt-3">
+        <p><span style="color:rgb(33, 36, 36); font-weight: bold;">1.-</span> In Progress <span class="text-muted"> (Action scheduled for the first time to be completed within a maximum of 2 weeks)</span></p>
+        <p><span style="color:rgb(33, 36, 36); font-weight: bold;">2.-</span> Next Stop <span class="text-muted">(Action to be executed during the next scheduled stop)</span></p>
+        <p><span style="color:rgb(33, 36, 36); font-weight: bold;">3.-</span> Missing Spare Part</p>
+        <p><span style="color:rgb(33, 36, 36); font-weight: bold;">4.-</span> Lack of Personnel</p>
+        <p><span style="color:rgb(33, 36, 36); font-weight: bold;">5.-</span> Equipment Unavailable Due to Production</p>
+        <p><span style="color:rgb(33, 36,36); fount-weight: bold;">6.-</span> Major Downtime (Stops lasting more than 24 hours)</p> 
+    </div>
+</div>
+
+
+<p></p>
+<p></p>
+<div class="boxhome p-3 shadow-lg rounded" style="background-color: #f8f9fa; border-left: 5px solid #005f5f;">
+    <h4 class="fw-bold" style="color: #004d00;">Normativa General</h4>
+
+    <div class="mt-3">
+        <p><strong>2.1</strong> <i class="bi bi-dot"></i> Start Time: <strong>09:00 am</strong>.</p>
+        <p><strong>2.2</strong> <i class="bi bi-dot"></i> Maximum Duration: <strong>20 minutes</strong>.</p>
+        <p><strong>2.3</strong> <i class="bi bi-dot"></i> The door will be closed once the meeting begins</p>
+        <p><strong>2.4</strong> <i class="bi bi-dot"></i> Entry is not allowed after the scheduled Start time.</p>
+        <p><strong>2.5</strong> <i class="bi bi-dot"></i> Attendance must be taken at the beginning of the meeting.</p>
+        <p><strong>2.6</strong> <i class="bi bi-dot"></i> Staff must be prepared with action plans.</p>
+        <p><strong>2.7</strong> <i class="bi bi-dot"></i> The Maintenance Planner will report overdue or ongoing activities <strong>Every Friday</strong>.</p>
+        <p><strong>2.8</strong> <i class="bi bi-dot"></i> <span class="text-danger fw-bold">Use of mobile phones is prohibited</span> during the meeting.</p>
+        <p><strong>2.9</strong> <i class="bi bi-dot"></i> Each Division Superintendent must hold their own meeting.</p>
+    </div>
+</div>
+
+
+@*<p>2.-	Cada vez que se cambie una fecha de una acción se debe actualizar el código de la reprogramación	</p>
+<p>3.-	Un Plan de Acción puede tener una fecha de compromiso y máximo 2 fechas de reprogramación o refechaje. Si todavía es necesario posponer un plan de acción (a mas de 3 fechas) se debe mantener la segunda fecha de refechaje en el Power Suite, además de reflejarlo como plan de acción retrazado en la Pizarra de Gestión Diaria	
+</p>
+<p>4.-	Es responsabilidad del Planificador de Mantenimiento el mantener actualizado y con la información correcta y completa el Sistema Power suite	</p>
+<p>5,-	En el casos de los planes de acción del personal de Mantenimiento, los Códigos de Programación "En Curso" y "Próxima Parada" son responsabilidad de los supervisores y los código de Programación "Falta Repuesto", "Falta de Personal" y "Eq. no Disponible" son responsabilidad de los Superintendentes de Mtto. garantizar los recursos y deben estar canalizadas a través de planes de acción en la reunión quincenal.	
+</p>
+<p>6.-	Los planes de acción que se le envíen al Planificador de Mantenimiento deben estar completos, es decir, deben contener:	
+		<p>- El KSF</p>
+		<p>- El código del equipo</p>
+		<p>- El Problema o la discrepancia</p>
+		<p>- El código de Programación</p>
+		<p>- La Acción</p>
+		<p>- Las Horas</p>
+		<p>- El responsable</p>
+		<p>- La fecha de compromiso</p>
+	En caso que falte alguno de los campos anteriores el planificador debe devolver el plan de acción al remitente.	
+</p>		
+<p>7.-	Todas las acciones para corregir discrepancias de mantenimiento que se reporten en la reunión diaria deben definírsele  el tiempo estimado de ejecución.	</p>
+<p>8.-	Todas las acciones para corregir discrepancias de mantenimiento que se reporten en la reunión diaria deben reportarse contra una ODT ya sea una ODT  general o una especifica contra el equipo o posición técnica (nueva ODT)	
+		- Las ODT se hacen especificas cuando el trabajo es contra un equipo o posición técnica, y que involucren trabajos de mas de media hora o consumo de Repuestos
+		
+		- A las ODT generales se les asignaran trabajos que no son en un equipo o posición técnica especifica tal como limpiezas de áreas y equipos, movimiento de partes o equipos, etc. También son las usadas para retirar consumibles (no repuestos) de producción y/o Mantenimiento (tales como  guantes, tirro, teipes, baterías, etc.)
+</p>		
+<p>9.-	Las autorizaciones de cierre de los Planes de Acción culminados deben ser hechas por los Spttes. de Producción	</p>
+		
+<p>10.-	El campo KSF tendra las siguientes alternativas: 	
+		
+	En la reunion Diaria:	Produccion: cuando afecta la produccion directamente y el responsable sea alguien de Produccion
+		Mantenimiento:  cuando afecta la produccion directamente y el responsable sea alguien de Mtto.
+		Calidad: cuando afecta la calidad del producto directamente y cualquier responsable
+		Seguridad: cuando afecta la seguridad de las personas directamente y cualquier responsable
+	Reu. Quincenal: Para los planes de accion derivados de la reunion quincenal y cualquier responsable	
+	Auditorias: Para los planes de accion derivados de las Auditorias y cualquier responsable	
+	ESD: Para los planes de accion derivados de los equipos de solucion de discrepancias y cualquier responsable</p>	*@
+</div>
+}
+else
+{
 <PageTitle>Index</PageTitle>
 
 <div class="p-4 text-white text-center position-relative" style="background: linear-gradient(90deg, #003300, #006600);">
@@ -76,7 +214,7 @@
         <p><span style="color:rgb(33, 36, 36); font-weight: bold;">3.-</span> Falta Repuesto</p>
         <p><span style="color:rgb(33, 36, 36); font-weight: bold;">4.-</span> Falta de Personal</p>
         <p><span style="color:rgb(33, 36, 36); font-weight: bold;">5.-</span> Equipo no Disponible por producción</p>
-        <p><span style="color:rgb(33, 36, 36); font-weight: bold;">6.-</span> Parada Mayor <span class="text-muted">(Paradas que sean superiores a 24 horas)</span></p>
+        <p><span style="color:rgb(33, 36,36); fount-weight: bold;">6.-</span> Parada Mayor (Paradas que sean superiores a 24 horas)</p> 
     </div>
 </div>
 
@@ -135,20 +273,45 @@
 	Auditorias: Para los planes de accion derivados de las Auditorias y cualquier responsable	
 	ESD: Para los planes de accion derivados de los equipos de solucion de discrepancias y cualquier responsable</p>	*@
 </div>			
+}
 
 @code{
     private List<Claim> claims { get; set; }
-        private string Pais { get; set; } = ""; //pais
+    private string Pais { get; set; } = ""; //pais
     private string UsrRol { get; set; } = ""; //rol para filtrar
+    private int idPais { get; set; }
+    private const int TrinidadYTobago = 5;
+
+    [CascadingParameter]
+    private Task<AuthenticationState>? authenticationState { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        await base.OnInitializedAsync();
-        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
-        var user = authState.User;
-        claims = Enumerable.ToList(user.Claims);
-        Pais = claims.FirstOrDefault(c => c.Type.Contains("Pais"))?.Value;
+        if (authenticationState is not null)
+        {
+            var authState = await authenticationState;
+            var user = authState.User;
 
+            if (user.Identity is not null && user.Identity.IsAuthenticated)
+            {
+                idPais = GetIdPais(user);
 
+                // Redirigir si está en la raíz "/"
+                var currentUri = Navigation.Uri;
+                if (Navigation.ToBaseRelativePath(currentUri) == "")
+                {
+                    if (idPais == TrinidadYTobago)
+                        Navigation.NavigateTo("/en/home", forceLoad: true);
+                    else
+                        Navigation.NavigateTo("/es/inicio", forceLoad: true);
+                }
+            }
+        }
+    }
+
+    private int GetIdPais(ClaimsPrincipal user)
+    {
+        int.TryParse(user.FindFirst(c => c.Type == "IdPais")?.Value, out int _idPais);
+        return _idPais;
     }
     }

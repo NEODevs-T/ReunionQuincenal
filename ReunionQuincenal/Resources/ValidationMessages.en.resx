@@ -1,0 +1,192 @@
+<?xml version='1.0' encoding='utf-8'?>
+<root>
+<resheader name="resmimetype">
+<value>text/microsoft-resx</value>
+</resheader>
+<resheader name="version">
+<value>2.0</value>
+</resheader><resheader name="reader">
+<value>System.Resources.ResXResourceReader, System.Windows.Forms, ...</value>
+</resheader><resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, ...</value>
+</resheader>
+<data name="Accion" xml:space="preserve"><value>Action</value></data>
+<data name="Acciones" xml:space="preserve"><value>Actions</value></data>
+<data name="Aceptar" xml:space="preserve"><value>Accept</value></data>
+<data name="Advertencia" xml:space="preserve"><value>warning</value></data>
+<data name="Area" xml:space="preserve"><value>Area</value></data>
+<data name="Asistencia" xml:space="preserve"><value>Attendance</value></data>
+<data name="Asistentes" xml:space="preserve"><value>Attendees</value></data>
+<data name="Asuntos" xml:space="preserve"><value>List of Issues</value></data>
+<data name="Atencion" xml:space="preserve"><value>Attention</value></data>
+<data name="Atras" xml:space="preserve"><value>Back</value></data>
+<data name="Bloque" xml:space="preserve"><value>Block</value></data>
+<data name="Borrar" xml:space="preserve"><value>Erase</value></data>
+<data name="Buscar" xml:space="preserve"><value>Search</value></data>
+<data name="Cargo" xml:space="preserve"><value>Position</value></data>
+<data name="Calendario" xml:space="preserve"><value>Calendar</value></data>
+<data name="Calidad" xml:space="preserve"><value>Quality</value></data>
+<data name="CambiosDeEstados" xml:space="preserve"><value>Changes of Status</value></data>
+<data name="CambiosDeFechaTrabajo" xml:space="preserve"><value>Changes of Work Date</value></data>
+<data name="Centro" xml:space="preserve"><value>Center</value></data>
+<data name="Cerrado" xml:space="preserve"><value>Closed</value></data>
+<data name="Codigo" xml:space="preserve"><value>Code</value></data>
+<data name="CodigoDeEquipo" xml:space="preserve"><value>Equipment Code</value></data>
+<data name="Compras" xml:space="preserve"><value>Purchases</value></data>,
+<data name="Consolidacion" xml:space="preserve"><value>Consolidation</value></data>
+<data name="ConsolidacionDeDiscrepancia" xml:space="preserve"><value>Issues Consolidation</value></data>
+<data name="Consultar" xml:space="preserve"><value>Consult</value></data>
+<data name="Correcto" xml:space="preserve"><value>Correct.</value></data>
+<data name="Desde" xml:space="preserve"><value>From</value></data>
+<data name="DetallesDeCalidad" xml:space="preserve"><value>Quality Details</value></data>
+<data name="Discrepancia" xml:space="preserve"><value>Add Issue</value></data>
+<data name="Discrepancias" xml:space="preserve"><value>Issues</value></data>
+<data name="Division" xml:space="preserve"><value>Division</value></data>
+<data name="EDato" xml:space="preserve"><value>Error inserting data, please try again.</value></data>
+<data name="EditarDiscrepancia" xml:space="preserve"><value>Edit Issue</value></data>
+<data name="Efluentes" xml:space="preserve"><value>Effluents</value></data>
+<data name="EnCurso" xml:space="preserve"><value>In Progress</value></data>
+<data name="Error" xml:space="preserve"><value>Error loading data</value></data>
+<data name="ErrorConexion" xml:space="preserve"><value>Connection Error</value></data>
+<data name="ErrorConexionM" xml:space="preserve"><value>Data connection error. Please try again.</value></data>
+<data name="ErrorInesp" xml:space="preserve"><value>Unexpected Error.</value></data>
+<data name="ErrorInser" xml:space="preserve"><value>Error inserting, please try again.</value></data>
+<data name="Estado" xml:space="preserve"><value>Status</value></data>
+<data name="Exito" xml:space="preserve"><value>success</value></data>
+<data name="FReunion" xml:space="preserve"><value>M. Date</value></data>
+<data name="FTrabajo" xml:space="preserve"><value>W. Date</value></data>
+<data name="FechaDeReunion" xml:space="preserve"><value>Metting Date</value></data>
+<data name="FechaDelCambio" xml:space="preserve"><value>Change Date</value></data>
+<data name="Filtrar" xml:space="preserve"><value>To Filter</value></data>
+<data name="FiltroFechaDeReunion" xml:space="preserve"><value>Meeting Date Filter</value></data>
+<data name="FiltroFechaDeTrabajo" xml:space="preserve"><value>Work Date Filter</value></data>
+<data name="Guardar" xml:space="preserve"><value>Save</value></data>
+<data name="Hasta" xml:space="preserve"><value>To</value></data>
+<data name="hay_registros_vencidos" xml:space="preserve"><value>There are expired records</value></data>
+<data name="Historicos" xml:space="preserve"><value>Historical</value></data>
+<data name="Hoy" xml:space="preserve"><value>Today</value></data>
+<data name="Imprimir" xml:space="preserve"><value>Print</value></data>
+<data name="Linea" xml:space="preserve"><value>Line</value></data>
+<data name="Listo" xml:space="preserve"><value>Done</value></data>
+<data name="LlDisp" xml:space="preserve"><value>Fill in the issues.</value></data>
+<data name="Mtto_ElectricoElectronico" xml:space="preserve"><value>Electrical/Electronic Maint.</value></data>
+<data name="Mtto_Mecanico" xml:space="preserve"><value>Mechanical Maint.</value></data>
+<data name="Mtto_Instrumentacion" xml:space="preserve"><value>Instrumentation Maint.</value></data>
+<data name="Mtto_Infraestructura" xml:space="preserve"><value>Infrastructure Maint.</value></data>
+<data name="NEquipo" xml:space="preserve"><value>Equi. Number</value></data>
+<data name="NFDatos" xml:space="preserve"><value>No data found to process.</value></data>
+<data name="NPA1" xml:space="preserve"><value>Cannot be closed without an Action Plan.</value></data>
+<data name="NPA2" xml:space="preserve"><value>Cannot be saved with an empty Action Plan.</value></data>
+<data name="NSDatos" xml:space="preserve"><value>Required data not found for saving.</value></data>
+<data name="NoCargadoP" xml:space="preserve"><value>No personnel has been assigned to this center.</value></data>
+<data name="NoHayDatos" xml:space="preserve"><value>No data available for this date.</value></data>
+<data name="NoHayDatos2" xml:space="preserve"><value>No data to display.</value></data>
+<data name="NoHayDescrip" xml:space="preserve"><value>No description available.</value></data>
+<data name="NoHayEquipos" xml:space="preserve"><value>No equipment available.</value></data>
+<data name="NoHayRegistros" xml:space="preserve"><value>No records found.</value></data>
+<data name="NoHayRegistros2" xml:space="preserve"><value>No records yet...</value></data>
+<data name="NombreDelEquipo" xml:space="preserve"><value>Equipment Name</value></data>
+<data name="NuevaFechaDeTrabajo" xml:space="preserve"><value>New Date Work</value></data>
+<data name="Nuevo" xml:space="preserve"><value>New</value></data>
+<data name="ODT" xml:space="preserve"><value>Insert ODT.</value></data>
+<data name="ObservacionesDeCalidad" xml:space="preserve"><value>Quality Observation</value></data>
+<data name="Operaciones" xml:space="preserve"><value>Operations</value></data>
+<data name="Ordenar" xml:space="preserve"><value>Order</value></data>
+<data name="OrgDelProducto" xml:space="preserve"><value>Product Origin</value></data>
+<data name="Pendiente" xml:space="preserve"><value>Pending</value></data>
+<data name="Personal" xml:space="preserve"><value>Personnel</value></data>
+<data name="PlanDeAccion" xml:space="preserve"><value>Action Plan</value></data>
+<data name="Por_Definir" xml:space="preserve"><value>To Be Defined</value></data>
+<data name="Presencia" xml:space="preserve"><value>Presence</value></data>
+<data name="RExitoso" xml:space="preserve"><value>Successful Record.</value></data>
+<data name="RHorario" xml:space="preserve"><value>Registration is only allowed during meeting hours.</value></data>
+<data name="Reload" xml:space="preserve"><value>Please Reload page.</value></data>
+<data name="RequiredPassword" xml:space="preserve"><value>Please enter the password.</value></data>
+<data name="RequiredUserName" xml:space="preserve"><value>Please enter the username.</value></data>
+<data name="Responsable" xml:space="preserve"><value>Responsible</value></data>
+<data name="Reunion" xml:space="preserve"><value>Meeting</value></data>
+<data name="SArea" xml:space="preserve"><value>Select the area.</value></data>
+<data name="SCentro" xml:space="preserve"><value>Select the center.</value></data>
+<data name="SDivision" xml:space="preserve"><value>Select the division.</value></data>
+<data name="SEstado" xml:space="preserve"><value>Select the status.</value></data>
+<data name="SSuplente" xml:space="preserve"><value>If there is a substitute, attendance must be marked.</value></data>
+<data name="SVCentro" xml:space="preserve"><value>Select a value in the column Center.</value></data>
+<data name="SVDivision" xml:space="preserve"><value>Select a value in the column Division.</value></data>
+<data name="SVLista" xml:space="preserve"><value>Select the values in the lists.</value></data>
+<data name="Seguridad" xml:space="preserve"><value>Safety</value></data>
+<data name="Seleccione" xml:space="preserve"><value>Select</value></data>
+<data name="SeleccioneUnCentro" xml:space="preserve"><value>Select a center</value></data>
+<data name="SeleccioneUnaDivision" xml:space="preserve"><value>Select a division</value></data>
+<data name="SeleccioneUnaEmpresa" xml:space="preserve"><value>Select a company</value></data>
+<data name="StatusNuevo" xml:space="preserve"><value>New Status</value></data>
+<data name="Suplencia" xml:space="preserve"><value>Substitution</value></data>
+<data name="TCargos" xml:space="preserve"><value>All positions are marked as absent.</value></data>
+<data name="Todo" xml:space="preserve"><value>All</value></data>
+<data name="Todos" xml:space="preserve"><value>All</value></data>
+<data name="Trazabilidad" xml:space="preserve"><value>Traceability</value></data>
+<data name="Usuario" xml:space="preserve"><value>User</value></data>
+<data name="PorcentajeDeAsistencia" xml:space="preserve"><value>Attendance Percentage</value></data>
+<data name="FechaInicial" xml:space="preserve"><value>Start Date</value></data>
+<data name="FechaFinal" xml:space="preserve"><value>End Date</value></data>
+<data name="Empresa" xml:space="preserve"><value>Company</value></data>
+<data name="ExcluirLosDiasNoLaborables" xml:space="preserve"><value>Exclude Non-Working Days</value></data>
+<data name="DiasNoLaborables" xml:space="preserve"><value>Non-Working Days</value></data>
+<data name="FiltrarPorCargo" xml:space="preserve"><value>Filter by Position</value></data>
+<data name="BuscarCargo" xml:space="preserve"><value>Search Position</value></data>
+<data name="PorcentajeGlobal" xml:space="preserve"><value>Global Percentage</value></data>
+<data name="NoExisteEseCargo" xml:space="preserve"><value>That position does not exist</value></data>
+<data name="LimpiarFiltros" xml:space="preserve"><value>Clear Filters</value></data>
+<data name="ReunionesProgramadas" xml:space="preserve"><value>Scheduled Meetings</value></data>
+<data name="ReunionesAsistidas" xml:space="preserve"><value>Attended Meetings</value></data>
+<data name="PorcentajeAsistencia" xml:space="preserve"><value>Attendance Percentage</value></data>
+<data name="BuscarCargo2" xml:space="preserve"><value>Search Position ...</value></data>
+<data name="SeleccioneDML" xml:space="preserve"><value>Select the non-working days you want to exclude:</value></data>
+<data name="AgregarFecha" xml:space="preserve"><value>Add date</value></data>
+<data name="FechasSeleccionadas" xml:space="preserve"><value>Selected datess</value></data>
+<data name="Cancelar" xml:space="preserve"><value>Cancel</value></data>
+<data name="NoHayFiltros" xml:space="preserve"><value>There are no records for the selected filters.</value></data>
+<data name="IniciarSesion" xml:space="preserve"><value>Sign In</value></data>
+<data name="CerrarSesion" xml:space="preserve"><value>Sign Out</value></data>
+<data name="Hola" xml:space="preserve"><value>Hi</value></data>
+<data name="Vencidos" xml:space="preserve"><value>Expired</value></data>
+<data name="ProximaParada" xml:space="preserve"><value>Next Stop</value></data>
+<data name="FaltaRepuesto" xml:space="preserve"><value>Missing Spare Part</value></data>
+<data name="FaltaDePersonal" xml:space="preserve"><value>Lack of Personnel</value></data>
+<data name="EquipoNoDisponible" xml:space="preserve"><value>Equipment Not Available</value></data>
+<data name="ParadaMayor" xml:space="preserve"><value>Major Downtime</value></data>
+<data name="Tiempo" xml:space="preserve"><value>Time</value></data>
+<data name="Requisicion" xml:space="preserve"><value>Requisition</value></data>
+<data name="FechaDelTrabajo" xml:space="preserve"><value>Work Date</value></data>
+<data name="TotalPendiente" xml:space="preserve"><value>Total Pending</value></data>
+<data name="NoConforme" xml:space="preserve"><value>Non-Conforming</value></data>
+<data name="CambiosDeFechaTrabajo" xml:space="preserve"><value>Work Date Changes</value></data>
+<data name="ProximaFecha" xml:space="preserve"><value>Next Date</value></data>
+<data name="Descripcion" xml:space="preserve"><value>Description</value></data>
+<data name="Revisar" xml:space="preserve"><value>Review</value></data>
+<data name="CambiosDeFechaDeTrabajoRestantes" xml:space="preserve"><value>Remaining Work Date Changes:</value></data>
+<data name="Agregar" xml:space="preserve"><value>Add</value></data>
+<data name="SeleccioneBuscar" xml:space="preserve"><value>Select What to Search</value></data>
+<data name="VencidasTurno" xml:space="preserve"><value>Expired Shift</value></data>
+<data name="PendientesLibro" xml:space="preserve"><value>Pending Book</value></data>
+<data name="KsfReunionDiaria" xml:space="preserve"><value>KSF Daily Meeting</value></data>
+<data name="NoRechazada" xml:space="preserve"><value>Could not be rejected</value></data>
+<data name="DiscrepanciaRechazada" xml:space="preserve"><value>The issue has been rejected</value></data>
+<data name="NoAgregada" xml:space="preserve"><value>Could not be added</value></data>
+<data name="ReunionQuincenalAgregada" xml:space="preserve"><value>Successfully added to the Bimonthly Meeting</value></data>
+<data name="VerifiqueCampos" xml:space="preserve"><value>Check all fields</value></data>
+<data name="Dia" xml:space="preserve"><value>Day</value></data>
+<data name="Semana" xml:space="preserve"><value>Week</value></data>
+<data name="Mes" xml:space="preserve"><value>Mouth</value></data>
+<data name="Planificacion" xml:space="preserve"><value>Planification</value></data>
+<data name="Año" xml:space="preserve"><value>Year</value></data>
+<data name="Limite" xml:space="preserve"><value>You have reached the limit for changing the Work Date.</value></data>
+<data name="FalloR" xml:space="preserve"><value>Registration failed, please try again.</value></data>
+<data name="ErrorP" xml:space="preserve"><value>If the problem persists, please reload the page.</value></data>
+<data name="ERevisar" xml:space="preserve"><value>Please check the data.</value></data>
+<data name="FechaMenor" xml:space="preserve"><value>The work date cannot be earlier than the meeting date.</value></data>
+<data name="VencidasDiaria" xml:space="preserve"><value>Daily Overdue</value></data>
+<data name="PendientesDiaria" xml:space="preserve"><value>Pending Daily</value></data>
+<data name="ReunionQuincenal" xml:space="preserve"><value>Bimonthly Meeting</value></data>
+<data name="PendienteFaltaRepuesto" xml:space="preserve"><value>Awaiting Spare Part</value></data>
+<data name="FormatoDeReunion" xml:space="preserve"><value>Meeting Format</value></data>
+<data name="Horas" xml:space="preserve"><value>Hours</value></data>
+</root>

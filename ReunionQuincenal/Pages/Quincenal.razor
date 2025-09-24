@@ -1,4 +1,5 @@
-@page "/turno"
+@page "/es/turno"
+@page "/en/shift"
 
 @inject IAsistenciaReuData AsistenciaReuData
 @inject IAvisadorData AvisadorData
@@ -11,6 +12,10 @@
 @inject AuthenticationStateProvider AuthStateProvider
 @inject ILocalStorageService LocalStorage
 @inject NotificationService NotificationService
+@inject UsuarioContexto UsuarioContexto
+
+@using System.Globalization
+@using ReunionWeb.Resources
 
 @attribute [Authorize(Roles = "Admin, AdminChempro, SuperUser, PrimeUser, SemiAdmin,SuperAdmin")]
 <!DOCTYPE html>
@@ -19,18 +24,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Consolidacion</title>
+    <title>@ValidationMessages.Consolidacion</title>
 </head>
 
 <body>
-    <h3>Consolidacion de Discrepancia</h3>
+    <h3>@ValidationMessages.ConsolidacionDeDiscrepancia</h3>
     @* ccc *@
     <div class="box-reuform">
         <div class="box-reuCent">
-            <label for="">Centro
+            <label for="">@ValidationMessages.Centro
                 <BSInput InputType="InputType.Select" class="Form-imput" @onchange="BuscarDivision"
                     @bind-Value="idCent">
-                    <option value="0">Selecione un Centro</option>
+                    <option value="0">@ValidationMessages.SeleccioneUnCentro</option>
                     @if (MaestraData.centro != null)
                     {
                         @foreach (var d in MaestraData.centro)
@@ -43,9 +48,9 @@
             </label>
         </div>
         <div class="box-reuDiv">
-            <label for="">Division
+            <label for="">@ValidationMessages.Division
                 <BSInput InputType="InputType.Select" class="Form-imput linea" @bind-Value="idDiv">
-                    <option value="0">Selecione una Division</option>
+                    <option value="0">@ValidationMessages.SeleccioneUnaDivision</option>
                     @if (MaestraData.centro != null)
                     {
                         @foreach (var d in MaestraData.divisions)
@@ -58,14 +63,14 @@
             </label>
         </div>
         <div class="box-reutipo">
-            <label for="">Busqueda
+            <label for="">@ValidationMessages.Buscar
                 <BSInput InputType="InputType.Select" class="Form-imput linea" @bind-Value="tipo">
-                    <option value="0">Selecione que Buscar</option>
+                    <option value="0">@ValidationMessages.SeleccioneBuscar</option>
                     @if (MaestraData.centro != null)
                     {
-                        <option value="1">Pendientes Diaria</option>
-                        <option value="2">KSF Reunion Quincenal</option>
-                        <option value="3">Falta Repuesto</option>
+                        <option value="1">@ValidationMessages.PendientesDiaria</option>
+                        <option value="2">KSF @ValidationMessages.ReunionQuincenal</option>
+                        <option value="3">@ValidationMessages.PendienteFaltaRepuesto</option>
 
                     }
                 </BSInput>
@@ -73,7 +78,7 @@
         </div>
 
         <div class="botton-Disc">
-            <button @onclick="buscar" type="submit" id="btn-disc" class="btn btn-primary mb-3">Buscar</button>
+            <button @onclick="buscar" type="submit" id="btn-disc" class="btn btn-primary mb-3">@ValidationMessages.Buscar</button>
         </div>
     </div>
     @if (band == true)
@@ -89,49 +94,49 @@
                 class="tabla-radzen" AllowPaging="true" PageSize="10" AllowSorting="true" Data="@PizarraData.reudiatablas"
                 TItem="ReunionDTO">
                 <Columns>
-                    <RadzenDataGridColumn Width="5%" TItem="ReunionDTO" Title="Linea" Filterable="false" Sortable="false"
+                    <RadzenDataGridColumn Width="5%" TItem="ReunionDTO" Title="@ValidationMessages.Linea" Filterable="false" Sortable="false"
                         TextAlign="TextAlign.Center">
                         <Template Context="data">
                             <RadzenText class="mb-0 tipografia">@data.Rdarea</RadzenText>
                         </Template>
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn Width="5%" TItem="ReunionDTO" Title="C. Equipo" Filterable="false" Sortable="false"
+                    <RadzenDataGridColumn Width="5%" TItem="ReunionDTO" Title="@ValidationMessages.CodigoDeEquipo" Filterable="false" Sortable="false"
                         TextAlign="TextAlign.Center">
                         <Template Context="data">
                             <RadzenText class="mb-0 tipografia">@data.RdcodEq</RadzenText>
                         </Template>
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn Width="5%" TItem="ReunionDTO" Title="C. Equipo" Filterable="false" Sortable="false"
+                    <RadzenDataGridColumn Width="5%" TItem="ReunionDTO" Title="@ValidationMessages.CodigoDeEquipo" Filterable="false" Sortable="false"
                         TextAlign="TextAlign.Center">
                         <Template Context="data">
                             <RadzenText class="mb-0 tipografia">@(string.IsNullOrWhiteSpace(data.EnombreEam) ? "EQUIPO NO ENCONTRADO" : data.EnombreEam)</RadzenText>
                         </Template>
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn Width="5%" TItem="ReunionDTO" Title="Discrepancia" Filterable="false" Sortable="false"
+                    <RadzenDataGridColumn Width="5%" TItem="ReunionDTO" Title="@ValidationMessages.Discrepancia" Filterable="false" Sortable="false"
                         TextAlign="TextAlign.Center">
                         <Template Context="data">
                             <RadzenText class="mb-0 tipografia">@data.Rddisc</RadzenText>
                         </Template>
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn Width="5%" TItem="ReunionDTO" Title="Plan de Accion" Filterable="false"
+                    <RadzenDataGridColumn Width="5%" TItem="ReunionDTO" Title="@ValidationMessages.PlanDeAccion" Filterable="false"
                         Sortable="false" TextAlign="TextAlign.Center">
                         <Template Context="data">
                             <RadzenText class="mb-0 tipografia">@data.RdplanAcc</RadzenText>
                         </Template>
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn Width="5%" TItem="ReunionDTO" Title="F. Reunion" Filterable="false" Sortable="false"
+                    <RadzenDataGridColumn Width="5%" TItem="ReunionDTO" Title="@ValidationMessages.FReunion" Filterable="false" Sortable="false"
                         TextAlign="TextAlign.Center">
                         <Template Context="data">
                             <RadzenText class="mb-0 tipografia">@data.RdfecReu.ToString("dd/MM/yyyy")</RadzenText>
                         </Template>
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn Width="5%" TItem="ReunionDTO" Title="F. Trabajo" Filterable="false" Sortable="false"
+                    <RadzenDataGridColumn Width="5%" TItem="ReunionDTO" Title="@ValidationMessages.FTrabajo" Filterable="false" Sortable="false"
                         TextAlign="TextAlign.Center">
                         <Template Context="data">
                             <RadzenText class="mb-0 tipografia">@data.RdfecTra.ToString("dd/MM/yyyy")</RadzenText>
                         </Template>
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn Width="5%" TItem="ReunionDTO" Title="Acciones" Filterable="false" Sortable="false"
+                    <RadzenDataGridColumn Width="5%" TItem="ReunionDTO" Title="@ValidationMessages.Acciones" Filterable="false" Sortable="false"
                         TextAlign="TextAlign.Center">
                         <Template Context="data">
                             @if (libro == 1)
@@ -147,7 +152,7 @@
         else if (PizarraData.reudiatablas.Count() == 0 && confirmacion == true)
         {
 <div style="text-align: center; padding: 20px; font-size: 18px; color: gray;">
-    <p>No hay registros disponibles</p>
+    <p>@ValidationMessages.NoHayRegistros</p>
 </div>
         }
 
@@ -338,7 +343,7 @@
         } 
         else
         {
-            mensaje = "Verifique todos los campos";
+            mensaje = ValidationMessages.VerifiqueCampos;
             NotificationService.Notify(Notificar.Notificacion("advertencia", mensaje, ""));
 
         }
@@ -356,13 +361,13 @@
 
     if (validacion == true)
     {
-        mensaje = "Se agregó correctamente a la Reunión Quincenal";
+        mensaje =  ValidationMessages.ReunionQuincenalAgregada;
         NotificationService.Notify(Notificar.Notificacion("exito", mensaje, ""));
         await buscar();
     }
     else
     {
-        mensaje = "No pudo ser Agregada";
+        mensaje = ValidationMessages.NoAgregada;
         NotificationService.Notify(Notificar.Notificacion("advertencia", mensaje, ""));
     }
 }
@@ -375,13 +380,13 @@
         bool validacion = await PizarraData.UpdateDiscrepancia3(registro, registro.IdReuDia);
         if (validacion == true)
         {
-            mensaje = "La discrepancia a sido rechazada";
+            mensaje = ValidationMessages.DiscrepanciaRechazada;
             NotificationService.Notify(Notificar.Notificacion("exito", mensaje, ""));
             await buscar();
         }
         else
         {
-            mensaje = "No pudo ser rechazada";
+            mensaje = ValidationMessages.NoRechazada;
             NotificationService.Notify(Notificar.Notificacion("advertencia", mensaje, ""));
         }
     }

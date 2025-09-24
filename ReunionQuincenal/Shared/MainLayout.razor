@@ -4,6 +4,10 @@
 @inject ILocalStorageService LocalStorage
 @inject NavigationManager NavigationManager
 @inject NotificationService NotificationService
+@using System.Globalization
+
+@inject NavigationManager Navigation
+@inject UsuarioContexto UsuarioContexto
 
 <PageTitle>ReunionWeb</PageTitle>
 
@@ -28,16 +32,22 @@
             </main>
         </div>
         <RadzenDialog /> @*Radzen *@
-
+      
 
     </Authorized>
     <NotAuthorized>
-
-
+    <main>
+            <div class="caja-idioma">
+                <select class="idioma" @bind="idioma">
+                    <option value=1>Español</option>
+                    <option value=2>English</option>
+                </select>
+            </div>
+            @if(idioma == 1){
         <div class="text-center fondo">
 
             <div class="form-signin w-25 m-auto loginform ">
-                @*                <div>
+@*                <div>
                     @if (@mensaje == "Accediendo...")
                     {
                         <BSAlert Color="BSColor.Success" IsDismissible="true" HasIcon="true" @ref="_alertRef" Dismissed="Dismissed">
@@ -87,12 +97,77 @@
                     <p></p>
                     @if (carga == true)
                     {
+                           <div class="loader"></div>
+                    }
+                    else if (carga == false)
+                    {
+                        <BSButton Class="w-100 btn btn-lg" Color="BSColor.Success" Size="Size.ExtraExtraLarge" IsSubmit>  Iniciar</BSButton>
+
+                    }
+                    <p class="mt-5 mb-3 text-muted">Neo 2022</p>
+
+                </BSForm>
+            </div>
+        </div>
+} else if(idioma == 2){
+                        <div class="text-center fondo">
+
+            <div class="form-signin w-25 m-auto loginform ">
+@*                <div>
+                    @if (@mensaje == "Accediendo...")
+                    {
+                        <BSAlert Color="BSColor.Success" IsDismissible="true" HasIcon="true" @ref="_alertRef" Dismissed="Dismissed">
+                            @mensaje
+                        </BSAlert>
+                    }
+                    else if (@mensaje == "Este usuario no está registrado en este proyecto." | mensaje == "Verifique el usuario.")
+                    {
+
+                        <BSAlert Color="BSColor.Warning" IsDismissible="true" HasIcon="true" @ref="_alertRef" Dismissed="Dismissed">
+                            @mensaje
+                        </BSAlert>
+                    }
+                    else if (@mensaje == "Contraseña Incorrecta.")
+                    {
+                        <BSAlert Color="BSColor.Danger" IsDismissible="true" HasIcon="true" @ref="_alertRef" Dismissed="Dismissed">
+                            @mensaje
+                        </BSAlert>
+                    }
+                </div>*@
+
+                <p></p>
+
+                <img class="mb-4" src="./images/Neo.png" alt="" width="100" height="100">
+                <h1 class="h3 mb-3 fw-normal">Log In</h1>
+
+
+                <BSForm Model="user" OnSubmit="HandleLogin">
+                    <DataAnnotationsValidator />
+
+                    <BSCol Column="8">
+                        @_message
+                        <BSValidationSummary />
+                    </BSCol>
+
+                    <div class="form-floating">
+                        <BSLabel IsHidden="true">User</BSLabel>
+                        <BSInput InputType="InputType.Text" placeholder="Ficha/Usuario" @bind-Value="user.UserName" />
+                        <BSFeedback For="@(() => user.UserName)" ValidMessage="Correct." />
+                    </div>
+                    <div class="form-floating">
+                        <BSLabel IsHidden="true">Password</BSLabel>
+                        <BSInput InputType="InputType.Password" @bind-Value="user.Password" />
+                        <BSFeedback For="@(() => user.Password)" ValidMessage="Correct." />
+                    </div>
+
+                    <p></p>
+                    @if (carga == true)
+                    {
                         <div class="loader"></div>
                     }
                     else if (carga == false)
                     {
-                        <BSButton Class="w-100 btn btn-lg" Color="BSColor.Success" Size="Size.ExtraExtraLarge" IsSubmit>
-                            Iniciar</BSButton>
+                        <BSButton Class="w-100 btn btn-lg" Color="BSColor.Success" Size="Size.ExtraExtraLarge" IsSubmit>Login</BSButton>
 
                     }
                     <p class="mt-5 mb-3 text-muted">Neo 2022</p>
@@ -101,8 +176,8 @@
 
             </div>
         </div>
-
-
+            }
+        </main>
     </NotAuthorized>
 </AuthorizeView>
 
@@ -122,49 +197,79 @@
     UserLoginDto user = new UserLoginDto();
     private bool carga = false;
     private NotifiRadzen Notificar = new NotifiRadzen();
+    private int idioma  {get; set;} = 1;
     //private bool _buttonDisabled = true;
     //private BSAlert? _alertRef;
-
+    protected override async Task OnInitializedAsync()
+    {
+        var cultureName = await LocalStorage.GetItemAsync<string>("userCulture") ?? "es";
+        var culture = new CultureInfo(cultureName);
+        CultureInfo.DefaultThreadCurrentCulture = culture;
+        CultureInfo.DefaultThreadCurrentUICulture = culture;
+    }
 
     protected async Task HandleLogin(EditContext e)
     {
         mensaje = "";
         user.Proyecto = "ReunionQuincenal";
+        var culture = idioma == 1 ? new CultureInfo("es") : new CultureInfo("en");
+        CultureInfo.DefaultThreadCurrentCulture = culture;
+        CultureInfo.DefaultThreadCurrentUICulture = culture;
         if (e.Validate())
         {
             carga = true;
             var result = await Http.PostAsJsonAsync("http://neo.paveca.com.ve/Authentication/api/Auth/Login", user);
             var ValidarToken = await result.Content.ReadAsStringAsync();
-
             if (ValidarToken != null)
             {
-
                 if (ValidarToken == "NotFoundUser")
                 {
-                    mensaje = "Verifique el usuario.";
-                    NotificationService.Notify(Notificar.Notificacion("advertencia", "Atención", mensaje));
-
+                    if (idioma == 1)
+                    {
+                        mensaje = "Verifique el usuario.";
+                        NotificationService.Notify(Notificar.Notificacion("advertencia", "Atención",mensaje));
+                    }else if(idioma == 2)
+                    {
+                        mensaje = "Check the user.";
+                        NotificationService.Notify(Notificar.Notificacion("advertencia", "Attention",mensaje));
+                    }
                     carga = false;
                 }
                 else if (ValidarToken == "WrongPassword")
                 {
-                    mensaje = "Contraseña Incorrecta.";
-                    NotificationService.Notify(Notificar.Notificacion("error", "Atención", mensaje));
-
+                    if (idioma == 1)
+                    {
+                        mensaje = "Contraseña Incorrecta.";
+                        NotificationService.Notify(Notificar.Notificacion("error", "Atención", mensaje));
+                    }else if(idioma ==2)
+                    {
+                        mensaje = "Check the password";
+                        NotificationService.Notify(Notificar.Notificacion("advertencia", "Attention",mensaje));
+                    }
                     carga = false;
                 }
                 else if (ValidarToken == "null")
                 {
-
-                    mensaje = "Este usuario no está registrado en este proyecto.";
-                    NotificationService.Notify(Notificar.Notificacion("error", "Atención", mensaje));
+                    if (idioma == 1)
+                    {
+                        mensaje = "Este usuario no está registrado en este proyecto."; 
+                        NotificationService.Notify(Notificar.Notificacion("error", "Atención", mensaje));
+                    }else if (idioma == 2)
+                    {
+                        mensaje = "This user don't register in this project";
+                        NotificationService.Notify(Notificar.Notificacion("error", "Attention", mensaje));
+                    }
                     carga = false;
                 }
                 else
                 {
-                    mensaje = "Accediendo...";
-
-
+                    if (idioma == 1)
+                    {
+                        mensaje = "Accediendo...";
+                    }else if (idioma == 2)
+                    {
+                        mensaje = "Accessing...";
+                    }
                     Console.WriteLine(ValidarToken);
                     await LocalStorage.SetItemAsync("ReunionQuincenalToken", ValidarToken);
                     var authState = await AuthStateProvider.GetAuthenticationStateAsync();
@@ -172,15 +277,15 @@
                     claims = Enumerable.ToList(userA.Claims);
                     user = new UserLoginDto();
                     carga = false;
-                    mensaje = "";
-                    NavigationManager.NavigateTo("");
+                    mensaje = ""; 
+                    var cultureName = idioma == 2 ? "en" : "es";
+                    string homeUrl = cultureName == "en" 
+                        ? $"{NavigationManager.BaseUri}en/home" 
+                        : $"{NavigationManager.BaseUri}es/inicio";
+                    NavigationManager.NavigateTo(homeUrl);
                 }
             }
-
         }
-
-
-
     }
 
 }

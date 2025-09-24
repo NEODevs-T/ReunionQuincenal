@@ -1,5 +1,7 @@
-﻿@page "/pendientes"
-@page "/pendientes/{accion}/{division}/{linea}/{f1}/{f2}/{tipo}/{est}"
+﻿@page "/es/pendientes"
+@page "/es/pendientes/{accion}/{division}/{linea}/{f1}/{f2}/{tipo}/{est}"
+@page "/en/remaining"
+@page "/en/remaining/{accion}/{division}/{linea}/{f1}/{f2}/{tipo}/{est}"
 @inject IAsistenciaReuData AsistenciaReuData
 @inject IAvisadorData AvisadorData
 @inject ICargoReuData CargoReuData
@@ -13,8 +15,12 @@
 @inject ILocalStorageService LocalStorage
 @inject IJSRuntime IJS
 @inject NotificationService NotificationService
+@inject UsuarioContexto UsuarioContexto
 
-<h4>Asuntos</h4>
+@using ReunionWeb.Resources
+@using System.Globalization
+
+<h4>@ValidationMessages.Asuntos</h4>
 
 
 @if (MaestraData.centro.Count() == 0)
@@ -28,9 +34,9 @@ else
 {
     <BSRow>
         <BSCol ColumnLarge="3" ColumnSmall="6">
-            <BSLabel>Centro</BSLabel>
+            <BSLabel>@ValidationMessages.Centro</BSLabel>
             <BSInput InputType="InputType.Select" @bind-Value="IdCentro" @onchange="BuscarDivision" >>
-                <option value="0"> Seleccione </option>
+                <option value="0"> @ValidationMessages.Seleccione </option>
                 @foreach (var d in MaestraData.centro)
                 {
                     <option value="@d.IdCentro">@d.Centro</option>
@@ -39,9 +45,9 @@ else
         </BSCol>
 
         <BSCol ColumnLarge="3" ColumnSmall="6">
-            <BSLabel>División</BSLabel>
+            <BSLabel>@ValidationMessages.Division</BSLabel>
             <BSInput InputType="InputType.Select" @bind-Value="IdDiv">
-                <option value="0">Seleccione</option>
+                <option value="0">@ValidationMessages.Seleccione</option>
                 @foreach (var d in MaestraData.divisions)
                 {
                     <option value="@d.IdDivision">@d.Ndivision</option>
@@ -51,9 +57,9 @@ else
         @if (PizarraData.reudiatablas.Count() > 0 && dataIsLoaded == 2)
         {
             <BSCol ColumnLarge="3" ColumnSmall="6">
-                <BSLabel>Línea</BSLabel>
+                <BSLabel>@ValidationMessages.Linea</BSLabel>
                 <BSInput InputType="InputType.Select" @bind-Value="NombreLinea" IsDisabled=@valueodt>
-                    <option value="Todo">Todo</option>
+                    <option value="Todo">@ValidationMessages.Todo</option>
                     @foreach (var d in MaestraData.lineas)
                     {
                                 <option value="@d.Linea">@d.Linea</option>
@@ -63,16 +69,17 @@ else
 
         }
         <BSCol ColumnLarge="3" ColumnSmall="6">
-            <BSLabel>Estado</BSLabel>
+            <BSLabel>@ValidationMessages.Estado</BSLabel>
             <BSInput InputType="InputType.Select" @bind-Value="Status" IsDisabled=@valueodt>
-                <option value="Total Pendiente">Total Pendiente</option>
-                <option value="Todo">Todo</option>
-                <option value="Pendiente">Pendiente</option>
-                <option value="Pendiente-Responsable">Pendiente/Responsable</option>
-                <option value="Listo">Listo</option>
-                <option value="Cerrado">Cerrado</option>
-                <option value="Vencidos">Vencidos</option>
-                <option value="VencidasDiaria">Vencidas diaria</option>
+                <option value="Total Pendiente">@ValidationMessages.TotalPendiente</option>
+                <option value="Todo">@ValidationMessages.Todo</option>
+                <option value="Pendiente">@ValidationMessages.Pendiente</option>
+                <option value="Pendiente-Responsable">@ValidationMessages.Pendiente / @ValidationMessages.Responsable</option>
+                <option value="No Conforme">@ValidationMessages.NoConforme</option>
+                <option value="Listo">@ValidationMessages.Listo</option>
+                <option value="Cerrado">@ValidationMessages.Cerrado</option>
+                <option value="Vencidos">@ValidationMessages.Vencidos</option>
+                <option value="VencidasDiaria">@ValidationMessages.VencidasDiaria</option>
             </BSInput>
         </BSCol>
 
@@ -91,30 +98,30 @@ else
     <BSRow>
 
         <BSCol ColumnLarge="3" ColumnSmall="4">
-            <BSLabel>Código</BSLabel>
+            <BSLabel>@ValidationMessages.Codigo</BSLabel>
             <BSInput InputType="InputType.Select" @bind-Value="Codigo" IsDisabled=@valueodt>
-                <option value="Todo">Todo</option>
-                <option value="1">1- En Curso</option>
-                <option value="2">2- Próxima Parada</option>
-                <option value="3">3- Falta Repuesto</option>
-                <option value="4">4- Falta de Personal</option>
-                <option value="5">5- Eq. no Disponible</option>
-                <option value="6">6- Parada Mayor</option>
+                <option value="Todo">@ValidationMessages.Todo</option>
+                <option value="1">1- @ValidationMessages.EnCurso</option>
+                <option value="2">2- @ValidationMessages.ProximaParada</option>
+                <option value="3">3- @ValidationMessages.FaltaRepuesto</option>
+                <option value="4">4- @ValidationMessages.FaltaDePersonal</option>
+                <option value="5">5- @ValidationMessages.EquipoNoDisponible</option>
+                <option value="6">6- @ValidationMessages.ParadaMayor</option>
             </BSInput>
         </BSCol>
 
 
         <BSCol ColumnLarge="3" ColumnSmall="8">
             <BSRow>
-                <BSLabel>  Ordenar </BSLabel>
+                <BSLabel>  @ValidationMessages.Ordenar </BSLabel>
             </BSRow>
             <BSInputRadio CheckedValue="@("2")" IsDisabled=@valueodt @bind-Value="tipoconsulta" IsToggle="true" Size="Size.ExtraSmall" Color="BSColor.Success" IsOutlined="true" style="width:50%;">
-                F.Trabajo
+                @ValidationMessages.FechaDelTrabajo
                 <span class="oi oi-cog"></span>
             </BSInputRadio>
 
             <BSInputRadio CheckedValue="@("0")" IsDisabled=@valueodt @bind-Value="tipoconsulta" IsToggle="true" Size="Size.ExtraSmall" Color="BSColor.Success" IsOutlined="true" style="width:50%;">
-                F. Reunión
+                @ValidationMessages.FechaDeReunion
                 <span class="oi oi-people"></span>
             </BSInputRadio>
         </BSCol>
@@ -122,25 +129,25 @@ else
 
         <BSCol ColumnLarge="3" ColumnSmall="6">
             <BSRow>
-                <BSLabel>Buscar</BSLabel>
+                <BSLabel>@ValidationMessages.Buscar</BSLabel>
             </BSRow>
-            <BSButton IsOutlined Color="BSColor.Success" Size="Size.ExtraSmall" IsDisabled=@valueodt @onclick="Get" style="width:70%;">  Consultar <span class="oi oi-check"></span></BSButton>
-         </BSCol>
+            <BSButton IsOutlined Color="BSColor.Success" Size="Size.ExtraSmall" IsDisabled=@valueodt @onclick="Get" style="width:70%;">  @ValidationMessages.Consultar <span class="oi oi-check"></span></BSButton>
+        </BSCol>
 
 
-         <BSCol ColumnLarge="3" ColumnSmall="6">
-             <BSLabel>ODT</BSLabel>  <RadzenSwitch @bind-Value=@valuvisualeodt Change="Cambio" />
-             <BSRow>
-                 <BSCol>
-                     <BSInput InputType="InputType.Text" @bind-Value="BuscarOdt" IsDisabled=@(!valueodt) />
-                 </BSCol>
-                 <BSCol>
-                     <BSButton IsOutlined Color="BSColor.Success" Size="Size.ExtraSmall" @onclick="BuscarxOdt" IsDisabled=@(!valueodt)>  <span class="oi oi-magnifying-glass"></span></BSButton>
-                 </BSCol>
-             </BSRow>
-         </BSCol>
+        <BSCol ColumnLarge="3" ColumnSmall="6">
+            <BSLabel>ODT</BSLabel>  <RadzenSwitch @bind-Value=@valuvisualeodt Change="Cambio" />
+            <BSRow>
+                <BSCol>
+                    <BSInput InputType="InputType.Text" @bind-Value="BuscarOdt" IsDisabled=@(!valueodt) />
+                </BSCol>
+                <BSCol>
+                    <BSButton IsOutlined Color="BSColor.Success" Size="Size.ExtraSmall" @onclick="BuscarxOdt" IsDisabled=@(!valueodt)>  <span class="oi oi-magnifying-glass"></span></BSButton>
+                </BSCol>
+            </BSRow>
+        </BSCol>
 
-     </BSRow>
+    </BSRow>
 
 
     @*Filltros extra*@
@@ -148,14 +155,13 @@ else
         @if (PizarraData.reudiatablas.Count() > 0 && dataIsLoaded == 2)
         {
             <BSCol Column="3">
-                <BSLabel>Responsable</BSLabel>
+                <BSLabel>@ValidationMessages.Responsable</BSLabel>
                 <BSInput InputType="InputType.Select" IsDisabled=@valueodt @bind-Value="idrespo">
-                    <option value=0>Todo</option>
+                    <option value=0>@ValidationMessages.Todo</option>
                     @foreach (var d in RespoReuData.resporeus)
                     {
-
-                        <option value="@d.IdResReu">@d.Rrnombre</option>
-
+                        <option value="@d.IdResReu">@ValidationMessages.ResourceManager.GetString(ValidationMessages
+                            .MapResponsableKey(d.Rrnombre),CultureInfo.CurrentUICulture)</option>
                     }
                 </BSInput>
             </BSCol>
@@ -166,18 +172,18 @@ else
 
                 <BSInput InputType="InputType.Select" IsDisabled=@valueodt @bind-Value="IdKsf">
 
-                    <option value="0">Todo</option>
-                    @foreach (var d in KsfData.ksfs)
+                    <option value="0">@ValidationMessages.Todo</option>
+                    @foreach (var d in KsfData.ksfs.Where(x => x.Idksf != 6))
                     {
-                        <option value="@d.Idksf">@d.KsfNombre</option>
+                        var texto = usuarioActual.idPais == 5? d.KsfEnglish : d.KsfNombre;
+                        <option value="@d.Idksf">@texto</option>
                     }
-
                 </BSInput>
             </BSCol>
 
             <BSCol Column="3">
                 <BSRow>
-                    <BSLabel>Imprimir</BSLabel>
+                    <BSLabel>@ValidationMessages.Imprimir</BSLabel>
                 </BSRow>
                 <BSButton IsOutlined Color="BSColor.Success" Size="Size.ExtraSmall" IsDisabled=@valueodt @onclick="PrintDocument">  <span class="oi oi-print"></span></BSButton>
              </BSCol>
@@ -195,20 +201,20 @@ else
             <BSTHead Class="cabecera">
                 <BSTR>
                     @*<BSTD>Id</BSTD>*@
-                    <BSTD>Área</BSTD>
+                    <BSTD>@ValidationMessages.Area</BSTD>
                     <BSTD>Ksf</BSTD>
-                    <BSTD>C. Equipo</BSTD>
-                    <BSTD>Nombre del Equipo</BSTD>
-                    <BSTD Class="col-5">Discrepancia</BSTD>
-                    <BSTD>Código</BSTD>
-                    <BSTD Class="col-4">Plan de Acción</BSTD>
-                    <BSTD>Tiempo</BSTD>
-                    <BSTD>Responsable</BSTD>
-                    <BSTD>Estado</BSTD>
-                    <BSTD>Requisición</BSTD>
+                    <BSTD>@ValidationMessages.CodigoDeEquipo</BSTD>
+                    <BSTD>@ValidationMessages.NombreDelEquipo</BSTD>
+                    <BSTD Class="col-5">@ValidationMessages.Discrepancia</BSTD>
+                    <BSTD>@ValidationMessages.Codigo</BSTD>
+                    <BSTD Class="col-4">@ValidationMessages.PlanDeAccion</BSTD>
+                    <BSTD>@ValidationMessages.Tiempo</BSTD>
+                    <BSTD>@ValidationMessages.Responsable</BSTD>
+                    <BSTD>@ValidationMessages.Estado</BSTD>
+                    <BSTD>@ValidationMessages.Requisicion</BSTD>
                     <BSTD>ODT</BSTD>
-                    <BSTD>Fecha de Reunión</BSTD> @*Fecha del dia de reunion*@
-                    <BSTD>Fecha del Trabajo</BSTD>@*Fecha de listo el trabajo*@
+                    <BSTD>@ValidationMessages.FechaDeReunion</BSTD> @*Fecha del dia de reunion*@
+                    <BSTD>@ValidationMessages.FechaDelTrabajo</BSTD>@*Fecha de listo el trabajo*@
                     <BSTD></BSTD>
                 </BSTR>
             </BSTHead>
@@ -234,43 +240,57 @@ else
 
                                             @*<BSTD>@d.IdReuDia</BSTD>*@
                                             <BSTD>@d.Rdarea</BSTD>
-                                                <BSTD>@KsfData.ksfs.Where(x => x.Idksf == d.Idksf).FirstOrDefault().KsfNombre</BSTD>
+                                                <BSTD>
+                                                @{
+                                                    if (usuarioActual != null)
+                                                    {
+                                                        var ksf = KsfData.ksfs.FirstOrDefault(x => x.Idksf == d.Idksf);
+                                                        var texto = usuarioActual.idPais == 5 ? ksf?.KsfEnglish : ksf?.KsfNombre;
+                                                        @texto
+                                                    }
+                                                }
+                                                </BSTD>
                                                 <BSTD>@d.RdcodEq</BSTD>
-                                                <BSTD>@(string.IsNullOrWhiteSpace(d.EnombreEam) ? "EQUIPO NO ENCONTRADO" : d.EnombreEam)</BSTD>
+                                                <BSTD>@{
+                                                        var texto = string.IsNullOrWhiteSpace(d.EnombreEam)
+                                                        ? (usuarioActual.idPais == 5 ? "EQUIPMENT NOT FOUND" : "EQUIPO NO ENCONTRADO")
+                                                        : d.EnombreEam;
+                                                    }
+                                                    @texto
+                                                </BSTD>
                                                 <BSTD>@d.Rddisc.ToUpperInvariant()</BSTD>
                                                 <BSTD>@d.RdcodDis</BSTD>
                                                 <BSTD Class="textotabla">@d.RdplanAcc</BSTD>
                                                 <BSTD>@d.Rdtiempo</BSTD>
+                                                @{
+                                                    var nombreResponsable = RespoReuData.resporeus.FirstOrDefault(x => x.IdResReu == d.IdResReu)?.Rrnombre;
+                                                    var textoTraducido = ValidationMessages.ResourceManager.GetString(
+                                                    ValidationMessages.MapResponsableKey(nombreResponsable),
+                                                    CultureInfo.CurrentUICulture
+                                                );
+                                                }
+                                                <BSTD class="@(nombreResponsable == "Por Definir" ? "Definir" : "")">
+                                                    @textoTraducido
+                                                </BSTD>
+                                                @{
+                                                    var estadoTraducido = d.Rdstatus switch
+                                                    {
+                                                        "Listo" => usuarioActual.idPais == 5 ? "Ready" : "Listo",
+                                                        "Cerrado" => usuarioActual.idPais == 5 ? "Closed" : "Cerrado",
+                                                        _ => usuarioActual.idPais == 5 ? "Pending" : "Pendiente"
+                                                    };
 
-                                                @if (RespoReuData.resporeus.Where(x => x.IdResReu == d.IdResReu).FirstOrDefault().Rrnombre == "Por Definir")
-                                            {
-                                                <BSTD Class="Definir">@RespoReuData.resporeus.Where(x => x.IdResReu == d.IdResReu).FirstOrDefault().Rrnombre </BSTD>
-                                            }
-                                            else
-                                            {
-                                                <BSTD>@RespoReuData.resporeus.Where(x => x.IdResReu == d.IdResReu).FirstOrDefault().Rrnombre </BSTD>
-                                            }
+                                                    var claseEstado = d.Rdstatus switch
+                                                    {
+                                                        "Listo" => "listo",
+                                                        "Cerrado" => "Cerrado",
+                                                        _ => "pendiente"
+                                                    };
 
-                                            @if (@d.Rdstatus == "Listo")
-                                            {
-                                                <BSTD Class="listo">@d.Rdstatus</BSTD>
-                                            }
-                                            else if (@d.Rdstatus == "Cerrado")
-                                            {
-                                                <BSTD Class="Cerrado">@d.Rdstatus</BSTD>
-                                            }
-                                            else
-                                            {
-                                                <BSTD Class="pendiente">@d.Rdstatus</BSTD>
-                                            }
-                                             @if (d.RdcodRequi == null)
-                                            {
-                                                <BSTD>N/A</BSTD>
-                                            }
-                                            else
-                                            {
-                                                <BSTD>@d.RdcodRequi</BSTD>
-                                            }
+                                                    var codRequiTexto = d.RdcodRequi == null ? "N/A" : d.RdcodRequi;
+                                                }
+                                                <BSTD Class="@claseEstado">@estadoTraducido</BSTD>
+                                                <BSTD>@codRequiTexto</BSTD>
                                             <BSTD>@d.Rdodt</BSTD>
                                                 <BSTD>@d.RdfecReu.ToString("dd/MM/yyyy")</BSTD>
                                                 <BSTD>@d.RdfecTra.ToString("dd/MM/yyyy")</BSTD>
@@ -302,17 +322,17 @@ else
 
     @*Mostrar la trazabilidad*@
     <BSModal IsCentered="true" DataId="History">
-        <Header>Trazabilidad</Header>
+        <Header>@ValidationMessages.Trazabilidad</Header>
         <Content>
-            <h5>Cambios de Estados:</h5>
+        <h5>@ValidationMessages.CambiosDeEstados:</h5>
             @if (cambiostatuss.Count() > 0 && cargandocambio == true)
             {
                 <BSTable IsResponsive="true" IsStriped="true" IsBordered="true">
                     <BSTHead Class="cabecera">
                         <BSTR>
-                            <BSTD>Fecha del Cambio</BSTD>
-                            <BSTD>Status Nuevo</BSTD>
-                            <BSTD>Usuario</BSTD>
+                            <BSTD>@ValidationMessages.FechaDelCambio</BSTD>
+                            <BSTD>@ValidationMessages.StatusNuevo</BSTD>
+                            <BSTD>@ValidationMessages.Usuario</BSTD>
                         </BSTR>
                     </BSTHead>
                     <BSTBody>
@@ -320,7 +340,10 @@ else
                         {
                             <BSTR>
                                 <BSTD>@d.Cbfecha</BSTD>
-                                    <BSTD>@d.Cbstat</BSTD>
+                                    <BSTD>@ValidationMessages.ResourceManager.GetString(
+                                ValidationMessages.MapStatusKey(d.Cbstat),
+                                CultureInfo.CurrentUICulture
+                            )</BSTD>
                                     <BSTD>@d.Cbuser</BSTD>
                                 </BSTR>
                         }
@@ -333,20 +356,20 @@ else
             }
             else if (cambiostatuss.Count() == 0 && cargandocambio == true)
             {
-                <p>No hay registros aún...</p>
+                <p>@ValidationMessages.NoHayRegistros2</p>
             }
             <p></p>
             <p></p>
-            <h5>Cambios de Fecha de Trabajo:</h5>
+            <h5>@ValidationMessages.CambiosDeFechaTrabajo</h5>
 
             @if (cambiofechas.Count() > 0)
             {
                 <BSTable IsResponsive="true" IsStriped="true" IsBordered="true">
                     <BSTHead Class="cabecera">
                         <BSTR>
-                            <BSTD>Fecha del Cambio</BSTD>
-                            <BSTD>Nueva Fecha de Trabajo</BSTD>
-                            <BSTD>Usuario</BSTD>
+                            <BSTD>@ValidationMessages.FechaDelCambio</BSTD>
+                            <BSTD>@ValidationMessages.NuevaFechaDeTrabajo</BSTD>
+                            <BSTD>@ValidationMessages.Usuario</BSTD>
                         </BSTR>
                     </BSTHead>
                     <BSTBody>
@@ -367,7 +390,7 @@ else
             }
             else if (cambiofechas.Count() == 0 && cargandocambio == true)
             {
-                <p>No hay registros aún...</p>
+                <p>@ValidationMessages.NoHayRegistros2</p>
             }
         </Content>
         <Footer Context="modal">
@@ -385,7 +408,7 @@ else if (dataIsLoaded == 1 && PizarraData.reudiatablas.Count() == 0)
 else if (dataIsLoaded == 2 && PizarraData.reudiatablas.Count() == 0)
 {
     <div style="text-align: center; padding: 20px; font-size: 18px; color: gray;">
-        <p>No hay datos para mostrar.</p>
+    <p>@ValidationMessages.NoHayDatos2</p>
 </div>
 }
 
@@ -552,7 +575,8 @@ else if (dataIsLoaded == 2 && PizarraData.reudiatablas.Count() == 0)
     List<MaestraVDTO> _divisiones = new List<MaestraVDTO>();
     private NotifiRadzen Notificar = new NotifiRadzen();//Logic para crear las noyificaciones radzen
     private bool isEditar { get; set; } = true;
-    private List<Claim> claims { get; set; }    
+    private List<Claim> claims { get; set; } 
+    private Usuario? usuarioActual;   
 
 
     private async Task CreateData()
@@ -564,9 +588,9 @@ else if (dataIsLoaded == 2 && PizarraData.reudiatablas.Count() == 0)
 
     }
 
-
     protected override async Task OnInitializedAsync()
     {
+        usuarioActual = await UsuarioContexto.ObtenerUsuarioActualAsync();
         await base.OnInitializedAsync();
         fecha1 = DateTime.Now;
         fecha2 = DateTime.Now;
@@ -679,8 +703,7 @@ else if (dataIsLoaded == 2 && PizarraData.reudiatablas.Count() == 0)
         }
         else
         {
-
-            NotificationService.Notify(Notificar.Notificacion("advertencia", "Atención", "Seleccione los valores en las listas"));
+            NotificationService.Notify(Notificar.Notificacion("advertencia", ValidationMessages.Atencion, ValidationMessages.SVLista));
         }
     }
 
@@ -708,12 +731,12 @@ else if (dataIsLoaded == 2 && PizarraData.reudiatablas.Count() == 0)
             else
             {
 
-                NotificationService.Notify(Notificar.Notificacion("advertencia", "Atención", "Seleccione los valores en las listas"));
+                NotificationService.Notify(Notificar.Notificacion("advertencia", ValidationMessages.Atencion, ValidationMessages.SVLista));
             }
         }
         else
         {
-            NotificationService.Notify(Notificar.Notificacion("advertencia", "Ingrese ODT", ""));
+            NotificationService.Notify(Notificar.Notificacion("advertencia", ValidationMessages.ODT, ""));
         }
 
 
@@ -766,8 +789,10 @@ else if (dataIsLoaded == 2 && PizarraData.reudiatablas.Count() == 0)
 
     void Editar(int id)
     {
-        NavigationManager.NavigateTo($"EditDisc/{id}/{tipoconsulta}/{NombreLinea}/{fecha1.ToString("dd-MM-yyyy")}/{fecha2.ToString("dd-MM-yyyy")}/{Status}");
-
+        var idioma = usuarioActual.idPais == 5 ? "en" : "es";
+        var url = $"{idioma}/EditDisc/{id}/{tipoconsulta}/{NombreLinea}/{fecha1:dd-MM-yyyy}/{fecha2:dd-MM-yyyy}/{Status}";
+        NavigationManager.NavigateTo(url);
+        //NavigationManager.NavigateTo($"EditDisc/{id}/{tipoconsulta}/{NombreLinea}/{fecha1.ToString("dd-MM-yyyy")}/{fecha2.ToString("dd-MM-yyyy")}/{Status}");
     }
 
     protected override async Task OnParametersSetAsync()
@@ -816,7 +841,7 @@ else if (dataIsLoaded == 2 && PizarraData.reudiatablas.Count() == 0)
         }
         catch (Exception ex)
         {
-            NotificationService.Notify(Notificar.Notificacion("error", "Ocurrió un error", "Por favor recargue la página."));
+            NotificationService.Notify(Notificar.Notificacion("error", ValidationMessages.ErrorInesp, ValidationMessages.Reload));
 
         }
 
@@ -838,9 +863,12 @@ else if (dataIsLoaded == 2 && PizarraData.reudiatablas.Count() == 0)
 
     public async Task PrintDocument()
     {
-        //NavigationManager.NavigateTo($"TablaReunion/{IdCentro.ToString()}/{IdDiv.ToString()}/{DateTime.Now.AddDays(-1).ToString("dd-MM-yyyy")}/{DateTime.Now.ToString("dd-MM-yyyy")}/1", forceLoad: true);
-        await IJS.InvokeAsync<object>("open", new object[] { $"TablaPendientes/{IdCentro.ToString()}/{IdDiv.ToString()}/{NombreLinea}/{fecha1.ToString("dd-MM-yyyy")}/{fecha2.ToString("dd-MM-yyyy")}/{tipoconsulta}/{Status}/{idrespo}", "_blank" });
+        string idiomaRuta = usuarioActual.idPais == 5 ? "en" : "es";
+        string nombrePagina = usuarioActual.idPais == 5 ? "TablePending" : "TablaPendientes";
+        string url = $"{idiomaRuta}/{nombrePagina}/{IdCentro}/{IdDiv}/{NombreLinea}/{fecha1:dd-MM-yyyy}/{fecha2:dd-MM-yyyy}/{tipoconsulta}/{Status}/{idrespo}";
+        await IJS.InvokeAsync<object>("open", new object[] { url, "_blank" });
     }
+
     string GetClassVencido(DateTime ft, string estado)
     {
         return ft.Date < DateTime.Now.Date && estado.StartsWith("Pendiente") ? "Vencido" : "";

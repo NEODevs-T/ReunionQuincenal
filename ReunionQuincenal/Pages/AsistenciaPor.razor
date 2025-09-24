@@ -1,4 +1,5 @@
-@page "/porcentajeasistencia"
+@page "/es/porcentajeasistencia"
+@page "/en/attendancepercentage"
 
 @using Radzen
 @using System.Linq
@@ -6,31 +7,35 @@
 @inject AuthenticationStateProvider AuthStateProvider
 @inject ICargoReuData CargoReuData
 @inject NotificationService NotificationService
+@inject ILocalStorageService LocalStorage
+
+@using ReunionWeb.Resources
+@using System.Globalization
 @attribute [Authorize(Roles = "Admin, AdminChempro, SuperUser, PrimeUser, SemiAdmin, SuperAdmin")]
 
-<h3>Porcentaje de Asistencia</h3>
+<h3>@ValidationMessages.PorcentajeDeAsistencia</h3>
 
 <RadzenTemplateForm Data="@this">
     <RadzenRow>
              <RadzenColumn Width="200px">
-            <RadzenLabel Text="Fecha Inicial" />
+            <RadzenLabel Text="@ValidationMessages.FechaInicial" />
             <RadzenDatePicker @bind-Value="mesAñoInicio" DateFormat="MM-yyyy" Style="width: 100%;" Max="@DateTime.Today" />
         </RadzenColumn>
         <RadzenColumn Width="200px">
-            <RadzenLabel Text="Fecha Final" />
+            <RadzenLabel Text="@ValidationMessages.FechaFinal" />
             <RadzenDatePicker @bind-Value="mesAñoFin" DateFormat="MM-yyyy" Style="width: 100%;" Max="@DateTime.Today" />
         </RadzenColumn>
         <RadzenColumn Width="250px">
-            <RadzenLabel Text="Empresa" />
+            <RadzenLabel Text="@ValidationMessages.Empresa" />
             <RadzenDropDown @bind-Value="empresa" Data="@empresas" TextProperty="Nombre" ValueProperty="Id" Style="width: 100%;" Placeholder="Seleccione una empresa"
                             Change="@(args => OnEmpresaChanged(args))" />
         </RadzenColumn>
         <RadzenColumn Width="250px">
-            <RadzenLabel Text="Área" />
+            <RadzenLabel Text="@ValidationMessages.Area" />
             <RadzenDropDown @bind-Value="area" Data="@areas" TextProperty="Nombre" ValueProperty="Id" Style="width: 100%;" Placeholder="Seleccione un centro" Disabled="@((string.IsNullOrEmpty(empresa)) || !areas.Any())" />
         </RadzenColumn>
         <RadzenColumn Width="150px" Style="display: flex; align-items: flex-start; padding-top: 30px;">
-            <RadzenButton Text="Consultar"
+            <RadzenButton Text="@ValidationMessages.Consultar"
                     Click="@(async () => await Consultar())"
                     Style="width: 100%; background-color: #28a745; color: #ffffff;"
                     Icon="search"
@@ -46,12 +51,12 @@
 {
 @if (registros != null && registros.Any())
 {
-    <RadzenLabel Text="Filtrar por cargo:" Style="margin-right:10px;" />
+    <RadzenLabel Text="@ValidationMessages.FiltrarPorCargo" Style="margin-right:10px;" />
     <RadzenTextBox @bind-Value="filtroCargo"
-                    Placeholder="Buscar cargo..."
+                    Placeholder="@ValidationMessages.BuscarCargo2"
                     Style="margin:15px 0 10px 0; width:250px;"
                     Change="@(args => FiltrarCargo())" />
-    <RadzenButton Text="Buscar Cargo"
+    <RadzenButton Text="@ValidationMessages.BuscarCargo"
                     Icon="search"
                     ButtonStyle="ButtonStyle.Secondary"
                     Style="margin-bottom: 10px;"
@@ -60,16 +65,16 @@
 @if (registros != null && registros.Any())
 {
     <div style="margin-bottom:10px;">
-        <b>Porcentaje Global:</b>
+        <b>@ValidationMessages.PorcentajeGlobal:</b>
         <span style="color:@GetColor(porcentajeGlobal)">
             @porcentajeGlobal.ToString("0.00")%
         </span>
     </div>
     @if (registrosFiltrados != null && !registrosFiltrados.Any() && !string.IsNullOrEmpty(filtroCargo))
     {
-        <div style="color:red; margin-bottom:10px;">No existe ese cargo.</div>
+        <div style="color:red; margin-bottom:10px;">@ValidationMessages.NoExisteEseCargo.</div>
     }
-    <RadzenButton Text="Limpiar Filtros"
+    <RadzenButton Text="@ValidationMessages.LimpiarFiltros"
                     Icon="refresh"
                     ButtonStyle="ButtonStyle.Secondary"
                     Style="margin-bottom: 10px;"
@@ -83,16 +88,16 @@
                     AllowSorting="true"
                     EmptyText="">
         <Columns>
-            <RadzenDataGridColumn TItem="AsistenReuPorcetanjeDTO" Property="Nombre" Title="Cargo" Frozen="true" />
-            <RadzenDataGridColumn TItem="AsistenReuPorcetanjeDTO" Property="ReunionesProgramadas" Title="Reuniones Programadas" />
-            <RadzenDataGridColumn TItem="AsistenReuPorcetanjeDTO" Property="ReunionesAsistidas" Title="Reuniones Asistidas">
+            <RadzenDataGridColumn TItem="AsistenReuPorcetanjeDTO" Property="Nombre" Title="@ValidationMessages.Cargo" Frozen="true" />
+            <RadzenDataGridColumn TItem="AsistenReuPorcetanjeDTO" Property="ReunionesProgramadas" Title="@ValidationMessages.ReunionesProgramadas" />
+            <RadzenDataGridColumn TItem="AsistenReuPorcetanjeDTO" Property="ReunionesAsistidas" Title="@ValidationMessages.ReunionesAsistidas">
                 <FooterTemplate>
                     <b>Total: @registrosFiltrados.Sum(x => x.ReunionesAsistidas)</b>
                 </FooterTemplate>
             </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="AsistenReuPorcetanjeDTO" Property="PorcentajeAsistencia" Title="Porcentaje Asistencia">
+            <RadzenDataGridColumn TItem="AsistenReuPorcetanjeDTO" Property="PorcentajeAsistencia" Title="@ValidationMessages.PorcentajeAsistencia">
                 <Template Context="data">
-                    <span title="Porcentaje de asistencia"
+                    <span title="@ValidationMessages.PorcentajeAsistencia"
                         style="color:@GetColor(data.PorcentajeAsistencia); font-weight:bold;">
                         @data.PorcentajeAsistencia.ToString("0.00")%
                         @if (data.PorcentajeAsistencia >= 90)
@@ -111,11 +116,14 @@
     }
     else if (registros != null)
     {
-        <div style="margin-top:20px;">No hay registros para los filtros seleccionados.</div>
+        <div style="margin-top:20px;">@ValidationMessages.NoHayFiltros</div>
     }
 }    
 
 @code {
+                [CascadingParameter]
+    private Task<AuthenticationState>? authenticationState { get; set; }
+    private int idPais { get; set; }
     private DateTime mesAñoInicio = DateTime.Now;
     private DateTime mesAñoFin = DateTime.Now;
     public string area { get; set; } = "";
@@ -135,6 +143,15 @@
         var authState = await AuthStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
         claims = user.Claims.ToList();
+        var idPaisClaim = claims.FirstOrDefault(c => c.Type == "IdPais")?.Value;
+        if (int.TryParse(idPaisClaim, out int paisTemp))
+        {
+            idPais = paisTemp;
+            var culture = new System.Globalization.CultureInfo(paisTemp == 5 ? "en" : "es");
+            System.Globalization.CultureInfo.DefaultThreadCurrentCulture = culture;
+            System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = culture;
+            await LocalStorage.SetItemAsync("userCulture", culture.Name);
+        }
 
         string? idEmpresaUsuario = claims.FirstOrDefault(c => c.Type.Contains("Empresa"))?.Value;
 

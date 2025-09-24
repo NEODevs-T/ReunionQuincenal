@@ -1,4 +1,5 @@
-@page "/vencidos"
+@page "/es/vencidos"
+@page "/en/expired"
 
 @inject IAsistenciaReuData AsistenciaReuData
 @inject IAvisadorData AvisadorData
@@ -11,6 +12,10 @@
 @inject AuthenticationStateProvider AuthStateProvider
 @inject ILocalStorageService LocalStorage
 @inject NotificationService NotificationService
+@inject UsuarioContexto UsuarioContexto
+
+@using ReunionWeb.Resources
+@using System.Globalization
 
 @attribute [Authorize(Roles = "Admin, AdminChempro, SuperUser, PrimeUser, SemiAdmin,SuperAdmin")]
 <!DOCTYPE html>
@@ -19,18 +24,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>vencidos</title>
+    <title>@ValidationMessages.Vencidos</title>
 </head>
 
 <body>
-    <h3>Vencidos Diaria</h3>
+    <h3>@ValidationMessages.VencidasDiaria</h3>
     @* ccc *@
     <div class="box-reuform">
         <div class="box-reuCent">
-            <label for="">Centro
+            <label for="">@ValidationMessages.Centro
                 <BSInput InputType="InputType.Select" class="Form-imput" @onchange="BuscarDivision"
                     @bind-Value="idCent">
-                    <option value="0">Selecione un Centro</option>
+                    <option value="0">@ValidationMessages.SeleccioneUnCentro</option>
                     @if (MaestraData.centro != null)
                     {
                         @foreach (var d in MaestraData.centro)
@@ -43,9 +48,9 @@
             </label>
         </div>
         <div class="box-reuDiv">
-            <label for="">Division
+            <label for="">@ValidationMessages.Division
                 <BSInput InputType="InputType.Select" class="Form-imput linea" @bind-Value="idDiv">
-                    <option value="0">Selecione una Division</option>
+                    <option value="0">@ValidationMessages.SeleccioneUnaDivision</option>
                     @if (MaestraData.centro != null)
                     {
                         @foreach (var d in MaestraData.divisions)
@@ -73,7 +78,7 @@
         </div> *@
 
         <div class="botton-Disc">
-            <button @onclick="buscar" type="submit" id="btn-disc" class="btn btn-primary mb-3">Buscar</button>
+            <button @onclick="buscar" type="submit" id="btn-disc" class="btn btn-primary mb-3">@ValidationMessages.Buscar</button>
         </div>
     </div>
     @if (band == true)
@@ -88,45 +93,47 @@ else if (PizarraData.reudiatablas.Count() > 0 && confirmacion == true)
         <BSCol Column="2">
             <BSLabel><strong>Ksf</strong></BSLabel>
             <BSInput InputType="InputType.Select" @bind-Value="IdKsf">
-                <option value="0">Todo</option>
-                @foreach (var d in KsfData.ksfs)
+                <option value="0">@ValidationMessages.Todo</option>
+                @foreach (var d in KsfData.ksfs.Where(x => x.Idksf != 6))
                 {
-                    <option value="@d.Idksf">@d.KsfNombre</option>
+                    var texto = usuarioActual.idPais == 5? d.KsfEnglish : d.KsfNombre;
+                    <option value="@d.Idksf">@texto</option>
                 }
             </BSInput>
         </BSCol>
 
         <BSCol Column="2">
-            <BSLabel><strong>Responsable</strong></BSLabel>
+            <BSLabel><strong>@ValidationMessages.Responsable</strong></BSLabel>
             <BSInput InputType="InputType.Select" @bind-Value="idrespo">
-                <option value="0">Todo</option>
+                <option value="0">@ValidationMessages.Todo</option>
                 @foreach (var d in RespoReuData.resporeus)
                 {
-                    <option value="@d.IdResReu">@d.Rrnombre</option>
+                    <option value="@d.IdResReu">@ValidationMessages.ResourceManager.GetString(ValidationMessages
+                    .MapResponsableKey(d.Rrnombre),CultureInfo.CurrentUICulture)</option>
                 }
             </BSInput>
         </BSCol>
 
         <BSCol Column="2">
-            <BSLabel><strong>Código</strong></BSLabel>
+            <BSLabel><strong>@ValidationMessages.Codigo</strong></BSLabel>
             <BSInput InputType="InputType.Select" @bind-Value="Codigo">
-                <option value="Todo">Todo</option>
-                <option value="1">1- En Curso</option>
-                <option value="2">2- Próxima Parada</option>
-                <option value="3">3- Falta Repuesto</option>
-                <option value="4">4- Falta de Personal</option>
-                <option value="5">5- Eq. no Disponible</option>
-                <option value="6">6- Parada Mayor</option>
+                <option value="Todo">@ValidationMessages.Todo</option>
+                <option value="1">1- @ValidationMessages.EnCurso</option>
+                <option value="2">2- @ValidationMessages.ProximaParada</option>
+                <option value="3">3- @ValidationMessages.FaltaRepuesto</option>
+                <option value="4">4- @ValidationMessages.FaltaDePersonal</option>
+                <option value="5">5- @ValidationMessages.EquipoNoDisponible</option>
+                <option value="6">6- @ValidationMessages.ParadaMayor</option>
             </BSInput>
         </BSCol>
 
         <BSCol Column="2">
-                    <BSLabel><strong>Estado</strong></BSLabel>
+                    <BSLabel><strong>@ValidationMessages.Estado</strong></BSLabel>
                     <BSInput InputType="InputType.Select" @bind-Value="Status">
-                        <option value="Todo">Todo</option>
-                        <option value="Pendiente">Pendiente</option>
-                        <option value="Pendiente-Responsable">Pendiente/Responsable</option>
-                        <option value="Listo">Listo</option>
+                        <option value="Todo">@ValidationMessages.Todo</option>
+                        <option value="Pendiente">@ValidationMessages.Pendiente</option>
+                        <option value="Pendiente-Responsable">@ValidationMessages.Pendiente / @ValidationMessages.Responsable</option>
+                        <option value="Listo">@ValidationMessages.Listo</option>
                     </BSInput>
                 </BSCol>
             </BSRow>
@@ -144,7 +151,7 @@ else if (PizarraData.reudiatablas.Count() > 0 && confirmacion == true)
 
 
         <Columns>
-            <RadzenDataGridColumn Width="6%" TItem="ReunionDTO" Title="Area" Filterable="false" Sortable="false">
+            <RadzenDataGridColumn Width="6%" TItem="ReunionDTO" Title="@ValidationMessages.Area" Filterable="false" Sortable="false">
                 <Template Context="data">
                     <RadzenText class="mb-0 tipografia">@data.Rdarea</RadzenText>
                 </Template>
@@ -156,20 +163,20 @@ else if (PizarraData.reudiatablas.Count() > 0 && confirmacion == true)
                 </Template>
             </RadzenDataGridColumn> *@
 
-            <RadzenDataGridColumn Width="6%" TItem="ReunionDTO" Title="Codigo Equipo" Filterable="false" Sortable="false">
+            <RadzenDataGridColumn Width="6%" TItem="ReunionDTO" Title="@ValidationMessages.CodigoDeEquipo" Filterable="false" Sortable="false">
                 <Template Context="data">
                     <RadzenText class="mb-0 tipografia">@data.RdcodEq</RadzenText>
                 </Template>
             </RadzenDataGridColumn>
 
-            <RadzenDataGridColumn Width="10%" TItem="ReunionDTO" Title="Nombre Equipo" Filterable="false" Sortable="false"
+            <RadzenDataGridColumn Width="10%" TItem="ReunionDTO" Title="@ValidationMessages.NombreDelEquipo" Filterable="false" Sortable="false"
                         TextAlign="TextAlign.Center">
                         <Template Context="data">
                             <RadzenText class="mb-0 tipografia">@(string.IsNullOrWhiteSpace(data.EnombreEam) ? "EQUIPO NO ENCONTRADO" : data.EnombreEam)</RadzenText>
                         </Template>
             </RadzenDataGridColumn>
 
-            <RadzenDataGridColumn Width="20%" TItem="ReunionDTO" Title="Discrepancia" Filterable="false" Sortable="false">
+            <RadzenDataGridColumn Width="20%" TItem="ReunionDTO" Title="@ValidationMessages.Discrepancia" Filterable="false" Sortable="false">
                 <Template Context="data">
                     <RadzenText class="mb-0 tipografia wrap-text">@data.Rddisc</RadzenText>
                 </Template>
@@ -181,7 +188,7 @@ else if (PizarraData.reudiatablas.Count() > 0 && confirmacion == true)
                 </Template>
             </RadzenDataGridColumn> *@
 
-            <RadzenDataGridColumn Width="15%" TItem="ReunionDTO" Title="Plan de Acción" Filterable="false" Sortable="false">
+            <RadzenDataGridColumn Width="15%" TItem="ReunionDTO" Title="@ValidationMessages.PlanDeAccion" Filterable="false" Sortable="false">
                 <Template Context="data">
                     <RadzenText class="mb-0 tipografia wrap-text">@data.RdplanAcc</RadzenText>
                 </Template>
@@ -193,7 +200,7 @@ else if (PizarraData.reudiatablas.Count() > 0 && confirmacion == true)
                 </Template>
             </RadzenDataGridColumn> *@
 
-            <RadzenDataGridColumn Width="8%" TItem="ReunionDTO" Title="Responsable" Filterable="false" Sortable="false">
+            <RadzenDataGridColumn Width="8%" TItem="ReunionDTO" Title="@ValidationMessages.Responsable" Filterable="false" Sortable="false">
                 <Template Context="data">
                     <RadzenText class="mb-0 tipografia">@data.Responsable</RadzenText>
                 </Template>
@@ -205,7 +212,7 @@ else if (PizarraData.reudiatablas.Count() > 0 && confirmacion == true)
                 </Template>
             </RadzenDataGridColumn> *@
 
-            <RadzenDataGridColumn Width="6%" TItem="ReunionDTO" Title="Requisición" Filterable="false" Sortable="false">
+            <RadzenDataGridColumn Width="6%" TItem="ReunionDTO" Title="@ValidationMessages.Requisicion" Filterable="false" Sortable="false">
                 <Template Context="data">
                     <RadzenText class="mb-0 tipografia">@data.RdcodRequi</RadzenText>
                 </Template>
@@ -223,13 +230,13 @@ else if (PizarraData.reudiatablas.Count() > 0 && confirmacion == true)
                 </Template>
             </RadzenDataGridColumn> *@
 
-            <RadzenDataGridColumn Width="7%" TItem="ReunionDTO" Title="F. Trabajo" Filterable="false" Sortable="false">
+            <RadzenDataGridColumn Width="7%" TItem="ReunionDTO" Title="@ValidationMessages.FTrabajo" Filterable="false" Sortable="false">
                 <Template Context="data">
                     <RadzenText class="mb-0 tipografia">@data.RdfecTra.ToString("dd/MM/yyyy")</RadzenText>
                 </Template>
             </RadzenDataGridColumn>
 
-            <RadzenDataGridColumn Width="5%" TItem="ReunionDTO" Title="Acciones" Filterable="false" Sortable="false">
+            <RadzenDataGridColumn Width="5%" TItem="ReunionDTO" Title="@ValidationMessages.Acciones" Filterable="false" Sortable="false">
                 <Template Context="data">
                     @if (libro == 0)
                     {
@@ -244,7 +251,7 @@ else if (PizarraData.reudiatablas.Count() > 0 && confirmacion == true)
 else if (PizarraData.reudiatablas.Count() == 0 && confirmacion == true)
 {
     <div style="text-align: center; padding: 20px; font-size: 18px; color: gray;">
-        <p>No hay registros disponibles</p>
+        <p>@ValidationMessages.NoHayRegistros</p>
     </div>
 }
 
@@ -365,7 +372,7 @@ else if (PizarraData.reudiatablas.Count() == 0 && confirmacion == true)
     private int idrespo = 0;
     private string Codigo { get; set; } = "Todo";
     private string Status { get; set; } = "Todo"; //Status
-    
+    private Usuario? usuarioActual;
 
     private async Task CreateData()
 
@@ -379,6 +386,7 @@ else if (PizarraData.reudiatablas.Count() == 0 && confirmacion == true)
 
     protected override async Task OnInitializedAsync()
     {
+        usuarioActual = await UsuarioContexto.ObtenerUsuarioActualAsync();
         await base.OnInitializedAsync();
         fecha1 = DateTime.Now;
         fecha2 = DateTime.Now;
@@ -438,13 +446,14 @@ else if (PizarraData.reudiatablas.Count() == 0 && confirmacion == true)
             }
             foreach (var d in tabla)
                 {
-                    d.Ksf = KsfData.ksfs.Where(x => x.Idksf == d.Idksf).FirstOrDefault().KsfNombre;
-                    d.Responsable = RespoReuData.resporeus.Where(x => x.IdResReu == d.IdResReu).FirstOrDefault().Rrnombre;
+                    d.Ksf = KsfData.ksfs.Where(x => x.Idksf == d.Idksf).Select(x => usuarioActual.idPais == 5 ? x.KsfEnglish : x.KsfNombre).FirstOrDefault();
+                    var nombreOriginal = RespoReuData.resporeus.Where(x => x.IdResReu == d.IdResReu).FirstOrDefault()?.Rrnombre ?? "";
+                    d.Responsable = ValidationMessages.ResourceManager.GetString(ValidationMessages.MapResponsableKey(nombreOriginal),CultureInfo.CurrentUICulture);
                 }
         } 
         else
         {
-            mensaje = "Verifique todos los campos";
+            mensaje = ValidationMessages.NoRechazada;
             NotificationService.Notify(Notificar.Notificacion("advertencia", mensaje, ""));
 
         }
@@ -468,13 +477,13 @@ else if (PizarraData.reudiatablas.Count() == 0 && confirmacion == true)
 
     if (validacion == true)
     {
-        mensaje = "Se agregó correctamente a la Reunión Quincenal";
+        mensaje = ValidationMessages.ReunionQuincenalAgregada;
         NotificationService.Notify(Notificar.Notificacion("exito", mensaje, ""));
         await buscar();
     }
     else
     {
-        mensaje = "No pudo ser Agregada";
+        mensaje = ValidationMessages.NoAgregada;
         NotificationService.Notify(Notificar.Notificacion("advertencia", mensaje, ""));
     }
     
@@ -488,13 +497,13 @@ else if (PizarraData.reudiatablas.Count() == 0 && confirmacion == true)
         bool validacion = await PizarraData.UpdateDiscrepancia3(registro, registro.IdReuDia);
         if (validacion == true)
         {
-            mensaje = "La discrepancia a sido rechazada";
+            mensaje = ValidationMessages.DiscrepanciaRechazada;
             NotificationService.Notify(Notificar.Notificacion("exito", mensaje, ""));
             await buscar();
         }
         else
         {
-            mensaje = "No pudo ser rechazada";
+            mensaje = ValidationMessages.NoRechazada;
             NotificationService.Notify(Notificar.Notificacion("advertencia", mensaje, ""));
         }
     }
