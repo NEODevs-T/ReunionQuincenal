@@ -13,56 +13,60 @@
 @inject HttpClient Http
 @inject AuthenticationStateProvider AuthStateProvider
 @inject ILocalStorageService LocalStorage
+@inject LocalizationService LocalizationService
+@inject ITranslationService Translator
+@inject IDiccionarioTraduccionesService DiccionarioTraduccionesService
 
 @using ReunionWeb.Resources
 @using System.Globalization
+@using ReunionWeb.Services
 
 
-<h3>@ValidationMessages.Calendario</h3>
 <BSContainer>
 
-    @if (MaestraData.centro.Count() == 0)
+    @if (!traduccionesCargadas || MaestraData.centro.Count() == 0)
     {
         <div class="loader"></div>
     }
     else
     {
+        <h3>@DiccionarioTraduccionesService.Traducciones["Calendario"]</h3>
         <BSRow>
             <BSCol Column="3" ColumnSmall="2">
-                <BSLabel>@ValidationMessages.Centro</BSLabel>
+                <BSLabel>@DiccionarioTraduccionesService.Traducciones["Centro"]</BSLabel>
                 <BSInput InputType="InputType.Select" @onchange="BuscarDivision"  @bind-Value="IdCentro">
-                    <option value="0">@ValidationMessages.Seleccione</option>
+                    <option value="0">@DiccionarioTraduccionesService.Traducciones["Seleccione"]</option>
                     @foreach (var d in MaestraData.centro)
                     {
                         <option value="@d.IdCentro">@d.Centro</option>
                     }
                 </BSInput>
                 <BSValidationSummary />
-                <BSFeedback For="@(() => IdCentro)" ValidMessage="Correcto." />
+                <BSFeedback For="@(() => IdCentro)"@DiccionarioTraduccionesService.Traducciones["Correcto"]" />
             </BSCol>
 
 
 
             <BSCol Column="3" ColumnSmall="2">
-                <BSLabel>@ValidationMessages.Division</BSLabel>
+                <BSLabel>@DiccionarioTraduccionesService.Traducciones["Division"]</BSLabel>
                 <BSInput InputType="InputType.Select" @bind-Value="IdDiv">
-                    <option value="0">@ValidationMessages.Seleccione</option>
+                    <option value="0">@DiccionarioTraduccionesService.Traducciones["Seleccione"]</option>
                     @foreach (var d in MaestraData.divisions)
                     {
                             <option value="@d.IdDivision">@d.Ndivision</option>
                     }
-                    <option value="0">@ValidationMessages.Todo</option>
+                    <option value="0">@DiccionarioTraduccionesService.Traducciones["Todo"]</option>
                 </BSInput>
-                <BSFeedback For="@(() => IdDiv)" ValidMessage="@ValidationMessages.Correcto" />
+                <BSFeedback For="@(() => IdDiv)" ValidMessage="@DiccionarioTraduccionesService.Traducciones["Correcto"]" />
             </BSCol>
 
 
             <BSCol ColumnSmall="2">
                 <BSRow>
-                    <BSLabel>@ValidationMessages.Aceptar</BSLabel>
+                    <BSLabel>@DiccionarioTraduccionesService.Traducciones["Aceptar"]</BSLabel>
                 </BSRow>
                 <BSButton IsOutlined Color="BSColor.Success" Size="Size.ExtraSmall" @onclick="(() => Get(IdCentro,IdDiv))">
-                    @ValidationMessages.Consultar <span class="oi oi-check"></span></BSButton>
+                    @DiccionarioTraduccionesService.Traducciones["Consultar"] <span class="oi oi-check"></span></BSButton>
             </BSCol>
 
         </BSRow>
@@ -77,12 +81,12 @@
 {
 
     <RadzenScheduler Data="@data" TItem="DataItem" StartProperty="Start" SelectedIndex="1" style="height: 630px;"
-        EndProperty="End" TodayText="@ValidationMessages.Hoy" TextProperty="Text" AppointmentRender=@OnAppointmentRender>
-        <RadzenDayView Text="@ValidationMessages.Dia" />
-        <RadzenWeekView Text="@ValidationMessages.Semana" />
-        <RadzenMonthView Text="@ValidationMessages.Mes" />
-        <RadzenYearPlannerView Text="@ValidationMessages.Planificacion" />
-        <RadzenYearView Text="@ValidationMessages.Año" />
+        EndProperty="End" TodayText="@DiccionarioTraduccionesService.Traducciones["Hoy"]" TextProperty="Text" AppointmentRender=@OnAppointmentRender>
+        <RadzenDayView Text="@DiccionarioTraduccionesService.Traducciones["Dia"]" />
+        <RadzenWeekView Text="@DiccionarioTraduccionesService.Traducciones["Semana"]" />
+        <RadzenMonthView Text="@DiccionarioTraduccionesService.Traducciones["Mes"]" />
+        <RadzenYearPlannerView Text="@DiccionarioTraduccionesService.Traducciones["Planificacion"]" />
+        <RadzenYearView Text="@DiccionarioTraduccionesService.Traducciones["Año"]" />
     </RadzenScheduler>
 }
 
@@ -93,7 +97,7 @@ else if (dataIsLoaded == 1 && PizarraData.calentrabajo.Count() == 0)
 else if (dataIsLoaded == 2 && PizarraData.calentrabajo.Count() == 0)
 {
         <div style="text-align: center; padding: 20px; font-size: 18px; color: gray;">
-                <p>@ValidationMessages.NoHayDatos</p>
+                <p>@DiccionarioTraduccionesService.Traducciones["NoHayDatos"]</p>
         </div>
         }
 
@@ -109,6 +113,8 @@ else if (dataIsLoaded == 2 && PizarraData.calentrabajo.Count() == 0)
     private int IdDiv { get; set; } //id de la division
     private int dataIsLoaded { get; set; } //verificar si cargo la lista
     DataItem[] data;
+    private int idPais { get; set; }
+    private bool traduccionesCargadas = false;
 
     private string mensaje = "";
 
@@ -118,13 +124,22 @@ else if (dataIsLoaded == 2 && PizarraData.calentrabajo.Count() == 0)
         var authState = await AuthStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
         claims = Enumerable.ToList(user.Claims);
-
+        
+        var idPaisClaim = claims.FirstOrDefault(c => c.Type == "IdPais")?.Value;
+        if (int.TryParse(idPaisClaim, out int paisTemp))
+        {
+            idPais = paisTemp;
+        }
     }
     protected override async Task OnInitializedAsync()
     {
 
         await CreateData();
-
+        await LocalizationService.EstablecerCulturaDesdeTokenAsync();
+        CultureInfo.CurrentCulture = CultureInfo.DefaultThreadCurrentCulture;
+        CultureInfo.CurrentUICulture = CultureInfo.DefaultThreadCurrentUICulture;
+        await DiccionarioTraduccionesService.CargarTraduccionesAsync();
+        traduccionesCargadas = true;
         var rol = claims.FirstOrDefault(c => c.Type.Contains("role"))?.Value;
 
         if (rol == "Admin" || rol == "SuperAdmin" || rol == "PrimeUser" || rol == "MttoAdmin" || rol == "SeguridadAdmin" || rol == "Auditores" || rol
