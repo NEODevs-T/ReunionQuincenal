@@ -155,7 +155,7 @@
 <data name="ParadaMayor" xml:space="preserve"><value>Parada Mayor</value></data>
 <data name="Tiempo" xml:space="preserve"><value>Tiempo</value></data>
 <data name="Requisicion" xml:space="preserve"><value>Requisición</value></data>
-<data name="FechaDelTrabajo" xml:space="preserve"><value>Fecha del Trabajo</value></data>
+<data name="FechaDeTrabajo" xml:space="preserve"><value>Fecha del Trabajo</value></data>
 <data name="TotalPendiente" xml:space="preserve"><value>Total Pendiente</value></data>
 <data name="NoConforme" xml:space="preserve"><value>No Conforme</value></data>
 <data name="CambiosDeFechaTrabajo" xml:space="preserve"><value>Cambios de Fecha Trabajo</value></data>

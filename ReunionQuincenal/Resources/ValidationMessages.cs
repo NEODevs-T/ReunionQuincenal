@@ -150,7 +150,7 @@ namespace ReunionWeb.Resources
         public static string ParadaMayor => _resourceManager.GetString("ParadaMayor", CultureInfo.CurrentUICulture);
         public static string Tiempo => _resourceManager.GetString("Tiempo", CultureInfo.CurrentUICulture);
         public static string Requisicion => _resourceManager.GetString("Requisicion", CultureInfo.CurrentUICulture);
-        public static string FechaDelTrabajo => _resourceManager.GetString("FechaDelTrabajo", CultureInfo.CurrentUICulture);
+        public static string FechaDeTrabajo => _resourceManager.GetString("FechaDeTrabajo", CultureInfo.CurrentUICulture);
         public static string ProximaFecha => _resourceManager.GetString("ProximaFecha", CultureInfo.CurrentUICulture);
         public static string Descripcion => _resourceManager.GetString("Descripcion", CultureInfo.CurrentUICulture);
         public static string Revisar => _resourceManager.GetString("Revisar", CultureInfo.CurrentUICulture);
