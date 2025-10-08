@@ -59,7 +59,7 @@ namespace ReunionWeb.Services
                 "Seleccione", "SeleccioneBuscar", "SeleccioneDML", "SeleccioneUnCentro", "SeleccioneUnaDivision",
                 "SeleccioneUnaEmpresa", "Semana", "StatusNuevo", "Suplencia", "TCargos",
                 "Tiempo", "Todo", "Todos", "TodosCampos", "TotalPendiente",
-                "Trazabilidad", "Usuario", "VencidasTurno", "Vencidos", "VerifiqueCampos", "Horas",
+                "Trazabilidad", "Usuario", "VencidasDiaria", "VencidasTurno", "Vencidos", "VerifiqueCampos", "Horas",
                 "hay_registros_vencidos"
             };
 

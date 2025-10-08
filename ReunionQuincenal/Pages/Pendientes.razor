@@ -15,12 +15,13 @@
 @inject ILocalStorageService LocalStorage
 @inject IJSRuntime IJS
 @inject NotificationService NotificationService
+@inject IDiccionarioTraduccionesService DiccionarioTraduccionesService
+@inject LocalizationService LocalizationService
+@inject ITranslationService Translator
 
 @using ReunionWeb.Resources
 @using System.Globalization
-
-<h4>@ValidationMessages.Asuntos</h4>
-
+@using ReunionWeb.Services
 
 @if (MaestraData.centro.Count() == 0)
 {
@@ -31,11 +32,12 @@
 }
 else
 {
+    <h4>@DiccionarioTraduccionesService.Traducciones["Asuntos"]</h4>
     <BSRow>
         <BSCol ColumnLarge="3" ColumnSmall="6">
-            <BSLabel>@ValidationMessages.Centro</BSLabel>
+            <BSLabel>@DiccionarioTraduccionesService.Traducciones["Centro"]</BSLabel>
             <BSInput InputType="InputType.Select" @bind-Value="IdCentro" @onchange="BuscarDivision" >>
-                <option value="0"> @ValidationMessages.Seleccione </option>
+                <option value="0"> @DiccionarioTraduccionesService.Traducciones["Seleccione"] </option>
                 @foreach (var d in MaestraData.centro)
                 {
                     <option value="@d.IdCentro">@d.Centro</option>
@@ -44,9 +46,9 @@ else
         </BSCol>
 
         <BSCol ColumnLarge="3" ColumnSmall="6">
-            <BSLabel>@ValidationMessages.Division</BSLabel>
+            <BSLabel>@DiccionarioTraduccionesService.Traducciones["Division"]</BSLabel>
             <BSInput InputType="InputType.Select" @bind-Value="IdDiv">
-                <option value="0">@ValidationMessages.Seleccione</option>
+                <option value="0">@DiccionarioTraduccionesService.Traducciones["Seleccione"]</option>
                 @foreach (var d in MaestraData.divisions)
                 {
                     <option value="@d.IdDivision">@d.Ndivision</option>
@@ -56,9 +58,9 @@ else
         @if (PizarraData.reudiatablas.Count() > 0 && dataIsLoaded == 2)
         {
             <BSCol ColumnLarge="3" ColumnSmall="6">
-                <BSLabel>@ValidationMessages.Linea</BSLabel>
+                <BSLabel>@DiccionarioTraduccionesService.Traducciones["Linea"]</BSLabel>
                 <BSInput InputType="InputType.Select" @bind-Value="NombreLinea" IsDisabled=@valueodt>
-                    <option value="Todo">@ValidationMessages.Todo</option>
+                    <option value="Todo">@DiccionarioTraduccionesService.Traducciones["Todo"]</option>
                     @foreach (var d in MaestraData.lineas)
                     {
                                 <option value="@d.Linea">@d.Linea</option>
@@ -68,17 +70,17 @@ else
 
         }
         <BSCol ColumnLarge="3" ColumnSmall="6">
-            <BSLabel>@ValidationMessages.Estado</BSLabel>
+            <BSLabel>@DiccionarioTraduccionesService.Traducciones["Estado"]</BSLabel>
             <BSInput InputType="InputType.Select" @bind-Value="Status" IsDisabled=@valueodt>
-                <option value="Total Pendiente">@ValidationMessages.TotalPendiente</option>
-                <option value="Todo">@ValidationMessages.Todo</option>
-                <option value="Pendiente">@ValidationMessages.Pendiente</option>
-                <option value="Pendiente-Responsable">@ValidationMessages.Pendiente / @ValidationMessages.Responsable</option>
-                <option value="No Conforme">@ValidationMessages.NoConforme</option>
-                <option value="Listo">@ValidationMessages.Listo</option>
-                <option value="Cerrado">@ValidationMessages.Cerrado</option>
-                <option value="Vencidos">@ValidationMessages.Vencidos</option>
-                <option value="VencidasDiaria">@ValidationMessages.VencidasDiaria</option>
+                <option value="Total Pendiente">@DiccionarioTraduccionesService.Traducciones["TotalPendiente"]</option>
+                <option value="Todo">@DiccionarioTraduccionesService.Traducciones["Todo"]</option>
+                <option value="Pendiente">@DiccionarioTraduccionesService.Traducciones["Pendiente"]</option>
+                <option value="Pendiente-Responsable">@DiccionarioTraduccionesService.Traducciones["Pendiente"] / @DiccionarioTraduccionesService.Traducciones["Responsable"]</option>
+                <option value="No Conforme">@DiccionarioTraduccionesService.Traducciones["NoConforme"]</option>
+                <option value="Listo">@DiccionarioTraduccionesService.Traducciones["Listo"]</option>
+                <option value="Cerrado">@DiccionarioTraduccionesService.Traducciones["Cerrado"]</option>
+                <option value="Vencidos">@DiccionarioTraduccionesService.Traducciones["Vencidos"]</option>
+                <option value="VencidasDiaria">@DiccionarioTraduccionesService.Traducciones["VencidasDiaria"]</option>
             </BSInput>
         </BSCol>
 
@@ -97,30 +99,30 @@ else
     <BSRow>
 
         <BSCol ColumnLarge="3" ColumnSmall="4">
-            <BSLabel>@ValidationMessages.Codigo</BSLabel>
+            <BSLabel>@DiccionarioTraduccionesService.Traducciones["Codigo"]</BSLabel>
             <BSInput InputType="InputType.Select" @bind-Value="Codigo" IsDisabled=@valueodt>
-                <option value="Todo">@ValidationMessages.Todo</option>
-                <option value="1">1- @ValidationMessages.EnCurso</option>
-                <option value="2">2- @ValidationMessages.ProximaParada</option>
-                <option value="3">3- @ValidationMessages.FaltaRepuesto</option>
-                <option value="4">4- @ValidationMessages.FaltaDePersonal</option>
-                <option value="5">5- @ValidationMessages.EquipoNoDisponible</option>
-                <option value="6">6- @ValidationMessages.ParadaMayor</option>
+                <option value="Todo">@DiccionarioTraduccionesService.Traducciones["Todo"]</option>
+                <option value="1">1- @DiccionarioTraduccionesService.Traducciones["EnCurso"]</option>
+                <option value="2">2- @DiccionarioTraduccionesService.Traducciones["ProximaParada"]</option>
+                <option value="3">3- @DiccionarioTraduccionesService.Traducciones["FaltaRepuesto"]</option>
+                <option value="4">4- @DiccionarioTraduccionesService.Traducciones["FaltaDePersonal"]</option>
+                <option value="5">5- @DiccionarioTraduccionesService.Traducciones["EquipoNoDisponible"]</option>
+                <option value="6">6- @DiccionarioTraduccionesService.Traducciones["ParadaMayor"]</option>
             </BSInput>
         </BSCol>
 
 
         <BSCol ColumnLarge="3" ColumnSmall="8">
             <BSRow>
-                <BSLabel>  @ValidationMessages.Ordenar </BSLabel>
+                <BSLabel>  @DiccionarioTraduccionesService.Traducciones["Ordenar"] </BSLabel>
             </BSRow>
             <BSInputRadio CheckedValue="@("2")" IsDisabled=@valueodt @bind-Value="tipoconsulta" IsToggle="true" Size="Size.ExtraSmall" Color="BSColor.Success" IsOutlined="true" style="width:50%;">
-                @ValidationMessages.FechaDeTrabajo
+                @DiccionarioTraduccionesService.Traducciones["FTrabajo"]
                 <span class="oi oi-cog"></span>
             </BSInputRadio>
 
             <BSInputRadio CheckedValue="@("0")" IsDisabled=@valueodt @bind-Value="tipoconsulta" IsToggle="true" Size="Size.ExtraSmall" Color="BSColor.Success" IsOutlined="true" style="width:50%;">
-                @ValidationMessages.FechaDeReunion
+                @DiccionarioTraduccionesService.Traducciones["FReunion"]
                 <span class="oi oi-people"></span>
             </BSInputRadio>
         </BSCol>
@@ -128,9 +130,9 @@ else
 
         <BSCol ColumnLarge="3" ColumnSmall="6">
             <BSRow>
-                <BSLabel>@ValidationMessages.Buscar</BSLabel>
+                <BSLabel>@DiccionarioTraduccionesService.Traducciones["Buscar"]</BSLabel>
             </BSRow>
-            <BSButton IsOutlined Color="BSColor.Success" Size="Size.ExtraSmall" IsDisabled=@valueodt @onclick="Get" style="width:70%;">  @ValidationMessages.Consultar <span class="oi oi-check"></span></BSButton>
+            <BSButton IsOutlined Color="BSColor.Success" Size="Size.ExtraSmall" IsDisabled=@valueodt @onclick="Get" style="width:70%;">  @DiccionarioTraduccionesService.Traducciones["Consultar"] <span class="oi oi-check"></span></BSButton>
         </BSCol>
 
 
@@ -154,13 +156,12 @@ else
         @if (PizarraData.reudiatablas.Count() > 0 && dataIsLoaded == 2)
         {
             <BSCol Column="3">
-                <BSLabel>@ValidationMessages.Responsable</BSLabel>
+                <BSLabel>@DiccionarioTraduccionesService.Traducciones["Responsable"]</BSLabel>
                 <BSInput InputType="InputType.Select" IsDisabled=@valueodt @bind-Value="idrespo">
-                    <option value=0>@ValidationMessages.Todo</option>
+                    <option value=0>@DiccionarioTraduccionesService.Traducciones["Todo"]</option>
                     @foreach (var d in RespoReuData.resporeus)
                     {
-                        <option value="@d.IdResReu">@ValidationMessages.ResourceManager.GetString(ValidationMessages
-                            .MapResponsableKey(d.Rrnombre),CultureInfo.CurrentUICulture)</option>
+                        <option value="@d.IdResReu">@DiccionarioTraduccionesService.Traducciones[ValidationMessages.MapResponsableKey(d.Rrnombre)]</option>
                     }
                 </BSInput>
             </BSCol>
@@ -171,7 +172,7 @@ else
 
                 <BSInput InputType="InputType.Select" IsDisabled=@valueodt @bind-Value="IdKsf">
 
-                    <option value="0">@ValidationMessages.Todo</option>
+                    <option value="0">@DiccionarioTraduccionesService.Traducciones["Todo"]</option>
                     @foreach (var d in KsfData.ksfs.Where(x => x.Idksf != 6))
                     {
                         var texto = idPais == 5? d.KsfEnglish : d.KsfNombre;
@@ -182,7 +183,7 @@ else
 
             <BSCol Column="3">
                 <BSRow>
-                    <BSLabel>@ValidationMessages.Imprimir</BSLabel>
+                    <BSLabel>@DiccionarioTraduccionesService.Traducciones["Imprimir"]</BSLabel>
                 </BSRow>
                 <BSButton IsOutlined Color="BSColor.Success" Size="Size.ExtraSmall" IsDisabled=@valueodt @onclick="PrintDocument">  <span class="oi oi-print"></span></BSButton>
              </BSCol>
@@ -200,20 +201,20 @@ else
             <BSTHead Class="cabecera">
                 <BSTR>
                     @*<BSTD>Id</BSTD>*@
-                    <BSTD>@ValidationMessages.Area</BSTD>
+                    <BSTD>@DiccionarioTraduccionesService.Traducciones["Area"]</BSTD>
                     <BSTD>Ksf</BSTD>
-                    <BSTD>@ValidationMessages.CodigoDeEquipo</BSTD>
-                    <BSTD>@ValidationMessages.NombreDelEquipo</BSTD>
-                    <BSTD Class="col-5">@ValidationMessages.Discrepancia</BSTD>
-                    <BSTD>@ValidationMessages.Codigo</BSTD>
-                    <BSTD Class="col-4">@ValidationMessages.PlanDeAccion</BSTD>
-                    <BSTD>@ValidationMessages.Tiempo</BSTD>
-                    <BSTD>@ValidationMessages.Responsable</BSTD>
-                    <BSTD>@ValidationMessages.Estado</BSTD>
-                    <BSTD>@ValidationMessages.Requisicion</BSTD>
+                    <BSTD>@DiccionarioTraduccionesService.Traducciones["CodigoDeEquipo"]</BSTD>
+                    <BSTD>@DiccionarioTraduccionesService.Traducciones["NombreDelEquipo"]</BSTD>
+                    <BSTD Class="col-5">@DiccionarioTraduccionesService.Traducciones["Discrepancia"]</BSTD>
+                    <BSTD>@DiccionarioTraduccionesService.Traducciones["Codigo"]</BSTD>
+                    <BSTD Class="col-4">@DiccionarioTraduccionesService.Traducciones["PlanDeAccion"]</BSTD>
+                    <BSTD>@DiccionarioTraduccionesService.Traducciones["Tiempo"]</BSTD>
+                    <BSTD>@DiccionarioTraduccionesService.Traducciones["Responsable"]</BSTD>
+                    <BSTD>@DiccionarioTraduccionesService.Traducciones["Estado"]</BSTD>
+                    <BSTD>@DiccionarioTraduccionesService.Traducciones["Requisicion"]</BSTD>
                     <BSTD>ODT</BSTD>
-                    <BSTD>@ValidationMessages.FechaDeReunion</BSTD> @*Fecha del dia de reunion*@
-                    <BSTD>@ValidationMessages.FechaDeTrabajo</BSTD>@*Fecha de listo el trabajo*@
+                    <BSTD>@DiccionarioTraduccionesService.Traducciones["FechaDeReunion"]</BSTD> @*Fecha del dia de reunion*@
+                    <BSTD>@DiccionarioTraduccionesService.Traducciones["FechaDeTrabajo"]</BSTD>@*Fecha de listo el trabajo*@
                     <BSTD></BSTD>
                 </BSTR>
             </BSTHead>
@@ -260,15 +261,22 @@ else
                                                 <BSTD Class="textotabla">@d.RdplanAcc</BSTD>
                                                 <BSTD>@d.Rdtiempo</BSTD>
                                                 @{
-                                                    var nombreResponsable = RespoReuData.resporeus.FirstOrDefault(x => x.IdResReu == d.IdResReu)?.Rrnombre;
-                                                    var textoTraducido = ValidationMessages.ResourceManager.GetString(
-                                                    ValidationMessages.MapResponsableKey(nombreResponsable),
-                                                    CultureInfo.CurrentUICulture
-                                                );
+                                                    var nombreResponsable = RespoReuData.resporeus
+                                                        .FirstOrDefault(x => x.IdResReu == d.IdResReu)?.Rrnombre;
+
+                                                    var clave = ValidationMessages.MapResponsableKey(nombreResponsable);
+                                                    var textoTraducido = DiccionarioTraduccionesService.Traducciones.TryGetValue(clave, out var traduccion)
+                                                        ? traduccion
+                                                        : nombreResponsable;
                                                 }
-                                                <BSTD class="@(nombreResponsable == "Por Definir" ? "Definir" : "")">
-                                                    @textoTraducido
-                                                </BSTD>
+                                                @if (nombreResponsable == "Por Definir")
+                                                {
+                                                    <BSTD Class="Definir">@textoTraducido</BSTD>
+                                                }
+                                                else
+                                                {
+                                                    <BSTD>@textoTraducido</BSTD>
+                                                }
                                                 @{
                                                     var estadoTraducido = d.Rdstatus switch
                                                     {
@@ -319,17 +327,17 @@ else
 
     @*Mostrar la trazabilidad*@
     <BSModal IsCentered="true" DataId="History">
-        <Header>@ValidationMessages.Trazabilidad</Header>
+        <Header>@DiccionarioTraduccionesService.Traducciones["Trazabilidad"]</Header>
         <Content>
-        <h5>@ValidationMessages.CambiosDeEstados:</h5>
+        <h5>@DiccionarioTraduccionesService.Traducciones["CambiosDeEstados"]:</h5>
             @if (cambiostatuss.Count() > 0 && cargandocambio == true)
             {
                 <BSTable IsResponsive="true" IsStriped="true" IsBordered="true">
                     <BSTHead Class="cabecera">
                         <BSTR>
-                            <BSTD>@ValidationMessages.FechaDelCambio</BSTD>
-                            <BSTD>@ValidationMessages.StatusNuevo</BSTD>
-                            <BSTD>@ValidationMessages.Usuario</BSTD>
+                            <BSTD>@DiccionarioTraduccionesService.Traducciones["FechaDelCambio"]</BSTD>
+                            <BSTD>@DiccionarioTraduccionesService.Traducciones["StatusNuevo"]</BSTD>
+                            <BSTD>@DiccionarioTraduccionesService.Traducciones["Usuario"]</BSTD>
                         </BSTR>
                     </BSTHead>
                     <BSTBody>
@@ -337,9 +345,7 @@ else
                         {
                             <BSTR>
                                 <BSTD>@d.Cbfecha</BSTD>
-                                    <BSTD>@ValidationMessages.ResourceManager.GetString(
-                                ValidationMessages.MapStatusKey(d.Cbstat),
-                                CultureInfo.CurrentUICulture
+                                    <BSTD>@DiccionarioTraduccionesService.Traducciones[ValidationMessages.MapStatusKey(d.Cbstat)]
                             )</BSTD>
                                     <BSTD>@d.Cbuser</BSTD>
                                 </BSTR>
@@ -353,20 +359,20 @@ else
             }
             else if (cambiostatuss.Count() == 0 && cargandocambio == true)
             {
-                <p>@ValidationMessages.NoHayRegistros2</p>
+                <p>@DiccionarioTraduccionesService.Traducciones["NoHayRegistros2"]</p>
             }
             <p></p>
             <p></p>
-            <h5>@ValidationMessages.CambiosDeFechaTrabajo</h5>
+            <h5>@DiccionarioTraduccionesService.Traducciones["CambiosDeFechaTrabajo"]</h5>
 
             @if (cambiofechas.Count() > 0)
             {
                 <BSTable IsResponsive="true" IsStriped="true" IsBordered="true">
                     <BSTHead Class="cabecera">
                         <BSTR>
-                            <BSTD>@ValidationMessages.FechaDelCambio</BSTD>
-                            <BSTD>@ValidationMessages.NuevaFechaDeTrabajo</BSTD>
-                            <BSTD>@ValidationMessages.Usuario</BSTD>
+                            <BSTD>@DiccionarioTraduccionesService.Traducciones["FechaDelCambio"]</BSTD>
+                            <BSTD>@DiccionarioTraduccionesService.Traducciones["NuevaFechaDeTrabajo"]</BSTD>
+                            <BSTD>@DiccionarioTraduccionesService.Traducciones["Usuario"]</BSTD>
                         </BSTR>
                     </BSTHead>
                     <BSTBody>
@@ -387,7 +393,7 @@ else
             }
             else if (cambiofechas.Count() == 0 && cargandocambio == true)
             {
-                <p>@ValidationMessages.NoHayRegistros2</p>
+                <p>@DiccionarioTraduccionesService.Traducciones["NoHayRegistros2"]</p>
             }
         </Content>
         <Footer Context="modal">
@@ -405,7 +411,7 @@ else if (dataIsLoaded == 1 && PizarraData.reudiatablas.Count() == 0)
 else if (dataIsLoaded == 2 && PizarraData.reudiatablas.Count() == 0)
 {
     <div style="text-align: center; padding: 20px; font-size: 18px; color: gray;">
-    <p>@ValidationMessages.NoHayDatos2</p>
+    <p>@DiccionarioTraduccionesService.Traducciones["NoHayDatos2"]</p>
 </div>
 }
 
@@ -573,9 +579,8 @@ else if (dataIsLoaded == 2 && PizarraData.reudiatablas.Count() == 0)
     private NotifiRadzen Notificar = new NotifiRadzen();//Logic para crear las noyificaciones radzen
     private bool isEditar { get; set; } = true;
     private List<Claim> claims { get; set; }
-            private int idPais {get; set;}
- 
-
+    private int idPais {get; set;}
+    private bool traduccionesCargadas = false;
 
     private async Task CreateData()
 
@@ -583,7 +588,11 @@ else if (dataIsLoaded == 2 && PizarraData.reudiatablas.Count() == 0)
         var authState = await AuthStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
         claims = Enumerable.ToList(user.Claims);
-
+        var idPaisClaim = claims.FirstOrDefault(c => c.Type == "IdPais")?.Value;
+        if (int.TryParse(idPaisClaim, out int paisTemp))
+        {
+            idPais = paisTemp;
+        }
     }
 
     protected override async Task OnInitializedAsync()
@@ -592,6 +601,11 @@ else if (dataIsLoaded == 2 && PizarraData.reudiatablas.Count() == 0)
         fecha1 = DateTime.Now;
         fecha2 = DateTime.Now;
         await CreateData();
+        await LocalizationService.EstablecerCulturaDesdeTokenAsync();
+        CultureInfo.CurrentCulture = CultureInfo.DefaultThreadCurrentCulture;
+        CultureInfo.CurrentUICulture = CultureInfo.DefaultThreadCurrentUICulture;
+        await DiccionarioTraduccionesService.CargarTraduccionesAsync();
+        traduccionesCargadas = true;
 
         //Cargar Listas
         @* await DivReset(IdCentro = int.Parse(claims.FirstOrDefault(c => c.Type.Equals("IdCentro"))?.Value ?? "0")); *@
@@ -700,7 +714,7 @@ else if (dataIsLoaded == 2 && PizarraData.reudiatablas.Count() == 0)
         }
         else
         {
-            NotificationService.Notify(Notificar.Notificacion("advertencia", ValidationMessages.Atencion, ValidationMessages.SVLista));
+            NotificationService.Notify(Notificar.Notificacion("advertencia", DiccionarioTraduccionesService.Traducciones["Atencion"], DiccionarioTraduccionesService.Traducciones["SVLista"]));
         }
     }
 
@@ -728,12 +742,12 @@ else if (dataIsLoaded == 2 && PizarraData.reudiatablas.Count() == 0)
             else
             {
 
-                NotificationService.Notify(Notificar.Notificacion("advertencia", ValidationMessages.Atencion, ValidationMessages.SVLista));
+                NotificationService.Notify(Notificar.Notificacion("advertencia", DiccionarioTraduccionesService.Traducciones["Atencion"], DiccionarioTraduccionesService.Traducciones["SVLista"]));
             }
         }
         else
         {
-            NotificationService.Notify(Notificar.Notificacion("advertencia", ValidationMessages.ODT, ""));
+            NotificationService.Notify(Notificar.Notificacion("advertencia", DiccionarioTraduccionesService.Traducciones["ODT"], ""));
         }
 
 
@@ -838,7 +852,7 @@ else if (dataIsLoaded == 2 && PizarraData.reudiatablas.Count() == 0)
         }
         catch (Exception ex)
         {
-            NotificationService.Notify(Notificar.Notificacion("error", ValidationMessages.ErrorInesp, ValidationMessages.Reload));
+            NotificationService.Notify(Notificar.Notificacion("error", DiccionarioTraduccionesService.Traducciones["ErrorInesp"], DiccionarioTraduccionesService.Traducciones["Reload"]));
 
         }
 
