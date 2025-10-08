@@ -13,12 +13,22 @@
 @inject AuthenticationStateProvider AuthStateProvider
 @inject ILocalStorageService LocalStorage
 @inject NotificationService NotificationService
-
+@inject IDiccionarioTraduccionesService DiccionarioTraduccionesService
+@inject LocalizationService LocalizationService
+@inject ITranslationService Translator
 
 @using ReunionWeb.Resources
 @using System.Globalization
+@using ReunionWeb.Services
 
-<h3>@ValidationMessages.Historicos</h3>
+
+@if (!traduccionesCargadas || MaestraData.centro.Count() == 0)
+{
+    <div class="loader"></div>
+}
+else
+{
+<h3>@DiccionarioTraduccionesService.Traducciones["Historicos"]</h3>
 
 
 <BSContainer>
@@ -33,9 +43,9 @@
 
         <BSRow>
             <BSCol Column="3" ColumnSmall="2">
-                <BSLabel>@ValidationMessages.Centro</BSLabel>
+                <BSLabel>@DiccionarioTraduccionesService.Traducciones["Centro"]</BSLabel>
                 <BSInput InputType="InputType.Select" @onchange="BuscarDivision" @bind-Value="IdCentro">
-                    <option value="0"> @ValidationMessages.Seleccione </option>
+                    <option value="0"> @DiccionarioTraduccionesService.Traducciones["Seleccione"] </option>
                     @foreach (var d in MaestraData.centro)
                     {
                         <option value="@d.IdCentro">@d.Centro</option>
@@ -45,9 +55,9 @@
 
 
             <BSCol Column="3" ColumnSmall="2">
-                <BSLabel>@ValidationMessages.Division</BSLabel>
+                <BSLabel>@DiccionarioTraduccionesService.Traducciones["Division"]</BSLabel>
                 <BSInput InputType="InputType.Select" @bind-Value="IdDiv">
-                    <option value="0">@ValidationMessages.Seleccione</option>
+                    <option value="0">@DiccionarioTraduccionesService.Traducciones["Seleccione"]</option>
                     @foreach (var d in MaestraData.divisions)
                     {
                         <option value="@d.IdDivision">@d.Ndivision</option>
@@ -58,19 +68,19 @@
 
 
             <BSCol Column="3" ColumnSmall="2">
-                <BSLabel> @ValidationMessages.Desde</BSLabel>
+                <BSLabel> @DiccionarioTraduccionesService.Traducciones["Desde"]</BSLabel>
                 <BSInput InputType="InputType.Date" @bind-Value="fecha1" />
             </BSCol>
 
             <BSCol Column="3" ColumnSmall="2">
-                <BSLabel>@ValidationMessages.Hasta</BSLabel>
+                <BSLabel>@DiccionarioTraduccionesService.Traducciones["Hasta"]</BSLabel>
                 <BSInput InputType="InputType.Date" @bind-Value="fecha2" />
             </BSCol>
 
             <BSCol ColumnSmall="1" Column="2">
-                <BSLabel>@ValidationMessages.Codigo</BSLabel>
+                <BSLabel>@DiccionarioTraduccionesService.Traducciones["Codigo"]</BSLabel>
                 <BSInput InputType="InputType.Select" @bind-Value="Codigo">
-                    <option value="Todo">@ValidationMessages.Todo</option>
+                    <option value="Todo">@DiccionarioTraduccionesService.Traducciones["Todo"]</option>
                     <option value="1">1</option>
                     <option value="2">2</option>
                     <option value="3">3</option>
@@ -81,15 +91,15 @@
             </BSCol>
 
             <BSCol ColumnSmall="2" Column="3">
-                <BSLabel>@ValidationMessages.Estado</BSLabel>
+                <BSLabel>@DiccionarioTraduccionesService.Traducciones["Estado"]</BSLabel>
                 <BSInput InputType="InputType.Select" @bind-Value="Status">
-                    <option value="Total Pendiente">@ValidationMessages.TotalPendiente</option>
-                    <option value="Todo">@ValidationMessages.Todo</option>
-                    <option value="Pendiente">@ValidationMessages.Pendiente</option>
-                    <option value="Pendiente/Responsable">@ValidationMessages.Pendiente / @ValidationMessages.Responsable</option>
-                    <option value="Listo">@ValidationMessages.Listo</option>
-                    <option value="Cerrado">@ValidationMessages.Cerrado</option>
-                    <option value="Vencidos">@ValidationMessages.Vencidos</option>
+                    <option value="Total Pendiente">@DiccionarioTraduccionesService.Traducciones["TotalPendiente"]</option>
+                    <option value="Todo">@DiccionarioTraduccionesService.Traducciones["Todo"]</option>
+                    <option value="Pendiente">@DiccionarioTraduccionesService.Traducciones["Pendiente"]</option>
+                    <option value="Pendiente/Responsable">@DiccionarioTraduccionesService.Traducciones["Pendiente"] / @DiccionarioTraduccionesService.Traducciones["Responsable"]</option>
+                    <option value="Listo">@DiccionarioTraduccionesService.Traducciones["Listo"]</option>
+                    <option value="Cerrado">@DiccionarioTraduccionesService.Traducciones["Cerrado"]</option>
+                    <option value="Vencidos">@DiccionarioTraduccionesService.Traducciones["Vencidos"]</option>
                 </BSInput>
             </BSCol>
 
@@ -100,31 +110,31 @@
 
             <BSCol ColumnSmall="2" Column="1">
                 <BSRow>
-                    <BSLabel>@ValidationMessages.FiltroFechaDeTrabajo</BSLabel>
+                    <BSLabel>@DiccionarioTraduccionesService.Traducciones["FiltroFechaDeTrabajo"]</BSLabel>
                 </BSRow>
                 <BSInputRadio CheckedValue="@("2")" @bind-Value="tipoconsulta" IsToggle="true" Size="Size.ExtraSmall"
                     Color="BSColor.Success" IsOutlined="true">
-                    @ValidationMessages.FechaDeTrabajo
+                    @DiccionarioTraduccionesService.Traducciones["FTrabajo"]
                     <span class="oi oi-cog"></span>
                 </BSInputRadio>
             </BSCol>
 
             <BSCol ColumnSmall="2" Column="1">
                 <BSRow>
-                    <BSLabel> @ValidationMessages.FiltroFechaDeReunion</BSLabel>
+                    <BSLabel> @DiccionarioTraduccionesService.Traducciones["FiltroFechaDeReunion"]</BSLabel>
                 </BSRow>
                 <BSInputRadio CheckedValue="@("0")" @bind-Value="tipoconsulta" IsToggle="true" Size="Size.ExtraSmall"
                     Color="BSColor.Success" IsOutlined="true">
-                    @ValidationMessages.FechaDeReunion
+                    @DiccionarioTraduccionesService.Traducciones["FReunion"]
                     <span class="oi oi-people"></span>
                 </BSInputRadio>
             </BSCol>
 
             <BSCol ColumnSmall="2" Column="2">
                 <BSRow>
-                    <BSLabel>@ValidationMessages.Buscar</BSLabel>
+                    <BSLabel>@DiccionarioTraduccionesService.Traducciones["Buscar"]</BSLabel>
                 </BSRow>
-                <BSButton IsOutlined Color="BSColor.Success" Size="Size.ExtraSmall" OnClick="Get"> @ValidationMessages.Consultar <span
+                <BSButton IsOutlined Color="BSColor.Success" Size="Size.ExtraSmall" OnClick="Get"> @DiccionarioTraduccionesService.Traducciones["Consultar"] <span
                         class="oi oi-check"></span></BSButton>
             </BSCol>
 
@@ -164,7 +174,7 @@
                     @(tabla.IndexOf(context) + 1)
                 </Template>
             </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="ReunionDTO" Title="@ValidationMessages.Linea" Frozen="true" Property="Rdarea" Width="80px">
+            <RadzenDataGridColumn TItem="ReunionDTO" Title="@DiccionarioTraduccionesService.Traducciones["Linea"]" Frozen="true" Property="Rdarea" Width="80px">
                 <Template>
                     @context.Rdarea
                 </Template>
@@ -172,13 +182,13 @@
 
 
 
-            <RadzenDataGridColumn TItem="ReunionDTO" Title="@ValidationMessages.CodigoDeEquipo" Frozen="true" Property="RdcodEq" Width="80px">
+            <RadzenDataGridColumn TItem="ReunionDTO" Title="@DiccionarioTraduccionesService.Traducciones["CodigoDeEquipo"]" Frozen="true" Property="RdcodEq" Width="80px">
                 <Template>
                     @context.RdcodEq
                 </Template>
             </RadzenDataGridColumn>
 
-            <RadzenDataGridColumn TItem="ReunionDTO" Title="@ValidationMessages.NombreDelEquipo" Frozen="true" Property="RdcodEq" Width="80px">
+            <RadzenDataGridColumn TItem="ReunionDTO" Title="@DiccionarioTraduccionesService.Traducciones["NombreDelEquipo"]" Frozen="true" Property="RdcodEq" Width="80px">
                 <Template>
                     @(string.IsNullOrWhiteSpace(context.EnombreEam) ? "EQUIPO NO ENCONTRADO" : context.EnombreEam)
                 </Template>
@@ -190,33 +200,33 @@
                 </Template>
             </RadzenDataGridColumn>
 
-            <RadzenDataGridColumn TItem="ReunionDTO" Title="@ValidationMessages.Discrepancia" Property="Rddisc" Width="220px">
+            <RadzenDataGridColumn TItem="ReunionDTO" Title="@DiccionarioTraduccionesService.Traducciones["Discrepancia"]" Property="Rddisc" Width="220px">
                 <Template>
                     @context.Rddisc
                 </Template>
             </RadzenDataGridColumn>
 
-            <RadzenDataGridColumn TItem="ReunionDTO" Title="@ValidationMessages.Codigo" Property="RdcodDis" Width="60px">
+            <RadzenDataGridColumn TItem="ReunionDTO" Title="@DiccionarioTraduccionesService.Traducciones["Codigo"]" Property="RdcodDis" Width="60px">
                 <Template>
                     @context.RdcodDis
                 </Template>
             </RadzenDataGridColumn>
 
-            <RadzenDataGridColumn TItem="ReunionDTO" Title="@ValidationMessages.Accion" Property="RdplanAcc" Width="200px">
+            <RadzenDataGridColumn TItem="ReunionDTO" Title="@DiccionarioTraduccionesService.Traducciones["Accion"]" Property="RdplanAcc" Width="200px">
                 <Template>
                     @context.RdplanAcc
                 </Template>
             </RadzenDataGridColumn>
 
-            <RadzenDataGridColumn TItem="ReunionDTO" Title="@ValidationMessages.Tiempo" Property="Rdtiempo" Width="60px">
+            <RadzenDataGridColumn TItem="ReunionDTO" Title="@DiccionarioTraduccionesService.Traducciones["Tiempo"]" Property="Rdtiempo" Width="60px">
                 <Template>
                     @context.Rdtiempo
                 </Template>
             </RadzenDataGridColumn>
 
-            <RadzenDataGridColumn TItem="ReunionDTO" Title="@ValidationMessages.Responsable" Property="Responsable" Width="100px">
+            <RadzenDataGridColumn TItem="ReunionDTO" Title="@DiccionarioTraduccionesService.Traducciones["Responsable"]" Property="Responsable" Width="100px">
                 <Template>
-                    @context.Responsable
+                    @DiccionarioTraduccionesService.Traducciones[context.Responsable]
                 </Template>
             </RadzenDataGridColumn>
 
@@ -226,19 +236,25 @@
                 </Template>
             </RadzenDataGridColumn>
 
-            <RadzenDataGridColumn TItem="ReunionDTO" Title="@ValidationMessages.Estado" Property="Rdstatus" Width="90px">
+            <RadzenDataGridColumn TItem="ReunionDTO" Title="@DiccionarioTraduccionesService.Traducciones["Estado"]" Property="Rdstatus" Width="90px">
                 <Template>
-                    @ValidationMessages.ResourceManager.GetString(context.Rdstatus, CultureInfo.CurrentUICulture)
+                @{
+                    var clave = context.Rdstatus;
+                    var traduccion = DiccionarioTraduccionesService.Traducciones.ContainsKey(clave)
+                    ? DiccionarioTraduccionesService.Traducciones[clave]
+                    : clave;
+                }
+                <span>@traduccion</span>
                 </Template>
             </RadzenDataGridColumn>
 
-            <RadzenDataGridColumn TItem="ReunionDTO" Title="@ValidationMessages.FReunion" Property="RdfecReu" Width="90px">
+            <RadzenDataGridColumn TItem="ReunionDTO" Title="@DiccionarioTraduccionesService.Traducciones["FReunion"]" Property="RdfecReu" Width="90px">
                 <Template>
                     @context.RdfecReu.ToString("yyyy/MM/dd")
                 </Template>
             </RadzenDataGridColumn>
 
-            <RadzenDataGridColumn TItem="ReunionDTO" Title="@ValidationMessages.FTrabajo" Property="RdfecTra" Width="90px">
+            <RadzenDataGridColumn TItem="ReunionDTO" Title="@DiccionarioTraduccionesService.Traducciones["FTrabajo"]" Property="RdfecTra" Width="90px">
                 <Template>
                     @context.RdfecTra.ToString("yyyy/MM/dd")
                 </Template>
@@ -256,8 +272,9 @@ else if (dataIsLoaded == 1 && tabla.Count() == 0)
 else if (dataIsLoaded == 2 && tabla.Count() == 0)
 {
             <div style="text-align: center; padding: 20px; font-size: 18px; color: gray;">
-                <p>@ValidationMessages.NoHayDatos</p>
+                <p>@DiccionarioTraduccionesService.Traducciones["NoHayDatos"]</p>
         </div>
+}
 }
 @code {
     RadzenDataGrid<ReunionDTO> ReuTabla;
@@ -289,7 +306,7 @@ else if (dataIsLoaded == 2 && tabla.Count() == 0)
     public DateTime fecha2;
     private string mensaje = "";
     private int idPais { get; set; }
-
+    private bool traduccionesCargadas = false;
     private NotifiRadzen Notificar = new NotifiRadzen();
 
     private async Task CreateData()
@@ -299,6 +316,11 @@ else if (dataIsLoaded == 2 && tabla.Count() == 0)
         var user = authState.User;
         claims = Enumerable.ToList(user.Claims);
 
+        var idPaisClaim = claims.FirstOrDefault(c => c.Type == "IdPais")?.Value;
+        if (int.TryParse(idPaisClaim, out int paisTemp))
+        {
+            idPais = paisTemp;
+        }
     }
 
     protected override async Task OnInitializedAsync()
@@ -307,7 +329,11 @@ else if (dataIsLoaded == 2 && tabla.Count() == 0)
         fecha1 = DateTime.Now;
         fecha2 = DateTime.Now;
         await CreateData();
-        
+        await LocalizationService.EstablecerCulturaDesdeTokenAsync();
+        CultureInfo.CurrentCulture = CultureInfo.DefaultThreadCurrentCulture;
+        CultureInfo.CurrentUICulture = CultureInfo.DefaultThreadCurrentUICulture;
+        await DiccionarioTraduccionesService.CargarTraduccionesAsync();
+        traduccionesCargadas = true;        
 
         var rol = claims.FirstOrDefault(c => c.Type.Contains("role"))?.Value;
 
@@ -389,7 +415,8 @@ else if (dataIsLoaded == 2 && tabla.Count() == 0)
                 {
                     d.Ksf = KsfData.ksfs.Where(x => x.Idksf == d.Idksf).Select(x => idPais == 5 ? x.KsfEnglish : x.KsfNombre).FirstOrDefault();
                     var nombreOriginal = RespoReuData.resporeus.Where(x => x.IdResReu == d.IdResReu).FirstOrDefault()?.Rrnombre ?? "";
-                    d.Responsable = ValidationMessages.ResourceManager.GetString(ValidationMessages.MapResponsableKey(nombreOriginal),CultureInfo.CurrentUICulture);
+                    var clave = ValidationMessages.MapResponsableKey(nombreOriginal);
+                    d.Responsable = clave; 
                 }
                 
                 dataIsLoaded = 2;
@@ -397,7 +424,7 @@ else if (dataIsLoaded == 2 && tabla.Count() == 0)
         }
         else
         {
-            mensaje = ValidationMessages.VerifiqueCampos;
+            mensaje = DiccionarioTraduccionesService.Traducciones["VerifiqueCampos"];
             NotificationService.Notify(Notificar.Notificacion("advertencia", mensaje, ""));
         }
     }
