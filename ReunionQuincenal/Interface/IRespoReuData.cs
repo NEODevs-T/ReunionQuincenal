@@ -8,7 +8,7 @@ using ReunionWeb.DTOs.Maestra;
 
 namespace ReunionWeb.Interface;
 
-interface IRespoReuData
+public interface IRespoReuData
 {
     List<RespoReuDTO> resporeus { get; set; }
 

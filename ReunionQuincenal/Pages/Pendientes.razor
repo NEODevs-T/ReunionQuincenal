@@ -15,7 +15,6 @@
 @inject ILocalStorageService LocalStorage
 @inject IJSRuntime IJS
 @inject NotificationService NotificationService
-@inject UsuarioContexto UsuarioContexto
 
 @using ReunionWeb.Resources
 @using System.Globalization
@@ -175,7 +174,7 @@ else
                     <option value="0">@ValidationMessages.Todo</option>
                     @foreach (var d in KsfData.ksfs.Where(x => x.Idksf != 6))
                     {
-                        var texto = usuarioActual.idPais == 5? d.KsfEnglish : d.KsfNombre;
+                        var texto = idPais == 5? d.KsfEnglish : d.KsfNombre;
                         <option value="@d.Idksf">@texto</option>
                     }
                 </BSInput>
@@ -242,18 +241,16 @@ else
                                             <BSTD>@d.Rdarea</BSTD>
                                                 <BSTD>
                                                 @{
-                                                    if (usuarioActual != null)
-                                                    {
                                                         var ksf = KsfData.ksfs.FirstOrDefault(x => x.Idksf == d.Idksf);
-                                                        var texto = usuarioActual.idPais == 5 ? ksf?.KsfEnglish : ksf?.KsfNombre;
+                                                        var texto = idPais == 5 ? ksf?.KsfEnglish : ksf?.KsfNombre;
                                                         @texto
-                                                    }
+                                                    
                                                 }
                                                 </BSTD>
                                                 <BSTD>@d.RdcodEq</BSTD>
                                                 <BSTD>@{
                                                         var texto = string.IsNullOrWhiteSpace(d.EnombreEam)
-                                                        ? (usuarioActual.idPais == 5 ? "EQUIPMENT NOT FOUND" : "EQUIPO NO ENCONTRADO")
+                                                        ? (idPais == 5 ? "EQUIPMENT NOT FOUND" : "EQUIPO NO ENCONTRADO")
                                                         : d.EnombreEam;
                                                     }
                                                     @texto
@@ -275,9 +272,9 @@ else
                                                 @{
                                                     var estadoTraducido = d.Rdstatus switch
                                                     {
-                                                        "Listo" => usuarioActual.idPais == 5 ? "Ready" : "Listo",
-                                                        "Cerrado" => usuarioActual.idPais == 5 ? "Closed" : "Cerrado",
-                                                        _ => usuarioActual.idPais == 5 ? "Pending" : "Pendiente"
+                                                        "Listo" => idPais == 5 ? "Ready" : "Listo",
+                                                        "Cerrado" => idPais == 5 ? "Closed" : "Cerrado",
+                                                        _ => idPais == 5 ? "Pending" : "Pendiente"
                                                     };
 
                                                     var claseEstado = d.Rdstatus switch
@@ -575,8 +572,9 @@ else if (dataIsLoaded == 2 && PizarraData.reudiatablas.Count() == 0)
     List<MaestraVDTO> _divisiones = new List<MaestraVDTO>();
     private NotifiRadzen Notificar = new NotifiRadzen();//Logic para crear las noyificaciones radzen
     private bool isEditar { get; set; } = true;
-    private List<Claim> claims { get; set; } 
-    private Usuario? usuarioActual;   
+    private List<Claim> claims { get; set; }
+            private int idPais {get; set;}
+ 
 
 
     private async Task CreateData()
@@ -590,7 +588,6 @@ else if (dataIsLoaded == 2 && PizarraData.reudiatablas.Count() == 0)
 
     protected override async Task OnInitializedAsync()
     {
-        usuarioActual = await UsuarioContexto.ObtenerUsuarioActualAsync();
         await base.OnInitializedAsync();
         fecha1 = DateTime.Now;
         fecha2 = DateTime.Now;
@@ -789,7 +786,7 @@ else if (dataIsLoaded == 2 && PizarraData.reudiatablas.Count() == 0)
 
     void Editar(int id)
     {
-        var idioma = usuarioActual.idPais == 5 ? "en" : "es";
+        var idioma = idPais == 5 ? "en" : "es";
         var url = $"{idioma}/EditDisc/{id}/{tipoconsulta}/{NombreLinea}/{fecha1:dd-MM-yyyy}/{fecha2:dd-MM-yyyy}/{Status}";
         NavigationManager.NavigateTo(url);
         //NavigationManager.NavigateTo($"EditDisc/{id}/{tipoconsulta}/{NombreLinea}/{fecha1.ToString("dd-MM-yyyy")}/{fecha2.ToString("dd-MM-yyyy")}/{Status}");
@@ -863,8 +860,8 @@ else if (dataIsLoaded == 2 && PizarraData.reudiatablas.Count() == 0)
 
     public async Task PrintDocument()
     {
-        string idiomaRuta = usuarioActual.idPais == 5 ? "en" : "es";
-        string nombrePagina = usuarioActual.idPais == 5 ? "TablePending" : "TablaPendientes";
+        string idiomaRuta = idPais == 5 ? "en" : "es";
+        string nombrePagina = idPais == 5 ? "TablePending" : "TablaPendientes";
         string url = $"{idiomaRuta}/{nombrePagina}/{IdCentro}/{IdDiv}/{NombreLinea}/{fecha1:dd-MM-yyyy}/{fecha2:dd-MM-yyyy}/{tipoconsulta}/{Status}/{idrespo}";
         await IJS.InvokeAsync<object>("open", new object[] { url, "_blank" });
     }

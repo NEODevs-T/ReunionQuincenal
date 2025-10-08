@@ -12,7 +12,6 @@
 @inject AuthenticationStateProvider AuthStateProvider
 @inject ILocalStorageService LocalStorage
 @inject NotificationService NotificationService
-@inject UsuarioContexto UsuarioContexto
 
 @using System.Globalization
 @using ReunionWeb.Resources
@@ -254,6 +253,8 @@
     bool confirmacion;
     int tipo = 1;
     int libro = 0;
+            private int idPais {get; set;}
+
 
     private async Task CreateData()
 

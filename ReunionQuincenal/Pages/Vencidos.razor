@@ -12,7 +12,6 @@
 @inject AuthenticationStateProvider AuthStateProvider
 @inject ILocalStorageService LocalStorage
 @inject NotificationService NotificationService
-@inject UsuarioContexto UsuarioContexto
 
 @using ReunionWeb.Resources
 @using System.Globalization
@@ -96,7 +95,7 @@ else if (PizarraData.reudiatablas.Count() > 0 && confirmacion == true)
                 <option value="0">@ValidationMessages.Todo</option>
                 @foreach (var d in KsfData.ksfs.Where(x => x.Idksf != 6))
                 {
-                    var texto = usuarioActual.idPais == 5? d.KsfEnglish : d.KsfNombre;
+                    var texto = idPais == 5? d.KsfEnglish : d.KsfNombre;
                     <option value="@d.Idksf">@texto</option>
                 }
             </BSInput>
@@ -372,7 +371,7 @@ else if (PizarraData.reudiatablas.Count() == 0 && confirmacion == true)
     private int idrespo = 0;
     private string Codigo { get; set; } = "Todo";
     private string Status { get; set; } = "Todo"; //Status
-    private Usuario? usuarioActual;
+        private int idPais {get; set;}
 
     private async Task CreateData()
 
@@ -386,7 +385,6 @@ else if (PizarraData.reudiatablas.Count() == 0 && confirmacion == true)
 
     protected override async Task OnInitializedAsync()
     {
-        usuarioActual = await UsuarioContexto.ObtenerUsuarioActualAsync();
         await base.OnInitializedAsync();
         fecha1 = DateTime.Now;
         fecha2 = DateTime.Now;
@@ -446,7 +444,7 @@ else if (PizarraData.reudiatablas.Count() == 0 && confirmacion == true)
             }
             foreach (var d in tabla)
                 {
-                    d.Ksf = KsfData.ksfs.Where(x => x.Idksf == d.Idksf).Select(x => usuarioActual.idPais == 5 ? x.KsfEnglish : x.KsfNombre).FirstOrDefault();
+                    d.Ksf = KsfData.ksfs.Where(x => x.Idksf == d.Idksf).Select(x => idPais == 5 ? x.KsfEnglish : x.KsfNombre).FirstOrDefault();
                     var nombreOriginal = RespoReuData.resporeus.Where(x => x.IdResReu == d.IdResReu).FirstOrDefault()?.Rrnombre ?? "";
                     d.Responsable = ValidationMessages.ResourceManager.GetString(ValidationMessages.MapResponsableKey(nombreOriginal),CultureInfo.CurrentUICulture);
                 }

@@ -13,7 +13,7 @@
 @inject AuthenticationStateProvider AuthStateProvider
 @inject ILocalStorageService LocalStorage
 @inject NotificationService NotificationService
-@inject UsuarioContexto UsuarioContexto
+
 
 @using ReunionWeb.Resources
 @using System.Globalization
@@ -287,8 +287,8 @@ else if (dataIsLoaded == 2 && tabla.Count() == 0)
     private List<Claim> claims { get; set; }
     public DateTime fecha1;
     public DateTime fecha2;
-    private Usuario? usuarioActual;
     private string mensaje = "";
+    private int idPais { get; set; }
 
     private NotifiRadzen Notificar = new NotifiRadzen();
 
@@ -303,7 +303,6 @@ else if (dataIsLoaded == 2 && tabla.Count() == 0)
 
     protected override async Task OnInitializedAsync()
     {
-        usuarioActual = await UsuarioContexto.ObtenerUsuarioActualAsync();
         await base.OnInitializedAsync();
         fecha1 = DateTime.Now;
         fecha2 = DateTime.Now;
@@ -388,7 +387,7 @@ else if (dataIsLoaded == 2 && tabla.Count() == 0)
                 tabla = await PizarraData.GetHistoricos(IdCentro.ToString(), IdDiv.ToString(), fecha1, fecha2, tipoconsulta, Uri.EscapeDataString(Status));
                 foreach(var d in PizarraData.reudiatablas)
                 {
-                    d.Ksf = KsfData.ksfs.Where(x => x.Idksf == d.Idksf).Select(x => usuarioActual.idPais == 5 ? x.KsfEnglish : x.KsfNombre).FirstOrDefault();
+                    d.Ksf = KsfData.ksfs.Where(x => x.Idksf == d.Idksf).Select(x => idPais == 5 ? x.KsfEnglish : x.KsfNombre).FirstOrDefault();
                     var nombreOriginal = RespoReuData.resporeus.Where(x => x.IdResReu == d.IdResReu).FirstOrDefault()?.Rrnombre ?? "";
                     d.Responsable = ValidationMessages.ResourceManager.GetString(ValidationMessages.MapResponsableKey(nombreOriginal),CultureInfo.CurrentUICulture);
                 }

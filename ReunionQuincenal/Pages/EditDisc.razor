@@ -11,7 +11,6 @@
 @inject NavigationManager NavigationManager
 @inject AuthenticationStateProvider AuthStateProvider
 @inject ILocalStorageService LocalStorage
-@inject UsuarioContexto UsuarioContexto
 
 @using System.Globalization
 @using ReunionWeb.Resources
@@ -63,7 +62,7 @@
                              <option value="">@ValidationMessages.Seleccione...</option>
                             @foreach (var d in KsfData.ksfs.Where(x => x.Idksf != 6))
                             {
-                                var texto = usuarioActual.idPais == 5? d.KsfEnglish : d.KsfNombre;
+                                var texto = idPais == 5? d.KsfEnglish : d.KsfNombre;
                                 <option value="@d.Idksf">@texto</option>
                             }
 
@@ -316,7 +315,7 @@
                          <option value="">@ValidationMessages.Seleccione...</option>
                             @foreach (var d in KsfData.ksfs.Where(x => x.Idksf != 6))
                             {
-                                var texto = usuarioActual.idPais == 5? d.KsfEnglish : d.KsfNombre;
+                                var texto = idPais == 5? d.KsfEnglish : d.KsfNombre;
                                 <option value="@d.Idksf">@texto</option>
                             }
 
@@ -565,8 +564,8 @@
     private DateTime? camFec;//Variable para verificar si es el usuario cambio la Fecha;
 
     private List<Claim> claims { get; set; }//obtener datos del token
-    private Usuario? usuarioActual;
 
+    private int idPais {get; set;}
 
 
     private async Task CreateData()
@@ -578,7 +577,6 @@
 
     protected override async Task OnParametersSetAsync()
     {
-        usuarioActual = await UsuarioContexto.ObtenerUsuarioActualAsync();
         await CreateData();
         loader = true;
         Emp = claims[5].Value;
@@ -603,7 +601,7 @@
         string backdiv = DiscForm.Rddiv;
 
         CentroDivisionDTO centrodiv = await PizarraData.GetCentroDivi(backcentro, backdiv, 1);
-        string lang = usuarioActual.idPais == 5 ? "en" : "es";
+        string lang = idPais == 5 ? "en" : "es";
         string accion = centrodiv.IdCentro.ToString();
         string division = centrodiv.IdDivision.ToString();
         string lineaFinal = linea ?? "Todo";
@@ -696,7 +694,7 @@
                     string centro = centrodiv.IdCentro.ToString();
                     string division = centrodiv.IdDivision.ToString();
 
-                    string lang = usuarioActual.idPais == 5 ? "en" : "es";
+                    string lang = idPais == 5 ? "en" : "es";
                     string f1Final = f1 ?? DateTime.Today.ToString("dd-MM-yyyy");
                     string f2Final = f2 ?? DateTime.Today.ToString("dd-MM-yyyy");
                     string estFinal = est ?? "Todo";

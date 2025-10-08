@@ -14,7 +14,6 @@
 @inject IJSRuntime IJS
 @inject NavigationManager NavigationManager
 @inject NotificationService NotificationService
-@inject UsuarioContexto UsuarioContexto
 
 @using System.Globalization
 @using ReunionWeb.Resources
@@ -142,19 +141,16 @@
                                 <BSTD>@d.Rdarea</BSTD>
                                 <BSTD>
                                 @{
-                                    if (usuarioActual != null)
-                                    {
                                         var ksf = KsfData.ksfs.FirstOrDefault(x => x.Idksf == d.Idksf);
-                                        var texto = usuarioActual.idPais == 5 ? ksf?.KsfEnglish : ksf?.KsfNombre;
+                                        var texto = idPais == 5 ? ksf?.KsfEnglish : ksf?.KsfNombre;
                                         @texto
-                                    }
                                 }
                                 </BSTD>
                                 <BSTD>@d.RdcodEq</BSTD>
                                 <BSTD>
                                 @{
                                     var texto = string.IsNullOrWhiteSpace(d.EnombreEam)
-                                    ? (usuarioActual.idPais == 5 ? "EQUIPMENT NOT FOUND" : "EQUIPO NO ENCONTRADO")
+                                    ? (idPais == 5 ? "EQUIPMENT NOT FOUND" : "EQUIPO NO ENCONTRADO")
                                     : d.EnombreEam;
                                 }
                                 @texto
@@ -179,10 +175,10 @@
 
                                     var estadoTraducido = d.Rdstatus switch
                                     {
-                                        "Revisar" => usuarioActual.idPais == 5 ? "Review" : "Revisar",
-                                        "Listo" => usuarioActual.idPais == 5 ? "Ready" : "Listo",
-                                        "Cerrado" => usuarioActual.idPais == 5 ? "Closed" : "Cerrado",
-                                        _ => usuarioActual.idPais == 5 ? "Pending" : "Pendiente"
+                                        "Revisar" => idPais == 5 ? "Review" : "Revisar",
+                                        "Listo" => idPais == 5 ? "Ready" : "Listo",
+                                        "Cerrado" => idPais == 5 ? "Closed" : "Cerrado",
+                                        _ => idPais == 5 ? "Pending" : "Pendiente"
                                     };
 
                                     var claseEstado = d.Rdstatus switch
@@ -265,7 +261,8 @@ else if (dataIsLoaded == 2 && PizarraData.reudiatablas.Count() == 0)
     private string Rol { get; set; } = ""; //Rol del usuario
 
     private string mensaje {get; set; } = "";
-    private Usuario? usuarioActual;  
+    private int idPais {get; set;}
+
 
 
 
@@ -283,7 +280,6 @@ else if (dataIsLoaded == 2 && PizarraData.reudiatablas.Count() == 0)
 
     protected override async Task OnInitializedAsync()
     {
-        usuarioActual = await UsuarioContexto.ObtenerUsuarioActualAsync();
         await CreateData();
         Rol = claims.FirstOrDefault(c => c.Type.Contains("role"))?.Value;
 
@@ -340,7 +336,7 @@ else if (dataIsLoaded == 2 && PizarraData.reudiatablas.Count() == 0)
     }
     void Editar(int id)
     {
-        var ruta = usuarioActual.idPais == 5 ? "en" : "es";
+        var ruta = idPais == 5 ? "en" : "es";
         var fechaInicio = DateTime.Now.AddDays(-1).ToString("dd-MM-yyyy");
         var fechaFin = DateTime.Now.ToString("dd-MM-yyyy");
         var url = $"{ruta}/EditDisc/{id}/1/Re/{fechaInicio}/{fechaFin}/Reunion";
