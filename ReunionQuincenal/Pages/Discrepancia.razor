@@ -12,14 +12,25 @@
 @inject AuthenticationStateProvider AuthStateProvider
 @inject ILocalStorageService LocalStorage
 @inject NotificationService NotificationService
+@inject LocalizationService LocalizationService
+@inject ITranslationService Translator
+@inject IDiccionarioTraduccionesService DiccionarioTraduccionesService
 
 @using ReunionWeb.Resources
 @using System.Globalization
+@using ReunionWeb.Services
 
 @attribute [Authorize(Roles = "Admin, AdminChempro, SuperUser, PrimeUser, SemiAdmin,SuperAdmin")]
 
-
-<h3>@ValidationMessages.Discrepancias</h3>
+@if (!traduccionesCargadas || dataIsLoaded == 1)
+{
+    <div class="loading-container">
+        <div class="loader"></div>
+    </div>
+}
+else
+{
+<h3>@DiccionarioTraduccionesService.Traducciones["Discrepancias"]</h3>
 
 <p></p>
 
@@ -33,9 +44,9 @@
 
     
         <BSCol Column="3">
-            <BSLabel>@ValidationMessages.Centro</BSLabel>
+            <BSLabel>@DiccionarioTraduccionesService.Traducciones["Centro"]</BSLabel>
             <BSInput InputType="InputType.Select" @onchange="BuscarDivision" @bind-Value="idCent">
-                <option value="0">@ValidationMessages.Seleccione...</option>
+                <option value="0">@DiccionarioTraduccionesService.Traducciones["Seleccione"]...</option>
                 @foreach (var d in MaestraData.centro)
                 {
                     <option value="@d.IdCentro">@d.Centro</option>
@@ -46,9 +57,9 @@
 
 
         <BSCol Column="3">
-            <BSLabel>@ValidationMessages.Division</BSLabel>
+            <BSLabel>@DiccionarioTraduccionesService.Traducciones["Division"]</BSLabel>
             <BSInput InputType="InputType.Select" @onchange='BuscarLinea' @bind-Value="idDiv">
-                <option value="0">@ValidationMessages.Seleccione...</option>
+                <option value="0">@DiccionarioTraduccionesService.Traducciones["Seleccione"]...</option>
                 @if(MaestraData.centro != null){
                     @foreach (var d in MaestraData.divisions)
                     {
@@ -62,9 +73,9 @@
 
 
         <BSCol Column="3">
-            <BSLabel>@ValidationMessages.Linea</BSLabel>
+            <BSLabel>@DiccionarioTraduccionesService.Traducciones["Linea"]</BSLabel>
             <BSInput InputType="InputType.Select" @onchange='BuscarEquipo' @bind-Value="idLin">
-                <option value="0">@ValidationMessages.Seleccione...</option>
+                <option value="0">@DiccionarioTraduccionesService.Traducciones["Seleccione"]...</option>
                 @foreach (var d in MaestraData.lineas)
                 {
                     <option value="@d.IdLinea">@d.Linea</option>
@@ -78,7 +89,7 @@
 
         <BSCol Column="2">
             <BSRow>
-                <BSLabel>@ValidationMessages.Filtrar: </BSLabel>
+                <BSLabel>@DiccionarioTraduccionesService.Traducciones["Filtrar"]: </BSLabel>
             </BSRow>
 
 
@@ -97,10 +108,10 @@
             @if (Reuniondb.Rdcentro != "Chempro")
             {
                 <BSCol Column="4">
-                    <BSLabel>@ValidationMessages.CodigoDeEquipo</BSLabel>
+                    <BSLabel>@DiccionarioTraduccionesService.Traducciones["CodigoDeEquipo"]</BSLabel>
                     <BSInput InputType="InputType.Select" @bind-Value="Reuniondb.RdcodEq">
 
-                        <option value="">@ValidationMessages.Seleccione...</option>
+                        <option value="">@DiccionarioTraduccionesService.Traducciones["Seleccione"]...</option>
                         @foreach (var d in MaestraData.equipos)
                         {
                                 <option value="@d.EcodEquiEam">@d.EcodEquiEam - @d.EnombreEam</option>
@@ -114,7 +125,7 @@
             else
             {
                 <BSCol Column="4">
-                    <BSLabel>@ValidationMessages.CodigoDeEquipo</BSLabel>
+                    <BSLabel>@DiccionarioTraduccionesService.Traducciones["CodigoDeEquipo"]</BSLabel>
                     <BSInput InputType="InputType.Text" @bind-Value="Reuniondb.RdcodEq" />
                 </BSCol>
             }
@@ -122,7 +133,7 @@
         else if (MaestraData.centro.Count > 0 & tipoequipo == "1")
         {
             <BSCol Column="4">
-                <BSLabel>@ValidationMessages.CodigoDeEquipo</BSLabel>
+                <BSLabel>@DiccionarioTraduccionesService.Traducciones["CodigoDeEquipo"]</BSLabel>
                 <div class="autocomplete">
                     <input @bind=selectedEquipoId @oninput=HandleInput class="form-control filter" />
                     @if (equiposfiltro is not null)
@@ -159,7 +170,7 @@
 
             <BSInput InputType="InputType.Select" @bind-Value="Reuniondb.Idksf">
 
-                <option value="">@ValidationMessages.Seleccione...</option>
+                <option value="">@DiccionarioTraduccionesService.Traducciones["Seleccione"]...</option>
                 @foreach (var d in KsfData.ksfs.Where(x => x.Idksf != 6))
                 {
                     var texto = idPais == 5? d.KsfEnglish : d.KsfNombre;
@@ -173,7 +184,7 @@
     <p></p>
     <BSRow>
         <BSCol Column="9">
-            <BSLabel>@ValidationMessages.Discrepancia</BSLabel>
+            <BSLabel>@DiccionarioTraduccionesService.Traducciones["Discrepancia"]</BSLabel>
             <BSInput InputType="InputType.Text" @bind-Value="Reuniondb.Rddisc" />
         </BSCol>
     </BSRow>
@@ -184,14 +195,14 @@
         <p></p>
 
         <BSCol Column="3">
-            <BSLabel>@ValidationMessages.Responsable</BSLabel>
+            <BSLabel>@DiccionarioTraduccionesService.Traducciones["Responsable"]</BSLabel>
             <BSInput InputType="InputType.Select" @bind-Value="Reuniondb.IdResReu">
-                <option value="">@ValidationMessages.Seleccione...</option>
+                <option value="">@DiccionarioTraduccionesService.Traducciones["Seleccione"]...</option>
 
                 @foreach (var d in RespoReuData.resporeus)
                 {
-                    <option value="@d.IdResReu">@ValidationMessages.ResourceManager.GetString(ValidationMessages
-                        .MapResponsableKey(d.Rrnombre),CultureInfo.CurrentUICulture)
+                    <option 
+                    value="@d.IdResReu"> @DiccionarioTraduccionesService.Traducciones[ValidationMessages.MapResponsableKey(d.Rrnombre)]
                     </option>
                 }
             </BSInput>
@@ -203,12 +214,11 @@
     <p></p>
 
     <BSCol Column="12">
-        <BSButton Color="BSColor.Success" Size="Size.ExtraSmall" IsDisabled="isDesactivado" IsSubmit>  @ValidationMessages.Guardar <span class="oi oi-check"></span></BSButton>
-        <BSButton Color="BSColor.Primary" Size="Size.ExtraSmall" IsReset>  @ValidationMessages.Nuevo </BSButton>
+        <BSButton Color="BSColor.Success" Size="Size.ExtraSmall" IsDisabled="isDesactivado" IsSubmit>  @DiccionarioTraduccionesService.Traducciones["Guardar"] <span class="oi oi-check"></span></BSButton>
+        <BSButton Color="BSColor.Primary" Size="Size.ExtraSmall" IsReset>  @DiccionarioTraduccionesService.Traducciones["Nuevo"] </BSButton>
     </BSCol>
 </BSForm>
-
-
+}
 
 @code {
 
@@ -217,27 +227,7 @@
 
     private List<Claim> claims { get; set; }
     private int idPais { get; set; }
-    private async Task CreateData()
-
-    {
-        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
-        var user = authState.User;
-        claims = Enumerable.ToList(user.Claims);
-
-        var idPaisClaim = claims.FirstOrDefault(c => c.Type == "IdPais")?.Value;
-        if (int.TryParse(idPaisClaim, out int paisTemp))
-        {
-            idPais = paisTemp;
-            var culture = new System.Globalization.CultureInfo(paisTemp == 5 ? "en" : "es");
-            System.Globalization.CultureInfo.DefaultThreadCurrentCulture = culture;
-            System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = culture;
-            await LocalStorage.SetItemAsync("userCulture", culture.Name);
-        }
-    }
-
-
     ReunionDTO Reuniondb = new ReunionDTO();
-
     private NotifiRadzen Notificar = new NotifiRadzen();//Logic para crear las noyificaciones radzen
     private string _message = "";
     private DateTime fechahoy, fechatrabajo = DateTime.Today;
@@ -247,7 +237,6 @@
     CambStatDTO CambStata = new CambStatDTO();//Formulario para agregar que usuario hizo el cambio de status.
     CambFecDTO CambFech = new CambFecDTO();//Formulario para agregar que usuario hizo el cambio de fecha.
     ReunionDTO regisReuDia = new ReunionDTO();
-
     private int idCent { get; set; }
     private int idDiv { get; set; }
     private int idLin { get; set; }
@@ -256,13 +245,32 @@
     private string Notificacion = "";
     private bool isDesactivado { get; set; } = false;
     private List<AsistenReuDTO> listaAsistencia { get; set; } = new List<AsistenReuDTO>();
-
     int reunionQuincenal = 3;
-    
+    private bool traduccionesCargadas = false;
+    int dataIsLoaded = 0;
+
+    private async Task CreateData()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        claims = Enumerable.ToList(user.Claims);
+
+        var idPaisClaim = claims.FirstOrDefault(c => c.Type == "IdPais")?.Value;
+        if (int.TryParse(idPaisClaim, out int paisTemp))
+        {
+            idPais = paisTemp;
+        }
+    }
+
     protected override async Task OnInitializedAsync()
     {
 
         await CreateData();
+        await LocalizationService.EstablecerCulturaDesdeTokenAsync();
+        CultureInfo.CurrentCulture = CultureInfo.DefaultThreadCurrentCulture;
+        CultureInfo.CurrentUICulture = CultureInfo.DefaultThreadCurrentUICulture;
+        await DiccionarioTraduccionesService.CargarTraduccionesAsync();
+        traduccionesCargadas = true;
         await KsfData.Getksf();
         await RespoReuData.GetResReu();
 
@@ -380,22 +388,22 @@ protected async Task Insert(EditContext d)
 
             if (Reuniondb.Rdarea is null)
             {
-                mensaje = ValidationMessages.SArea;
+                mensaje = DiccionarioTraduccionesService.Traducciones["SArea"];
                 NotificationService.Notify(Notificar.Notificacion("advertencia", mensaje, ""));
             }
             else if (Reuniondb.Rddiv is null)
             {
-                mensaje = ValidationMessages.SDivision;
+                mensaje = DiccionarioTraduccionesService.Traducciones["SDivision"];
                 NotificationService.Notify(Notificar.Notificacion("advertencia", mensaje, ""));
             }
             else if (Reuniondb.Rddisc is null)
             {
-                mensaje = ValidationMessages.LlDisp;
+                mensaje = DiccionarioTraduccionesService.Traducciones["LlDisp"];
                 NotificationService.Notify(Notificar.Notificacion("advertencia", mensaje, ""));
             }
             else if (Reuniondb.Rdstatus is null)
             {
-                mensaje = ValidationMessages.SEstado;
+                mensaje = DiccionarioTraduccionesService.Traducciones["SEstado"];
                 NotificationService.Notify(Notificar.Notificacion("advertencia", mensaje, ""));
             }
             else
@@ -417,7 +425,7 @@ protected async Task Insert(EditContext d)
                 var result = await AvisadorData.InsertarRegistros(AvisadorData.listaRegistro);
                 if (result)
                 {
-                    mensaje = ValidationMessages.RExitoso;
+                    mensaje = DiccionarioTraduccionesService.Traducciones["RExitoso"];
                     Reuniondb = new ReunionDTO();
                     CambStata = new CambStatDTO();
                     CambFech = new CambFecDTO();
@@ -429,18 +437,18 @@ protected async Task Insert(EditContext d)
                 }
                 else
                 {
-                    NotificationService.Notify(Notificar.Notificacion("error", ValidationMessages.ErrorInser,""));
+                    NotificationService.Notify(Notificar.Notificacion("error", DiccionarioTraduccionesService.Traducciones["ErrorInser"],""));
                 }
             }
         }
     }
     catch (Microsoft.EntityFrameworkCore.DbUpdateException ex)
     {
-        NotificationService.Notify(Notificar.Notificacion("advertencia", ValidationMessages.ErrorConexion, ValidationMessages.ErrorConexionM));
+        NotificationService.Notify(Notificar.Notificacion("advertencia", DiccionarioTraduccionesService.Traducciones["ErrorConexion"], DiccionarioTraduccionesService.Traducciones["ErrorConexionM"]));
     }
     catch (Exception ex)
     {
-        NotificationService.Notify(Notificar.Notificacion("error", ValidationMessages.ErrorInesp,  ex.Message));
+        NotificationService.Notify(Notificar.Notificacion("error", DiccionarioTraduccionesService.Traducciones["ErrorInesp"],  ex.Message));
     }
 
     isDesactivado = false;
