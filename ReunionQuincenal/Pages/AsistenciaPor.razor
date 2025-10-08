@@ -8,34 +8,46 @@
 @inject ICargoReuData CargoReuData
 @inject NotificationService NotificationService
 @inject ILocalStorageService LocalStorage
+@inject LocalizationService LocalizationService
+@inject ITranslationService Translator
+@inject IDiccionarioTraduccionesService DiccionarioTraduccionesService
 
 @using ReunionWeb.Resources
 @using System.Globalization
+@using ReunionWeb.Services
 @attribute [Authorize(Roles = "Admin, AdminChempro, SuperUser, PrimeUser, SemiAdmin, SuperAdmin")]
 
-<h3>@ValidationMessages.PorcentajeDeAsistencia</h3>
+@if (!traduccionesCargadas || dataIsLoaded == 1)
+{
+    <div class="loading-container">
+        <div class="loader"></div>
+    </div>
+}
+else
+{
+<h3>@DiccionarioTraduccionesService.Traducciones["PorcentajeDeAsistencia"]</h3>
 
 <RadzenTemplateForm Data="@this">
     <RadzenRow>
              <RadzenColumn Width="200px">
-            <RadzenLabel Text="@ValidationMessages.FechaInicial" />
+            <RadzenLabel Text="@DiccionarioTraduccionesService.Traducciones["FechaInicial"]" />
             <RadzenDatePicker @bind-Value="mesAñoInicio" DateFormat="MM-yyyy" Style="width: 100%;" Max="@DateTime.Today" />
         </RadzenColumn>
         <RadzenColumn Width="200px">
-            <RadzenLabel Text="@ValidationMessages.FechaFinal" />
+            <RadzenLabel Text="@DiccionarioTraduccionesService.Traducciones["FechaFinal"]" />
             <RadzenDatePicker @bind-Value="mesAñoFin" DateFormat="MM-yyyy" Style="width: 100%;" Max="@DateTime.Today" />
         </RadzenColumn>
         <RadzenColumn Width="250px">
-            <RadzenLabel Text="@ValidationMessages.Empresa" />
+            <RadzenLabel Text="@DiccionarioTraduccionesService.Traducciones["Empresa"]" />
             <RadzenDropDown @bind-Value="empresa" Data="@empresas" TextProperty="Nombre" ValueProperty="Id" Style="width: 100%;" Placeholder="Seleccione una empresa"
                             Change="@(args => OnEmpresaChanged(args))" />
         </RadzenColumn>
         <RadzenColumn Width="250px">
-            <RadzenLabel Text="@ValidationMessages.Area" />
+            <RadzenLabel Text="@DiccionarioTraduccionesService.Traducciones["Area"]" />
             <RadzenDropDown @bind-Value="area" Data="@areas" TextProperty="Nombre" ValueProperty="Id" Style="width: 100%;" Placeholder="Seleccione un centro" Disabled="@((string.IsNullOrEmpty(empresa)) || !areas.Any())" />
         </RadzenColumn>
         <RadzenColumn Width="150px" Style="display: flex; align-items: flex-start; padding-top: 30px;">
-            <RadzenButton Text="@ValidationMessages.Consultar"
+            <RadzenButton Text="@DiccionarioTraduccionesService.Traducciones["Consultar"]"
                     Click="@(async () => await Consultar())"
                     Style="width: 100%; background-color: #28a745; color: #ffffff;"
                     Icon="search"
@@ -51,12 +63,12 @@
 {
 @if (registros != null && registros.Any())
 {
-    <RadzenLabel Text="@ValidationMessages.FiltrarPorCargo" Style="margin-right:10px;" />
+    <RadzenLabel Text="@DiccionarioTraduccionesService.Traducciones["FiltrarPorCargo"]" Style="margin-right:10px;" />
     <RadzenTextBox @bind-Value="filtroCargo"
-                    Placeholder="@ValidationMessages.BuscarCargo2"
+                    Placeholder="@DiccionarioTraduccionesService.Traducciones["BuscarCargo2"]"
                     Style="margin:15px 0 10px 0; width:250px;"
                     Change="@(args => FiltrarCargo())" />
-    <RadzenButton Text="@ValidationMessages.BuscarCargo"
+    <RadzenButton Text="@DiccionarioTraduccionesService.Traducciones["BuscarCargo"]"
                     Icon="search"
                     ButtonStyle="ButtonStyle.Secondary"
                     Style="margin-bottom: 10px;"
@@ -65,16 +77,16 @@
 @if (registros != null && registros.Any())
 {
     <div style="margin-bottom:10px;">
-        <b>@ValidationMessages.PorcentajeGlobal:</b>
+        <b>@DiccionarioTraduccionesService.Traducciones["PorcentajeGlobal"]:</b>
         <span style="color:@GetColor(porcentajeGlobal)">
             @porcentajeGlobal.ToString("0.00")%
         </span>
     </div>
     @if (registrosFiltrados != null && !registrosFiltrados.Any() && !string.IsNullOrEmpty(filtroCargo))
     {
-        <div style="color:red; margin-bottom:10px;">@ValidationMessages.NoExisteEseCargo.</div>
+        <div style="color:red; margin-bottom:10px;">@DiccionarioTraduccionesService.Traducciones["NoExisteEseCargo"].</div>
     }
-    <RadzenButton Text="@ValidationMessages.LimpiarFiltros"
+    <RadzenButton Text="@DiccionarioTraduccionesService.Traducciones["LimpiarFiltros"]"
                     Icon="refresh"
                     ButtonStyle="ButtonStyle.Secondary"
                     Style="margin-bottom: 10px;"
@@ -88,16 +100,16 @@
                     AllowSorting="true"
                     EmptyText="">
         <Columns>
-            <RadzenDataGridColumn TItem="AsistenReuPorcetanjeDTO" Property="Nombre" Title="@ValidationMessages.Cargo" Frozen="true" />
-            <RadzenDataGridColumn TItem="AsistenReuPorcetanjeDTO" Property="ReunionesProgramadas" Title="@ValidationMessages.ReunionesProgramadas" />
-            <RadzenDataGridColumn TItem="AsistenReuPorcetanjeDTO" Property="ReunionesAsistidas" Title="@ValidationMessages.ReunionesAsistidas">
+            <RadzenDataGridColumn TItem="AsistenReuPorcetanjeDTO" Property="Nombre" Title="@DiccionarioTraduccionesService.Traducciones["Cargo"]" Frozen="true" />
+            <RadzenDataGridColumn TItem="AsistenReuPorcetanjeDTO" Property="ReunionesProgramadas" Title="@DiccionarioTraduccionesService.Traducciones["ReunionesProgramadas"]" />
+            <RadzenDataGridColumn TItem="AsistenReuPorcetanjeDTO" Property="ReunionesAsistidas" Title="@DiccionarioTraduccionesService.Traducciones["ReunionesAsistidas"]">
                 <FooterTemplate>
                     <b>Total: @registrosFiltrados.Sum(x => x.ReunionesAsistidas)</b>
                 </FooterTemplate>
             </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="AsistenReuPorcetanjeDTO" Property="PorcentajeAsistencia" Title="@ValidationMessages.PorcentajeAsistencia">
+            <RadzenDataGridColumn TItem="AsistenReuPorcetanjeDTO" Property="PorcentajeAsistencia" Title="@DiccionarioTraduccionesService.Traducciones["PorcentajeAsistencia"]">
                 <Template Context="data">
-                    <span title="@ValidationMessages.PorcentajeAsistencia"
+                    <span title="@DiccionarioTraduccionesService.Traducciones["PorcentajeAsistencia"]"
                         style="color:@GetColor(data.PorcentajeAsistencia); font-weight:bold;">
                         @data.PorcentajeAsistencia.ToString("0.00")%
                         @if (data.PorcentajeAsistencia >= 90)
@@ -116,10 +128,10 @@
     }
     else if (registros != null)
     {
-        <div style="margin-top:20px;">@ValidationMessages.NoHayFiltros</div>
+        <div style="margin-top:20px;">@DiccionarioTraduccionesService.Traducciones["NoHayFiltros"]</div>
     }
 }    
-
+}
 @code {
                 [CascadingParameter]
     private Task<AuthenticationState>? authenticationState { get; set; }
@@ -137,21 +149,29 @@
     private List<CarReuDTO> cargosReunion = new();
     private int dataIsLoaded = 0;
     private List<Claim> claims;
+    private bool traduccionesCargadas = false;
 
-    protected override async Task OnInitializedAsync()
+     private async Task CreateData()
     {
         var authState = await AuthStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
         claims = user.Claims.ToList();
+
         var idPaisClaim = claims.FirstOrDefault(c => c.Type == "IdPais")?.Value;
         if (int.TryParse(idPaisClaim, out int paisTemp))
         {
             idPais = paisTemp;
-            var culture = new System.Globalization.CultureInfo(paisTemp == 5 ? "en" : "es");
-            System.Globalization.CultureInfo.DefaultThreadCurrentCulture = culture;
-            System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = culture;
-            await LocalStorage.SetItemAsync("userCulture", culture.Name);
         }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CreateData();
+        await LocalizationService.EstablecerCulturaDesdeTokenAsync();
+        CultureInfo.CurrentCulture = CultureInfo.DefaultThreadCurrentCulture;
+        CultureInfo.CurrentUICulture = CultureInfo.DefaultThreadCurrentUICulture;
+        await DiccionarioTraduccionesService.CargarTraduccionesAsync();
+        traduccionesCargadas = true;
 
         string? idEmpresaUsuario = claims.FirstOrDefault(c => c.Type.Contains("Empresa"))?.Value;
 
