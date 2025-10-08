@@ -11,23 +11,27 @@
 @inject AuthenticationStateProvider AuthStateProvider
 @inject ILocalStorageService LocalStorage
 @inject NotificationService NotificationService
+@inject LocalizationService LocalizationService
+@inject ITranslationService Translator
+@inject IDiccionarioTraduccionesService DiccionarioTraduccionesService
 
 @using ReunionWeb.Resources
 @using System.Globalization
+@using ReunionWeb.Services
 @attribute [Authorize(Roles = "Admin, AdminChempro, SupIntendente, PrimeUser, SupIntendenteGeneral, SuperAdmin")]
 
-<h3>@ValidationMessages.Asistencia</h3>
-<p></p>
 
 
 <BSContainer>
 
-    @if (MaestraData.centro.Count() == 0)
+    @if (!traduccionesCargadas || MaestraData.centro.Count() == 0)
     {
         <div class="loader"></div>
     }
     else
     {
+        <h3>@DiccionarioTraduccionesService.Traducciones["Asistencia"]</h3>
+        <p></p>
 
         <BSRow>
             <BSCol Column="4">
@@ -41,7 +45,7 @@
         </BSCol>
 
         <BSCol ColumnSmall="3">
-            <BSButton IsOutlined Color="BSColor.Success" Size="Size.ExtraSmall" @onclick="Get">   @ValidationMessages.Asistentes  <span class="oi oi-check"></span></BSButton>
+            <BSButton IsOutlined Color="BSColor.Success" Size="Size.ExtraSmall" @onclick="Get">   @DiccionarioTraduccionesService.Traducciones["Asistentes"]  <span class="oi oi-check"></span></BSButton>
         </BSCol>
 
     </BSRow>
@@ -58,7 +62,7 @@
     @if (listaAsistencia.Where(c => c.Cargo.Crbloque == 1).Count() > 0)
     {
         <BSCol Column="4">
-            <BSLabel>@ValidationMessages.Bloque: @bloque</BSLabel>
+            <BSLabel>@DiccionarioTraduccionesService.Traducciones["Bloque"]: @bloque</BSLabel>
             <BSInput InputType="InputType.Range" step="1" min="1" max="3" @bind-Value="bloque" />
         </BSCol>
     }
@@ -67,9 +71,9 @@
         <BSTable IsResponsive="true" IsStriped="true" IsBordered="true">
             <BSTHead Class="cabecera">
                 <BSTR>
-                    <BSTD>@ValidationMessages.Personal</BSTD>
-                    <BSTD>@ValidationMessages.Presencia</BSTD>
-                    <BSTD>@ValidationMessages.Suplencia</BSTD>
+                    <BSTD>@DiccionarioTraduccionesService.Traducciones["Personal"]</BSTD>
+                    <BSTD>@DiccionarioTraduccionesService.Traducciones["Presencia"]</BSTD>
+                    <BSTD>@DiccionarioTraduccionesService.Traducciones["Suplencia"]</BSTD>
                 </BSTR>
             </BSTHead>
             <BSTBody>
@@ -132,7 +136,7 @@
             </BSTBody>
 
         </BSTable>
-        <BSButton IsOutlined Color="BSColor.Success" Size="Size.ExtraSmall" @onclick="Save">   @ValidationMessages.Guardar  <span class="oi oi-check"></span></BSButton>
+        <BSButton IsOutlined Color="BSColor.Success" Size="Size.ExtraSmall" @onclick="Save">   @DiccionarioTraduccionesService.Traducciones["Guardar"]  <span class="oi oi-check"></span></BSButton>
     </BSCol>
 
 
@@ -140,7 +144,7 @@
 else if (CargoReuData.cargoreuss.Count() == 0 && dataIsLoaded == 2)
 {
         <div style="text-align: center; padding: 20px; font-size: 18px; color: gray;">
-            <p>@ValidationMessages.NoCargadoP</p>
+            <p>@DiccionarioTraduccionesService.Traducciones["NoCargadoP"]</p>
         </div>
 }
 else if (dataIsLoaded == 1 && RespoReuData.resporeus.Count() == 0)
@@ -157,11 +161,8 @@ else if (dataIsLoaded == 1 && RespoReuData.resporeus.Count() == 0)
     private List<CargoReuDTO> cr = new List<CargoReuDTO>();
     private AsistenReuDTO reuform;
     private string UsrRol { get; set; } = ""; //rol para filtrar
-
     private int fecha = int.Parse(DateTime.Now.ToString("yyyyMMdd"));
-
     private NotifiRadzen Notificar = new NotifiRadzen();
-
     private string mensaje = "", result = "";//resultado del save;
     int dataIsLoaded = 0;
     // private string RadioValue { get; set; }
@@ -169,36 +170,29 @@ else if (dataIsLoaded == 1 && RespoReuData.resporeus.Count() == 0)
     private int bloque { get; set; } = 0;//Indica el Bloque de reunion a llenar asistencia
     private List<AsistenReuDTO> listaAsistencia { get; set; }
     private int idPais {get; set;} 
-
-
-
+    private bool traduccionesCargadas = false;
     private List<Claim> claims { get; set; }
 
     private async Task CreateData()
-
     {
         var authState = await AuthStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
         claims = Enumerable.ToList(user.Claims);
-
         var idPaisClaim = claims.FirstOrDefault(c => c.Type == "IdPais")?.Value;
         if (int.TryParse(idPaisClaim, out int paisTemp))
         {
             idPais = paisTemp;
-            var culture = new System.Globalization.CultureInfo(paisTemp == 5 ? "en" : "es");
-            System.Globalization.CultureInfo.DefaultThreadCurrentCulture = culture;
-            System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = culture;
-            await LocalStorage.SetItemAsync("userCulture", culture.Name);
         }
-
-
     }
-
 
     protected override async Task OnInitializedAsync()
     {
-
         await CreateData();
+        await LocalizationService.EstablecerCulturaDesdeTokenAsync();
+        CultureInfo.CurrentCulture = CultureInfo.DefaultThreadCurrentCulture;
+        CultureInfo.CurrentUICulture = CultureInfo.DefaultThreadCurrentUICulture;
+        await DiccionarioTraduccionesService.CargarTraduccionesAsync();
+        traduccionesCargadas = true;
         UsrRol = claims.FirstOrDefault(c => c.Type.Contains("role"))?.Value;
         if (UsrRol == "Admin" | UsrRol == "SuperAdmin" | UsrRol == "PrimeUser")
         {
@@ -295,23 +289,23 @@ protected async Task Save()
 
             if (!validar)
             {
-                NotificationService.Notify(Notificar.Notificacion("advertencia", ValidationMessages.Atencion, ValidationMessages.SSuplente));
+                NotificationService.Notify(Notificar.Notificacion("advertencia", DiccionarioTraduccionesService.Traducciones["Atencion"], DiccionarioTraduccionesService.Traducciones["SSuplente"]));
             }
             else if (conteo == listaAsistencia.Count)
             {
-                NotificationService.Notify(Notificar.Notificacion("advertencia", ValidationMessages.Atencion, ValidationMessages.TCargos));
+                NotificationService.Notify(Notificar.Notificacion("advertencia", DiccionarioTraduccionesService.Traducciones["Atencion"], DiccionarioTraduccionesService.Traducciones["TCargos"]));
             }
             else
             {
                 mensaje = await AsistenciaReuData.Postasistencia(listaAsistencia);
                 
-                if (mensaje == ValidationMessages.RExitoso)
+                if (mensaje == DiccionarioTraduccionesService.Traducciones["RExitoso"])
                 {
                     NotificationService.Notify(Notificar.Notificacion("exito", mensaje, ""));
                 }
                 else 
                 {
-                    NotificationService.Notify(Notificar.Notificacion("exito", ValidationMessages.RExitoso, ""));
+                    NotificationService.Notify(Notificar.Notificacion("exito", DiccionarioTraduccionesService.Traducciones["RExitoso"], ""));
                 }
 
                 dataIsLoaded = 0;
@@ -319,13 +313,13 @@ protected async Task Save()
         @* }
         else
         {
-            NotificationService.Notify(Notificar.Notificacion("advertencia", ValidationMessages.Atencion, ValidationMessages.RHorario));
+            NotificationService.Notify(Notificar.Notificacion("advertencia", DiccionarioTraduccionesService.Traducciones["Atencion"], DiccionarioTraduccionesService.Traducciones["RHorario"]));
             dataIsLoaded = 0;
         } *@
     }
     catch (Exception ex)
     {
-            NotificationService.Notify(Notificar.Notificacion("error", ValidationMessages.EDato, ex.Message));
+            NotificationService.Notify(Notificar.Notificacion("error", DiccionarioTraduccionesService.Traducciones["EDato"], ex.Message));
     }
 }
 
