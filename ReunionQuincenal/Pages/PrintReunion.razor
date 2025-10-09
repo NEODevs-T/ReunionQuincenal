@@ -1,60 +1,83 @@
 ﻿@layout EmptyLayout
-@page "/TablaReunion"
-@page "/TablaReunion/{accion}/{division}/{f1}/{f2}/{tipo}"
+@page "/es/TablaReunion"
+@page "/es/TablaReunion/{accion}/{division}/{f1}/{f2}/{tipo}"
+@page "/en/TableMeeting"
+@page "/en/TableMeeting/{accion}/{division}/{f1}/{f2}/{tipo}"
 
-@inject IDbReunionService DbReu
-@inject IAPIReunionService APIReunionService
+@inject AuthenticationStateProvider AuthStateProvider
+@inject ILocalStorageService LocalStorage
+@inject IAsistenciaReuData AsistenciaReuData
+@inject IAvisadorData AvisadorData
+@inject ICargoReuData CargoReuData
+@inject IKsfData KsfData
+@inject IPizarraData PizarraData
+@inject IRespoReuData RespoReuData
+@inject IMaestraData MaestraData
+@inject IDiccionarioTraduccionesService DiccionarioTraduccionesService
+@inject LocalizationService LocalizationService
+@inject ITranslationService Translator
 
+@using ReunionWeb.Resources
+@using System.Globalization
+@using ReunionWeb.Services
 
-
-
+@if (!traduccionesCargadas || dataIsLoaded == 1)
+{
+    <div class="loading-container">
+        <div class="loader"></div>
+    </div>
+}
+else
+{
 <body>
 
-    @if (reudiatablas.Count() > 0 && dataIsLoaded == 2)
+    @if (idPais != 0 && PizarraData.reudiatablas.Count() > 0 && dataIsLoaded == 2)
     {
 
 
-                <BSTable IsStriped="true" IsBordered="true">
-                    <BSTHead Class="cabecera">
-                        <BSTR>
+        <BSTable IsStriped="true" IsBordered="true">
+            <BSTHead Class="cabecera">
+                <BSTR>
 
                     @*<BSTD>Id</BSTD>*@
                     @*Centro para validar el comedor*@
                     @if (CentroComedor == 11)
                     {
-                                    <BSTD>N. Equipo</BSTD>
+                        <BSTD>@DiccionarioTraduccionesService.Traducciones["NEquipo"]</BSTD>
                     }
                     else
                     {
 
                         @*  <BSTD>División</BSTD>*@
-                                    <BSTD>Área</BSTD>
-                                    <BSTD>Ksf</BSTD>
+                        <BSTD>@DiccionarioTraduccionesService.Traducciones["Area"]</BSTD>
+                        <BSTD>Ksf</BSTD>
 
                     }
 
-                            <BSTD>Código de Equipo</BSTD>
-                            <BSTD ColSpan="4">Discrepancia</BSTD>
-                            <BSTD>Código</BSTD>
-                            <BSTD>Plan de Acción</BSTD>
-                            <BSTD>Tiempo</BSTD>
-                            <BSTD ColSpan="1">Responsable</BSTD>
-                            <BSTD>Status</BSTD>
-                            <BSTD>ODT</BSTD>
-                            <BSTD>Fecha del Trabajo</BSTD>@*Fecha de listo el trabajo*@
+                    <BSTD>@DiccionarioTraduccionesService.Traducciones["CodigoDeEquipo"]</BSTD>
+                    <BSTD ColSpan="4">@DiccionarioTraduccionesService.Traducciones["Discrepancia"]</BSTD>
+                    <BSTD>@DiccionarioTraduccionesService.Traducciones["Codigo"]</BSTD>
+                    <BSTD>@DiccionarioTraduccionesService.Traducciones["PlanDeAccion"]</BSTD>
+                    <BSTD>@DiccionarioTraduccionesService.Traducciones["Tiempo"]</BSTD>
+                    <BSTD ColSpan="1">@DiccionarioTraduccionesService.Traducciones["Responsable"]</BSTD>
+                    <BSTD>Status</BSTD>
+                    <BSTD>@DiccionarioTraduccionesService.Traducciones["Requisicion"]</BSTD>
+                    <BSTD>ODT</BSTD>
+                    <BSTD>@DiccionarioTraduccionesService.Traducciones["FechaDeTrabajo"]</BSTD>@*Fecha de listo el trabajo*@
 
 
-                        </BSTR>
-                    </BSTHead>
-                    <BSTBody>
-                @foreach (var d in reudiatablas)
+                </BSTR>
+            </BSTHead>
+            <BSTBody>
+                @foreach (var d in PizarraData.reudiatablas)
                 {
-                    @if (d.Rdstatus != "Listo" & d.RdfecTra <= DateTime.Now | (d.Rdstatus != "Listo" & (d.Rdodt == "" | d.Rdodt is null)))
+                    @if (d.Rdstatus != "Listo" & d.RdfecTra <= DateTime.Now | (d.Rdstatus != "Listo" & (d.Rdodt == "" | d.Rdodt
+                   is null)))
                     //@if (d.Rdstatus != "Listo")
                     {
 
 
-                                        <BSTR>
+                        <BSTR>
 
                             @*<BSTD>@d.IdReuDia</BSTD>*@
                             @*Centro para validar el comedor*@
@@ -69,7 +92,7 @@
 
                                         if (eq.CodigoEq == d.RdcodEq)
                                         {
-                                                                            <BSTD>@eq.Equipo</BSTD>
+                                            <BSTD>@eq.Equipo</BSTD>
 
                                         }
 
@@ -78,7 +101,7 @@
                                 }
                                 else
                                 {
-                                                            <BSTD>No hay desctripción.</BSTD>
+                                    <BSTD>@DiccionarioTraduccionesService.Traducciones["NoHayDescrip"]</BSTD>
 
                                 }
 
@@ -86,58 +109,86 @@
                             else
                             {
                                 @*  <BSTD>@d.Rddiv</BSTD>*@
-                                                    <BSTD>@d.Rdarea</BSTD>
-                                                    <BSTD>@d.Ksf</BSTD>
+                                <BSTD>@d.Rdarea</BSTD>
+                                <BSTD>
+                                @{
+                                    var texto = idPais == 5 
+                                    ? KsfData.ksfs.Where(x => x.Idksf == d.Idksf).FirstOrDefault()?.KsfEnglish 
+                                    : KsfData.ksfs.Where(x => x.Idksf == d.Idksf).FirstOrDefault()?.KsfNombre;
+                                }
+                                @texto</BSTD>
                             }
-
-
-                                            <BSTD>@d.RdcodEq</BSTD>
-                                            <BSTD ColSpan="4">@d.Rddisc.ToUpper()</BSTD>
-                                            <BSTD>@d.RdcodDis</BSTD>
+                            <BSTD>@d.RdcodEq</BSTD>
+                            <BSTD ColSpan="4">@d.Rddisc.ToUpper()</BSTD>
+                            <BSTD>@d.RdcodDis</BSTD>
                             @if (@d.RdplanAcc is not null)
                             {
-                                                    <BSTD Class="textotabla listo">@d.RdplanAcc</BSTD>
+                                <BSTD Class="textotabla listo">@d.RdplanAcc</BSTD>
                             }
                             else
                             {
-                                                    <BSTD Class="textotabla ">@d.RdplanAcc</BSTD>
+                                <BSTD Class="textotabla ">@d.RdplanAcc</BSTD>
                             }
-                                            <BSTD>@d.Rdtiempo</BSTD>
-                            @if (@d.Ksf == "Por Definir")
+                            <BSTD>@d.Rdtiempo</BSTD>
+                            @{
+                                var nombreResponsable = RespoReuData.resporeus.FirstOrDefault(x => x.IdResReu == d.IdResReu)?.Rrnombre;
+                                var clave = ValidationMessages.MapResponsableKey(nombreResponsable ?? string.Empty);
+                                var textoTraducido = DiccionarioTraduccionesService.Traducciones.TryGetValue(clave, out var traduccion)
+                                ? traduccion
+                                : nombreResponsable;
+                            }
+                            @if (nombreResponsable == "Por Definir")
                             {
-                                                    <BSTD Class="Definir">@d.Responsable </BSTD>
+                                <BSTD Class="Definir">@textoTraducido</BSTD>
                             }
                             else
                             {
-                                                    <BSTD ColSpan="1">@d.Responsable</BSTD>
+                                <BSTD>@textoTraducido</BSTD>
                             }
+                            @{
+                                var estadoTraducido = d.Rdstatus switch
+                                {
+                                    "Listo" => idPais == 5 ? "Ready" : "Listo",
+                                    "Cerrado" => idPais == 5 ? "Closed" : "Cerrado",
+                                    _ => idPais == 5 ? "Pending" : "Pendiente"
+                                };
 
-                            @if (@d.Rdstatus == "Revisar")
+                                var claseEstado = d.Rdstatus switch
+                                {
+                                    "Listo" => "listo",
+                                    "Cerrado" => "Cerrado",
+                                    _ => "pendiente"
+                                };
+
+                                var codRequiTexto = d.RdcodRequi == null ? "N/A" : d.RdcodRequi;
+                            }
+                            <BSTD Class="@claseEstado">@estadoTraducido</BSTD>
+                                                        @if (d.RdcodRequi == null)
                             {
-                                                    <BSTD Class="cabecera">@d.Rdstatus</BSTD>
+                                <BSTD>N/A</BSTD>
                             }
                             else
                             {
-                                                    <BSTD Class="">@d.Rdstatus</BSTD>
+                                <BSTD>@d.RdcodRequi</BSTD>
                             }
-                                            <BSTD>@d.Rdodt</BSTD>
-                                            <BSTD>@d.RdfecTra.ToString("dd/MM/yyyy") </BSTD>
+                            <BSTD>@d.Rdodt</BSTD>
+                            <BSTD>@d.RdfecTra.ToString("dd/MM/yyyy") </BSTD>
 
 
-                                        </BSTR>
+                        </BSTR>
 
                     }
                 }
 
 
-                    </BSTBody>
+            </BSTBody>
 
-                </BSTable>
+        </BSTable>
 
     }
-     <button type="button" onclick="window.print()" class="btn btn-success"><span class="oi oi-print"></span></button>
+    <button type="button" onclick="window.print()" class="btn btn-success"><span class="oi oi-print"></span></button>
 </body>
-
+}
 
 
 @code {
@@ -171,21 +222,75 @@
     private List<CalendarioTrabajoDTO> calentrabajo { get; set; }
     private List<CambFecDTO> cambiofecha { get; set; }
     private List<ReunionDTO> reudiatablas { get; set; }
-
-
-
-
+    private int idPais { get; set; }
+    private List<Claim> claims { get; set; }
     int dataIsLoaded = 0;
     int CentroComedor = 0;
+    private bool traduccionesCargadas = false;
+    private async Task CreateData()
 
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        claims = Enumerable.ToList(user.Claims);
+
+        var idPaisClaim = claims.FirstOrDefault(c => c.Type == "IdPais")?.Value;
+        if (int.TryParse(idPaisClaim, out int paisTemp))
+        {
+            idPais = paisTemp;
+        }
+
+    }
+
+    private string TraducirKsfManual(string ksfOriginal)
+    {
+        if (string.IsNullOrWhiteSpace(ksfOriginal))
+            return string.Empty;
+
+        var traducciones = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            { "Producción", "Production" },
+            { "Mantenimiento", "Maintenance" },
+            { "Calidad", "Quality" },
+            { "Seguridad", "Safety" },
+            { "Auditoría", "Audit" },
+            { "Preventivo", "Preventive" },
+            { "RRHH", "HR" },
+            { "Ambiente", "Environment" },
+            { "Reunión Diaria", "Daily Meeting" }
+        };
+
+        return idPais == 5 && traducciones.ContainsKey(ksfOriginal)
+            ? traducciones[ksfOriginal]
+            : ksfOriginal;
+    }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CreateData();
+        await KsfData.Getksf();
+        await RespoReuData.GetResReu();
+        await LocalizationService.EstablecerCulturaDesdeTokenAsync();
+        CultureInfo.CurrentCulture = CultureInfo.DefaultThreadCurrentCulture;
+        CultureInfo.CurrentUICulture = CultureInfo.DefaultThreadCurrentUICulture;
+        await DiccionarioTraduccionesService.CargarTraduccionesAsync();
+        traduccionesCargadas = true;
+    }
     protected override async Task OnParametersSetAsync()
     {
         if (accion != null)
         {
             dataIsLoaded = 1;
-            await DbReu.GetPendientes(accion, division, DateTime.Now.AddDays(-1), DateTime.Now, tipo, "Reunion");
+            await PizarraData.GetPendientes(accion, division, DateTime.Now.AddDays(-1), DateTime.Now, tipo, "Reunion");
             dataIsLoaded = 2;
-        }
 
+            foreach (var e in PizarraData.reudiatablas)
+            {
+                e.Ksf = KsfData.ksfs.Where(x => x.Idksf == e.Idksf).FirstOrDefault().KsfNombre;
+                e.Responsable = RespoReuData.resporeus.Where(x => x.IdResReu == e.IdResReu).FirstOrDefault().Rrnombre;
+            }
+        }
     }
+
 }

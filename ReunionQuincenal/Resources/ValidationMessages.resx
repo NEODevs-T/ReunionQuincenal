@@ -12,6 +12,7 @@
 <data name="Accion" xml:space="preserve"><value>Acción</value></data>
 <data name="Acciones" xml:space="preserve"><value>Acciones</value></data>
 <data name="Aceptar" xml:space="preserve"><value>Aceptar</value></data>
+<data name="ADiscrepancia" xml:space="preserve"><value>Discrepancia</value></data>
 <data name="Advertencia" xml:space="preserve"><value>Advertencia</value></data>
 <data name="Area" xml:space="preserve"><value>Área</value></data>
 <data name="Asistencia" xml:space="preserve"><value>Asistencia</value></data>

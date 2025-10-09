@@ -12,6 +12,7 @@
 <data name="Accion" xml:space="preserve"><value>Action</value></data>
 <data name="Acciones" xml:space="preserve"><value>Actions</value></data>
 <data name="Aceptar" xml:space="preserve"><value>Accept</value></data>
+<data name="ADiscrepancia" xml:space="preserve"><value>Add Issue</value></data>
 <data name="Advertencia" xml:space="preserve"><value>warning</value></data>
 <data name="Area" xml:space="preserve"><value>Area</value></data>
 <data name="Asistencia" xml:space="preserve"><value>Attendance</value></data>
@@ -38,7 +39,7 @@
 <data name="Correcto" xml:space="preserve"><value>Correct.</value></data>
 <data name="Desde" xml:space="preserve"><value>From</value></data>
 <data name="DetallesDeCalidad" xml:space="preserve"><value>Quality Details</value></data>
-<data name="Discrepancia" xml:space="preserve"><value>Add Issue</value></data>
+<data name="Discrepancia" xml:space="preserve"><value>Issue</value></data>
 <data name="Discrepancias" xml:space="preserve"><value>Issues</value></data>
 <data name="Division" xml:space="preserve"><value>Division</value></data>
 <data name="EDato" xml:space="preserve"><value>Error inserting data, please try again.</value></data>

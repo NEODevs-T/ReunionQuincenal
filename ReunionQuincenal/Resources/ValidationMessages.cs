@@ -15,6 +15,7 @@ namespace ReunionWeb.Resources
         public static string Accion => _resourceManager.GetString("Accion", CultureInfo.CurrentUICulture);
         public static string Acciones => _resourceManager.GetString("Acciones", CultureInfo.CurrentUICulture);
         public static string Aceptar => _resourceManager.GetString("Aceptar", CultureInfo.CurrentUICulture);
+        public static string ADiscrepancia => _resorceManager.GetString("ADiscrepancia", CultureInfo.CurrentUICulture);
         public static string Advertencia => _resourceManager.GetString("Advertencia", CultureInfo.CurrentUICulture);
         public static string Area => _resourceManager.GetString("Area", CultureInfo.CurrentUICulture);
         public static string Asistencia => _resourceManager.GetString("Asistencia", CultureInfo.CurrentUICulture);

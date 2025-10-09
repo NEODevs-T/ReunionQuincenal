@@ -23,7 +23,7 @@ namespace ReunionWeb.Services
             var claves = new[]
             {
                 "AExitoso", "Accion", "Acciones", "Aceptar", "Activar",
-                "Activo", "Advertencia", "Agregar", "AgregarEquipos", "AgregarFecha",
+                "Activo", "ADiscrepancia", "Advertencia", "Agregar", "AgregarEquipos", "AgregarFecha",
                 "AgregarFechaProgramada", "Area", "Asistencia", "Asistentes", "Asuntos",
                 "Atencion", "Atras", "Año", "Bloque", "Borrar",
                 "Buscar", "BuscarCargo", "BuscarCargo2", "C_Equipo", "Calendario",
