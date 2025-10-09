@@ -4,16 +4,33 @@
 @page "/en/TablePending"
 @page "/en/TablePending/{accion}/{division}/{linea}/{f1}/{f2}/{tipo}/{est}/{idrespo:int}"
 
-@inject IDbReunionService DbReunionService
-@inject IAPIReunionService APIReunionService
+@inject IPizarraData PizarraData
+@inject IRespoReuData RespoReuData
+@inject IMaestraData MaestraData
+@inject IKsfData KsfData
 @inject AuthenticationStateProvider AuthStateProvider
 @inject ILocalStorageService LocalStorage
+@inject IDiccionarioTraduccionesService DiccionarioTraduccionesService
+@inject LocalizationService LocalizationService
+@inject ITranslationService Translator
 
+@using ReunionWeb.Resources
+@using System.Globalization
+@using ReunionWeb.Services
+
+@if (!traduccionesCargadas || dataIsLoaded == 1)
+{
+    <div class="loading-container">
+        <div class="loader"></div>
+    </div>
+}
+else
+{
 <BSRow>
     <BSCol ColumnSmall="1" Column="2">
-        <BSLabel>Código</BSLabel>
+        <BSLabel>@DiccionarioTraduccionesService.Traducciones["Codigo"]</BSLabel>
         <BSInput InputType="InputType.Select" @bind-Value="Codigo">
-            <option value="Todo">Todo</option>
+            <option value="Todo">@DiccionarioTraduccionesService.Traducciones["Todo"]</option>
             <option value="1">1</option>
             <option value="2">2</option>
             <option value="3">3</option>
@@ -23,33 +40,38 @@
     </BSCol>
 
     <BSCol ColumnSmall="1" Column="2">
-        <BSLabel>Estado</BSLabel>
+        <BSLabel>@DiccionarioTraduccionesService.Traducciones["Estado"]</BSLabel>
         <BSInput InputType="InputType.Select" @bind-Value="Status">
-            <option value="Total Pendiente">Total Pendiente</option>
-            <option value="Todo">Todo</option>
-            <option value="Pendiente">Pendiente</option>
-            <option value="Pendiente/Responsable">Pendiente/Responsable</option>
-            <option value="Listo">Listo</option>
-            <option value="Cerrado">Cerrado</option>
-            <option value="Vencidos">Vencidos</option>
+            <option value="Total Pendiente">@DiccionarioTraduccionesService.Traducciones["TotalPendiente"]</option>
+            <option value="Todo">@DiccionarioTraduccionesService.Traducciones["Todo"]</option>
+            <option value="Pendiente">@DiccionarioTraduccionesService.Traducciones["Pendiente"]</option>
+            <option value="Pendiente/Responsable">@DiccionarioTraduccionesService.Traducciones["Pendiente"] / @DiccionarioTraduccionesService.Traducciones["Responsable"]</option>
+            <option value="Listo">@DiccionarioTraduccionesService.Traducciones["Listo"]</option>
+            <option value="Cerrado">@DiccionarioTraduccionesService.Traducciones["Cerrado"]</option>
+            <option value="Vencidos">@DiccionarioTraduccionesService.Traducciones["Vencidos"]</option>
         </BSInput>
     </BSCol>
 
     <BSCol Column="3">
-        <BSLabel>Responsable</BSLabel>
+        <BSLabel>@DiccionarioTraduccionesService.Traducciones["Responsable"]</BSLabel>
         <BSInput InputType="InputType.Select" @bind-Value="idrespo">
-            <option value=0>Todo</option>
+            <option value=0>@DiccionarioTraduccionesService.Traducciones["Todo"]</option>
+            @if (resporeu != null)
             @foreach (var d in resporeu)
             {
-
-                <option value="@d.IdResReu">@d.Rrnombre</option>
-
+                <option value="@d.IdResReu">@DiccionarioTraduccionesService.Traducciones[ValidationMessages.MapResponsableKey(d.Rrnombre)]</option>
             }
         </BSInput>
     </BSCol>
+        @{
+            var clave = ValidationMessages.MapResponsableKey(linea ?? string.Empty);
+            var lineaTraducida = DiccionarioTraduccionesService.Traducciones.TryGetValue(clave, out var traduccion)
+                ? traduccion
+                : linea;
+        }
     <BSCol Column="3">
-        <BSLabel>Línea</BSLabel>
-        <BSInput InputType="InputType.Text" @bind-Value="linea" IsReadonly=true />
+        <BSLabel>@DiccionarioTraduccionesService.Traducciones["Linea"]</BSLabel>
+        <BSInput InputType="InputType.Text" @bind-Value="@lineaTraducida" IsReadonly=true />
     </BSCol>
 
 </BSRow>
@@ -57,7 +79,7 @@
 <p></p>
 
 <body>
-    @if (reudiatablas.Count() > 0 && dataIsLoaded == 2)
+    @if (reudiatablas != null && PizarraData.reudiatablas.Count() > 0 && dataIsLoaded == 2)
     {
 
 
@@ -68,18 +90,19 @@
                     @*<BSTD>Id</BSTD>*@
                     @*Centro para validar el comedor*@
 
-                    <BSTD>Área</BSTD>
+                   <BSTD>@DiccionarioTraduccionesService.Traducciones["Area"]</BSTD>
                     <BSTD>Ksf</BSTD>
-                    <BSTD>C. Equipo</BSTD>
-                    <BSTD ColSpan="4">Discrepancia</BSTD>
-                    <BSTD>Código</BSTD>
-                    <BSTD>Plan de Acción</BSTD>
-                    <BSTD>Tiempo</BSTD>
-                    <BSTD>Responsable</BSTD>
+                    <BSTD>@DiccionarioTraduccionesService.Traducciones["CodigoDeEquipo"]</BSTD>
+                    <BSTD ColSpan="4">@DiccionarioTraduccionesService.Traducciones["Discrepancia"]</BSTD>
+                    <BSTD>@DiccionarioTraduccionesService.Traducciones["Codigo"]</BSTD>
+                    <BSTD>@DiccionarioTraduccionesService.Traducciones["PlanDeAccion"]</BSTD>
+                    <BSTD>@DiccionarioTraduccionesService.Traducciones["Tiempo"]</BSTD>
+                    <BSTD>@DiccionarioTraduccionesService.Traducciones["Responsable"]</BSTD>
                     <BSTD>Status</BSTD>
                     <BSTD>ODT</BSTD>
-                    <BSTD>Fecha de Reunión</BSTD> @*Fecha del dia de reunion*@
-                    <BSTD>Fecha del Trabajo</BSTD>@*Fecha de listo el trabajo*@
+                    <BSTD>@DiccionarioTraduccionesService.Traducciones["FechaDeReunion"]</BSTD> @*Fecha del dia de reunion*@
+                    <BSTD>@DiccionarioTraduccionesService.Traducciones["FechaDeTrabajo"]</BSTD>@*Fecha de listo el trabajo*@
+
 
 
                 </BSTR>
@@ -89,22 +112,28 @@
             @if (UsrRol == "Calidad" | UsrRol == "Seguridad" | UsrRol=="Mtto")*@
                 @if (UsrRol != "")
                 {
-                    listareu = reudiatablas.Where(r => r.Responsable.StartsWith(UsrRol)).ToList();
+                    listareu = PizarraData.reudiatablas.Where(r => r.Responsable.StartsWith(UsrRol)).ToList();
                 }
                 else
                 {
-                    listareu = reudiatablas;
-
+                    listareu = PizarraData.reudiatablas;
                 }
                 @* @foreach (var d in DbReunionService.reudiatablas)*@
                 @foreach (var d in listareu)
                 {
+                    var nombreOriginal = RespoReuData.resporeus
+                        .Where(x => x.IdResReu == d.IdResReu)
+                        .FirstOrDefault()?.Rrnombre;
+
+                    var claveResponsable = ValidationMessages.MapResponsableKey(nombreOriginal ?? string.Empty);
+                    d.Responsable = DiccionarioTraduccionesService.Traducciones.TryGetValue(claveResponsable, out var traduccionResponsable)
+                        ? traduccionResponsable : nombreOriginal;
                     @if (linea == "Todo" | linea == d.Rdarea)
                     {
                         @if (Codigo == d.RdcodDis | Codigo == "Todo")
                         {
                             @if (Status == d.Rdstatus | Status == "Todo" | Status == "Total Pendiente" & (d.Rdstatus == "Pendiente" |
-                           d.Rdstatus == "Pendiente/Responsable"))
+                        d.Rdstatus == "Pendiente/Responsable"))
                             {
                                 @if (idrespo == 0 | idrespo == d.IdResReu)
                                 {
@@ -112,33 +141,53 @@
                                         @*<BSTD>@d.IdReuDia</BSTD>*@
 
                                         <BSTD>@d.Rdarea</BSTD>
-                                        <BSTD>@d.Ksf</BSTD>
+                                        <BSTD>                                        @{
+                                            var texto = idPais == 5 
+                                                ? KsfData.ksfs.Where(x => x.Idksf == d.Idksf).FirstOrDefault()?.KsfEnglish 
+                                                : KsfData.ksfs.Where(x => x.Idksf == d.Idksf).FirstOrDefault()?.KsfNombre;
+                                        }
+                                        @texto</BSTD>
                                         <BSTD>@d.RdcodEq</BSTD>
                                         <BSTD ColSpan="4">@d.Rddisc.ToUpperInvariant()</BSTD>
                                         <BSTD>@d.RdcodDis</BSTD>
                                         <BSTD Class="textotabla">@d.RdplanAcc</BSTD>
                                         <BSTD>@d.Rdtiempo</BSTD>
-                                        @if (@d.Responsable == "Por Definir")
-                                        {
-                                            <BSTD Class="Definir">@d.Responsable </BSTD>
-                                        }
-                                        else
-                                        {
-                                            <BSTD>@d.Responsable </BSTD>
+                                        @{
+                                            var nombreResponsable = RespoReuData.resporeus
+                                                .FirstOrDefault(x => x.IdResReu == d.IdResReu)?.Rrnombre;
+
+                                            var clave = ValidationMessages.MapResponsableKey(nombreResponsable ?? string.Empty);
+                                            var textoTraducido = DiccionarioTraduccionesService.Traducciones.TryGetValue(clave, out var traduccion)
+                                                ? traduccion
+                                                : nombreResponsable;
                                         }
 
-                                        @if (@d.Rdstatus == "Listo")
+                                        @if (nombreResponsable == "Por Definir")
                                         {
-                                            <BSTD Class="listo">@d.Rdstatus</BSTD>
-                                        }
-                                        else if (@d.Rdstatus == "Cerrado")
-                                        {
-                                            <BSTD Class="Cerrado">@d.Rdstatus</BSTD>
+                                            <BSTD Class="Definir">@textoTraducido</BSTD>
                                         }
                                         else
                                         {
-                                            <BSTD Class="pendiente">@d.Rdstatus</BSTD>
+                                            <BSTD>@textoTraducido</BSTD>
                                         }
+                                        @{
+                                            var estadoTraducido = d.Rdstatus switch
+                                            {
+                                                "Listo" => idPais == 5 ? "Ready" : "Listo",
+                                                "Cerrado" => idPais == 5 ? "Closed" : "Cerrado",
+                                                _ => idPais == 5 ? "Pending" : "Pendiente"
+                                            };
+
+                                            var claseEstado = d.Rdstatus switch
+                                            {
+                                                "Listo" => "listo",
+                                                "Cerrado" => "Cerrado",
+                                                _ => "pendiente"
+                                                };
+
+                                            var codRequiTexto = d.RdcodRequi == null ? "N/A" : d.RdcodRequi;
+                                        }
+                                        <BSTD Class="@claseEstado">@estadoTraducido</BSTD>
                                         <BSTD>@d.Rdodt</BSTD>
                                         <BSTD>@d.RdfecReu.ToString("dd/MM/yyyy")</BSTD>
                                         <BSTD>@d.RdfecTra.ToString("dd/MM/yyyy")</BSTD>
@@ -160,7 +209,7 @@
         </BSTable>
     }
 </body>
-
+}
 @code {
     [Parameter]
     public string? accion { get; set; }//centro
@@ -192,7 +241,7 @@
     private List<DivisionDTO> divisions { get; set; }
     private List<MaestraVDTO> centro { get; set; }
     private List<KsfDTO> ksfs { get; set; }
-    private List<RespoReuDTO> resporeu { get; set; }
+    private List<RespoReuDTO> resporeu { get; set; } = new();
     private List<ReunionDTO> reunionditabla { get; set; }
     private List<ReunionDTO> reudiatabla { get; set; }
     private List<AsistenReuDTO> asistenreus { get; set; }
@@ -204,8 +253,9 @@
     private RegistroCambiosDTO listaRegistro { get; set; }
     private List<CalendarioTrabajoDTO> calentrabajo { get; set; }
     private List<CambFecDTO> cambiofecha { get; set; }
-    private List<ReunionDTO> reudiatablas { get; set; }
-
+    private List<ReunionDTO> reudiatablas { get; set; } = new();
+    private bool traduccionesCargadas = false;
+    private int idPais {get; set;}
 
 
 
@@ -220,15 +270,28 @@
         var user = authState.User;
         claims = Enumerable.ToList(user.Claims);
 
+        var idPaisClaim = claims.FirstOrDefault(c => c.Type == "IdPais")?.Value;
+        if (int.TryParse(idPaisClaim, out int paisTemp))
+        {
+            idPais = paisTemp;
+    await RespoReuData.GetResReu();
+    var empresa = claims.FirstOrDefault(c => c.Type.Contains("Empresa"))?.Value;
+    RespoReuData.resporeus = RespoReuData.resporeus
+        .Where(a => a.Rrdesc == empresa || string.IsNullOrEmpty(a.Rrdesc))
+        .ToList();
+        }
     }
 
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-        await APIReunionService.GetResReu();
-
-
-
+        await RespoReuData.GetResReu();
+        await KsfData.Getksf();
+        await LocalizationService.EstablecerCulturaDesdeTokenAsync();
+        CultureInfo.CurrentCulture = CultureInfo.DefaultThreadCurrentCulture;
+        CultureInfo.CurrentUICulture = CultureInfo.DefaultThreadCurrentUICulture;
+        await DiccionarioTraduccionesService.CargarTraduccionesAsync();
+        traduccionesCargadas = true;
     }
 
     protected override async Task OnParametersSetAsync()
@@ -240,44 +303,44 @@
             case "Admin":
             case "SuperAdmin":
                 UsrAdmin = "SuperAdmin";
-                await APIReunionService.GetCentrosxEmpresa("All" + claims.FirstOrDefault(c => c.Type.Contains("IdEmpresa"))?.Value);
+                await MaestraData.GetCentrosxEmpresa("All" + claims.FirstOrDefault(c => c.Type.Contains("IdEmpresa"))?.Value);
                 break;
 
             case "SemiAdmin":
                 UsrAdmin = "SemiAdmin";
-                await APIReunionService.GetCentrosxEmpresa(claims.FirstOrDefault(c => c.Type.Contains("IdCentro"))?.Value);
+                await MaestraData.GetCentrosxEmpresa(claims.FirstOrDefault(c => c.Type.Contains("IdCentro"))?.Value);
                 break;
 
             case "Planificador":
             case "SuperUser":
-                await APIReunionService.GetCentrosxEmpresa(claims.FirstOrDefault(c => c.Type.Contains("IdCentro"))?.Value);
+                await MaestraData.GetCentrosxEmpresa(claims.FirstOrDefault(c => c.Type.Contains("IdCentro"))?.Value);
                 break;
 
             case "MttoAdmin":
                 UsrRol = "Mtto";
-                await APIReunionService.GetCentrosxEmpresa("All" + claims.FirstOrDefault(c => c.Type.Contains("IdEmpresa"))?.Value);
+                await MaestraData.GetCentrosxEmpresa("All" + claims.FirstOrDefault(c => c.Type.Contains("IdEmpresa"))?.Value);
                 break;
             case "SeguridadAdmin":
                 UsrRol = "Seguridad";//Seguridad para filtar por seguridad
-                await APIReunionService.GetCentrosxEmpresa("All" + claims.FirstOrDefault(c => c.Type.Contains("IdEmpresa"))?.Value);
+                await MaestraData.GetCentrosxEmpresa("All" + claims.FirstOrDefault(c => c.Type.Contains("IdEmpresa"))?.Value);
                 break;
             case "CalidadAdmin":
                 UsrRol = "Calidad";//Seguridad para filtar por calidad
-                await APIReunionService.GetCentrosxEmpresa("All" + claims.FirstOrDefault(c => c.Type.Contains("IdEmpresa"))?.Value);
+                await MaestraData.GetCentrosxEmpresa("All" + claims.FirstOrDefault(c => c.Type.Contains("IdEmpresa"))?.Value);
                 break;
 
             case "Mantenimiento":
                 UsrRol = "Mtto";
-                await APIReunionService.GetCentrosxEmpresa(claims.FirstOrDefault(c => c.Type.Contains("IdCentro"))?.Value);
+                await MaestraData.GetCentrosxEmpresa(claims.FirstOrDefault(c => c.Type.Contains("IdCentro"))?.Value);
                 break;
 
             case "Auditores":
-                await APIReunionService.GetCentrosxEmpresa("All" + claims.FirstOrDefault(c => c.Type.Contains("IdEmpresa"))?.Value);
+                await MaestraData.GetCentrosxEmpresa("All" + claims.FirstOrDefault(c => c.Type.Contains("IdEmpresa"))?.Value);
                 break;
 
             default:
                 UsrRol = claims.FirstOrDefault(c => c.Type.Contains("role"))?.Value;
-                await APIReunionService.GetCentrosxEmpresa(claims.FirstOrDefault(c => c.Type.Contains("IdCentro"))?.Value);
+                await MaestraData.GetCentrosxEmpresa(claims.FirstOrDefault(c => c.Type.Contains("IdCentro"))?.Value);
                 break;
         }
 
@@ -293,8 +356,14 @@
             DateTime date2 = new DateTime(int.Parse(fec2[2]), int.Parse(fec2[1]), int.Parse(fec2[0]));
 
             dataIsLoaded = 1;
-            await DbReunionService.GetPendientes(accion, division, date1, date2, tipo, est);
+            await PizarraData.GetPendientes(accion, division, date1, date2, tipo, est);
             dataIsLoaded = 2;
+            foreach (var e in PizarraData.reudiatablas)
+            {
+                e.Ksf = KsfData.ksfs.Where(x => x.Idksf == e.Idksf).FirstOrDefault().KsfNombre;
+                e.Responsable = RespoReuData.resporeus.Where(x => x.IdResReu == e.IdResReu).FirstOrDefault().Rrnombre;
+
+            }
 
         }
 
