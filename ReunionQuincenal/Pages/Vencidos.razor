@@ -13,8 +13,13 @@
 @inject ILocalStorageService LocalStorage
 @inject NotificationService NotificationService
 
+@inject IDiccionarioTraduccionesService DiccionarioTraduccionesService
+@inject LocalizationService LocalizationService
+@inject ITranslationService Translator
+
 @using ReunionWeb.Resources
 @using System.Globalization
+@using ReunionWeb.Services
 
 @attribute [Authorize(Roles = "Admin, AdminChempro, SuperUser, PrimeUser, SemiAdmin,SuperAdmin")]
 <!DOCTYPE html>
@@ -23,18 +28,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@ValidationMessages.Vencidos</title>
 </head>
+    @if (!traduccionesCargadas || MaestraData.centro.Count() == 0)
+{
+     <div class="loader"></div>
+}
+else
+{
 
+<title>@DiccionarioTraduccionesService.Traducciones["Vencidos"]</title>
 <body>
-    <h3>@ValidationMessages.VencidasDiaria</h3>
+    <h3>@DiccionarioTraduccionesService.Traducciones["VencidasDiaria"]</h3>
     @* ccc *@
     <div class="box-reuform">
         <div class="box-reuCent">
-            <label for="">@ValidationMessages.Centro
+            <label for="">@DiccionarioTraduccionesService.Traducciones["Centro"]
                 <BSInput InputType="InputType.Select" class="Form-imput" @onchange="BuscarDivision"
                     @bind-Value="idCent">
-                    <option value="0">@ValidationMessages.SeleccioneUnCentro</option>
+                    <option value="0">@DiccionarioTraduccionesService.Traducciones["SeleccioneUnCentro"]</option>
                     @if (MaestraData.centro != null)
                     {
                         @foreach (var d in MaestraData.centro)
@@ -47,9 +58,9 @@
             </label>
         </div>
         <div class="box-reuDiv">
-            <label for="">@ValidationMessages.Division
+            <label for="">@DiccionarioTraduccionesService.Traducciones["Division"]
                 <BSInput InputType="InputType.Select" class="Form-imput linea" @bind-Value="idDiv">
-                    <option value="0">@ValidationMessages.SeleccioneUnaDivision</option>
+                    <option value="0">@DiccionarioTraduccionesService.Traducciones["SeleccioneUnaDivision"]</option>
                     @if (MaestraData.centro != null)
                     {
                         @foreach (var d in MaestraData.divisions)
@@ -77,7 +88,7 @@
         </div> *@
 
         <div class="botton-Disc">
-            <button @onclick="buscar" type="submit" id="btn-disc" class="btn btn-primary mb-3">@ValidationMessages.Buscar</button>
+            <button @onclick="buscar" type="submit" id="btn-disc" class="btn btn-primary mb-3">@DiccionarioTraduccionesService.Traducciones["Buscar"]</button>
         </div>
     </div>
     @if (band == true)
@@ -92,7 +103,7 @@ else if (PizarraData.reudiatablas.Count() > 0 && confirmacion == true)
         <BSCol Column="2">
             <BSLabel><strong>Ksf</strong></BSLabel>
             <BSInput InputType="InputType.Select" @bind-Value="IdKsf">
-                <option value="0">@ValidationMessages.Todo</option>
+                <option value="0">@DiccionarioTraduccionesService.Traducciones["Todo"]</option>
                 @foreach (var d in KsfData.ksfs.Where(x => x.Idksf != 6))
                 {
                     var texto = idPais == 5? d.KsfEnglish : d.KsfNombre;
@@ -102,37 +113,36 @@ else if (PizarraData.reudiatablas.Count() > 0 && confirmacion == true)
         </BSCol>
 
         <BSCol Column="2">
-            <BSLabel><strong>@ValidationMessages.Responsable</strong></BSLabel>
+            <BSLabel><strong>@DiccionarioTraduccionesService.Traducciones["Responsable"]</strong></BSLabel>
             <BSInput InputType="InputType.Select" @bind-Value="idrespo">
-                <option value="0">@ValidationMessages.Todo</option>
+                <option value="0">@DiccionarioTraduccionesService.Traducciones["Todo"]</option>
                 @foreach (var d in RespoReuData.resporeus)
                 {
-                    <option value="@d.IdResReu">@ValidationMessages.ResourceManager.GetString(ValidationMessages
-                    .MapResponsableKey(d.Rrnombre),CultureInfo.CurrentUICulture)</option>
+                    <option value="@d.IdResReu">@DiccionarioTraduccionesService.Traducciones[ValidationMessages.MapResponsableKey(d.Rrnombre)]</option>
                 }
             </BSInput>
         </BSCol>
 
         <BSCol Column="2">
-            <BSLabel><strong>@ValidationMessages.Codigo</strong></BSLabel>
+            <BSLabel><strong>@DiccionarioTraduccionesService.Traducciones["Codigo"]</strong></BSLabel>
             <BSInput InputType="InputType.Select" @bind-Value="Codigo">
-                <option value="Todo">@ValidationMessages.Todo</option>
-                <option value="1">1- @ValidationMessages.EnCurso</option>
-                <option value="2">2- @ValidationMessages.ProximaParada</option>
-                <option value="3">3- @ValidationMessages.FaltaRepuesto</option>
-                <option value="4">4- @ValidationMessages.FaltaDePersonal</option>
-                <option value="5">5- @ValidationMessages.EquipoNoDisponible</option>
-                <option value="6">6- @ValidationMessages.ParadaMayor</option>
+                <option value="Todo">@DiccionarioTraduccionesService.Traducciones["Todo"]</option>
+                <option value="1">1- @DiccionarioTraduccionesService.Traducciones["EnCurso"]</option>
+                <option value="2">2- @DiccionarioTraduccionesService.Traducciones["ProximaParada"]</option>
+                <option value="3">3- @DiccionarioTraduccionesService.Traducciones["FaltaRepuesto"]</option>
+                <option value="4">4- @DiccionarioTraduccionesService.Traducciones["FaltaDePersonal"]</option>
+                <option value="5">5- @DiccionarioTraduccionesService.Traducciones["EquipoNoDisponible"]</option>
+                <option value="6">6- @DiccionarioTraduccionesService.Traducciones["ParadaMayor"]</option>
             </BSInput>
         </BSCol>
 
         <BSCol Column="2">
-                    <BSLabel><strong>@ValidationMessages.Estado</strong></BSLabel>
+                    <BSLabel><strong>@DiccionarioTraduccionesService.Traducciones["Estado"]</strong></BSLabel>
                     <BSInput InputType="InputType.Select" @bind-Value="Status">
-                        <option value="Todo">@ValidationMessages.Todo</option>
-                        <option value="Pendiente">@ValidationMessages.Pendiente</option>
-                        <option value="Pendiente-Responsable">@ValidationMessages.Pendiente / @ValidationMessages.Responsable</option>
-                        <option value="Listo">@ValidationMessages.Listo</option>
+                        <option value="Todo">@DiccionarioTraduccionesService.Traducciones["Todo"]</option>
+                        <option value="Pendiente">@DiccionarioTraduccionesService.Traducciones["Pendiente"]</option>
+                        <option value="Pendiente-Responsable">@DiccionarioTraduccionesService.Traducciones["Pendiente"] / @DiccionarioTraduccionesService.Traducciones["Responsable"]</option>
+                        <option value="Listo">@DiccionarioTraduccionesService.Traducciones["Listo"]</option>
                     </BSInput>
                 </BSCol>
             </BSRow>
@@ -150,7 +160,7 @@ else if (PizarraData.reudiatablas.Count() > 0 && confirmacion == true)
 
 
         <Columns>
-            <RadzenDataGridColumn Width="6%" TItem="ReunionDTO" Title="@ValidationMessages.Area" Filterable="false" Sortable="false">
+            <RadzenDataGridColumn Width="6%" TItem="ReunionDTO" Title="@DiccionarioTraduccionesService.Traducciones["Area"]" Filterable="false" Sortable="false">
                 <Template Context="data">
                     <RadzenText class="mb-0 tipografia">@data.Rdarea</RadzenText>
                 </Template>
@@ -162,20 +172,20 @@ else if (PizarraData.reudiatablas.Count() > 0 && confirmacion == true)
                 </Template>
             </RadzenDataGridColumn> *@
 
-            <RadzenDataGridColumn Width="6%" TItem="ReunionDTO" Title="@ValidationMessages.CodigoDeEquipo" Filterable="false" Sortable="false">
+            <RadzenDataGridColumn Width="6%" TItem="ReunionDTO" Title="@DiccionarioTraduccionesService.Traducciones["CodigoDeEquipo"]" Filterable="false" Sortable="false">
                 <Template Context="data">
                     <RadzenText class="mb-0 tipografia">@data.RdcodEq</RadzenText>
                 </Template>
             </RadzenDataGridColumn>
 
-            <RadzenDataGridColumn Width="10%" TItem="ReunionDTO" Title="@ValidationMessages.NombreDelEquipo" Filterable="false" Sortable="false"
+            <RadzenDataGridColumn Width="10%" TItem="ReunionDTO" Title="@DiccionarioTraduccionesService.Traducciones["NombreDelEquipo"]" Filterable="false" Sortable="false"
                         TextAlign="TextAlign.Center">
                         <Template Context="data">
                             <RadzenText class="mb-0 tipografia">@(string.IsNullOrWhiteSpace(data.EnombreEam) ? "EQUIPO NO ENCONTRADO" : data.EnombreEam)</RadzenText>
                         </Template>
             </RadzenDataGridColumn>
 
-            <RadzenDataGridColumn Width="20%" TItem="ReunionDTO" Title="@ValidationMessages.Discrepancia" Filterable="false" Sortable="false">
+            <RadzenDataGridColumn Width="20%" TItem="ReunionDTO" Title="@DiccionarioTraduccionesService.Traducciones["Discrepancia"]" Filterable="false" Sortable="false">
                 <Template Context="data">
                     <RadzenText class="mb-0 tipografia wrap-text">@data.Rddisc</RadzenText>
                 </Template>
@@ -187,7 +197,7 @@ else if (PizarraData.reudiatablas.Count() > 0 && confirmacion == true)
                 </Template>
             </RadzenDataGridColumn> *@
 
-            <RadzenDataGridColumn Width="15%" TItem="ReunionDTO" Title="@ValidationMessages.PlanDeAccion" Filterable="false" Sortable="false">
+            <RadzenDataGridColumn Width="15%" TItem="ReunionDTO" Title="@DiccionarioTraduccionesService.Traducciones["PlanDeAccion"]" Filterable="false" Sortable="false">
                 <Template Context="data">
                     <RadzenText class="mb-0 tipografia wrap-text">@data.RdplanAcc</RadzenText>
                 </Template>
@@ -199,9 +209,16 @@ else if (PizarraData.reudiatablas.Count() > 0 && confirmacion == true)
                 </Template>
             </RadzenDataGridColumn> *@
 
-            <RadzenDataGridColumn Width="8%" TItem="ReunionDTO" Title="@ValidationMessages.Responsable" Filterable="false" Sortable="false">
+            <RadzenDataGridColumn Width="8%" TItem="ReunionDTO" Title="@DiccionarioTraduccionesService.Traducciones["Responsable"]" Filterable="false" Sortable="false">
                 <Template Context="data">
-                    <RadzenText class="mb-0 tipografia">@data.Responsable</RadzenText>
+                    @if (!string.IsNullOrWhiteSpace(data.Responsable) && DiccionarioTraduccionesService.Traducciones.ContainsKey(data.Responsable))
+                    {
+                        @DiccionarioTraduccionesService.Traducciones[data.Responsable]
+                    }
+                    else
+                    {
+                        <span>Responsable no definido</span>
+                    }
                 </Template>
             </RadzenDataGridColumn>
 
@@ -211,7 +228,7 @@ else if (PizarraData.reudiatablas.Count() > 0 && confirmacion == true)
                 </Template>
             </RadzenDataGridColumn> *@
 
-            <RadzenDataGridColumn Width="6%" TItem="ReunionDTO" Title="@ValidationMessages.Requisicion" Filterable="false" Sortable="false">
+            <RadzenDataGridColumn Width="6%" TItem="ReunionDTO" Title="@DiccionarioTraduccionesService.Traducciones["Requisicion"]" Filterable="false" Sortable="false">
                 <Template Context="data">
                     <RadzenText class="mb-0 tipografia">@data.RdcodRequi</RadzenText>
                 </Template>
@@ -229,13 +246,13 @@ else if (PizarraData.reudiatablas.Count() > 0 && confirmacion == true)
                 </Template>
             </RadzenDataGridColumn> *@
 
-            <RadzenDataGridColumn Width="7%" TItem="ReunionDTO" Title="@ValidationMessages.FTrabajo" Filterable="false" Sortable="false">
+            <RadzenDataGridColumn Width="7%" TItem="ReunionDTO" Title="@DiccionarioTraduccionesService.Traducciones["FTrabajo"]" Filterable="false" Sortable="false">
                 <Template Context="data">
                     <RadzenText class="mb-0 tipografia">@data.RdfecTra.ToString("dd/MM/yyyy")</RadzenText>
                 </Template>
             </RadzenDataGridColumn>
 
-            <RadzenDataGridColumn Width="5%" TItem="ReunionDTO" Title="@ValidationMessages.Acciones" Filterable="false" Sortable="false">
+            <RadzenDataGridColumn Width="5%" TItem="ReunionDTO" Title="@DiccionarioTraduccionesService.Traducciones["Acciones"]" Filterable="false" Sortable="false">
                 <Template Context="data">
                     @if (libro == 0)
                     {
@@ -250,12 +267,13 @@ else if (PizarraData.reudiatablas.Count() > 0 && confirmacion == true)
 else if (PizarraData.reudiatablas.Count() == 0 && confirmacion == true)
 {
     <div style="text-align: center; padding: 20px; font-size: 18px; color: gray;">
-        <p>@ValidationMessages.NoHayRegistros</p>
+        <p>@DiccionarioTraduccionesService.Traducciones["NoHayRegistros"]</p>
     </div>
 }
 
     }
 </body>
+}
 <style>
     .tipografia {
     white-space: normal !important;
@@ -371,7 +389,8 @@ else if (PizarraData.reudiatablas.Count() == 0 && confirmacion == true)
     private int idrespo = 0;
     private string Codigo { get; set; } = "Todo";
     private string Status { get; set; } = "Todo"; //Status
-        private int idPais {get; set;}
+    private int idPais {get; set;}
+    private bool traduccionesCargadas = false;
 
     private async Task CreateData()
 
@@ -380,6 +399,11 @@ else if (PizarraData.reudiatablas.Count() == 0 && confirmacion == true)
         var user = authState.User;
         claims = Enumerable.ToList(user.Claims);
 
+        var idPaisClaim = claims.FirstOrDefault(c => c.Type == "IdPais")?.Value;
+        if (int.TryParse(idPaisClaim, out int paisTemp))
+        {
+            idPais = paisTemp;
+        }
     }
 
 
@@ -389,9 +413,14 @@ else if (PizarraData.reudiatablas.Count() == 0 && confirmacion == true)
         fecha1 = DateTime.Now;
         fecha2 = DateTime.Now;
         await CreateData();
+        await LocalizationService.EstablecerCulturaDesdeTokenAsync();
+        CultureInfo.CurrentCulture = CultureInfo.DefaultThreadCurrentCulture;
+        CultureInfo.CurrentUICulture = CultureInfo.DefaultThreadCurrentUICulture;
+        await DiccionarioTraduccionesService.CargarTraduccionesAsync();
+        traduccionesCargadas = true;
         await KsfData.Getksf();
         await RespoReuData.GetResReu();
-
+        RespoReuData.resporeus = RespoReuData.resporeus.Where(a => a.Rrdesc == claims.FirstOrDefault(c => c.Type.Contains("Empresa"))?.Value | string.IsNullOrEmpty(a.Rrdesc)).ToList();
         PizarraData.reudiatablas = new List<ReunionDTO>();
         if (claims != null && claims.Count > 1 && (claims[1]?.Value == "Admin" || claims[1]?.Value == "SuperAdmin" || claims[1]?.Value == "PrimeUser"))
         {
@@ -446,12 +475,13 @@ else if (PizarraData.reudiatablas.Count() == 0 && confirmacion == true)
                 {
                     d.Ksf = KsfData.ksfs.Where(x => x.Idksf == d.Idksf).Select(x => idPais == 5 ? x.KsfEnglish : x.KsfNombre).FirstOrDefault();
                     var nombreOriginal = RespoReuData.resporeus.Where(x => x.IdResReu == d.IdResReu).FirstOrDefault()?.Rrnombre ?? "";
-                    d.Responsable = ValidationMessages.ResourceManager.GetString(ValidationMessages.MapResponsableKey(nombreOriginal),CultureInfo.CurrentUICulture);
+                    var clave = ValidationMessages.MapResponsableKey(nombreOriginal);
+                    d.Responsable = clave; 
                 }
         } 
         else
         {
-            mensaje = ValidationMessages.NoRechazada;
+            mensaje = DiccionarioTraduccionesService.Traducciones["NoRechazada"];
             NotificationService.Notify(Notificar.Notificacion("advertencia", mensaje, ""));
 
         }
@@ -475,13 +505,13 @@ else if (PizarraData.reudiatablas.Count() == 0 && confirmacion == true)
 
     if (validacion == true)
     {
-        mensaje = ValidationMessages.ReunionQuincenalAgregada;
+        mensaje = DiccionarioTraduccionesService.Traducciones["ReunionQuincenalAgregada"];
         NotificationService.Notify(Notificar.Notificacion("exito", mensaje, ""));
         await buscar();
     }
     else
     {
-        mensaje = ValidationMessages.NoAgregada;
+        mensaje = DiccionarioTraduccionesService.Traducciones["NoAgregada"];
         NotificationService.Notify(Notificar.Notificacion("advertencia", mensaje, ""));
     }
     
@@ -495,13 +525,13 @@ else if (PizarraData.reudiatablas.Count() == 0 && confirmacion == true)
         bool validacion = await PizarraData.UpdateDiscrepancia3(registro, registro.IdReuDia);
         if (validacion == true)
         {
-            mensaje = ValidationMessages.DiscrepanciaRechazada;
+            mensaje = DiccionarioTraduccionesService.Traducciones["DiscrepanciaRechazada"];
             NotificationService.Notify(Notificar.Notificacion("exito", mensaje, ""));
             await buscar();
         }
         else
         {
-            mensaje = ValidationMessages.NoRechazada;
+            mensaje = DiccionarioTraduccionesService.Traducciones["NoRechazada"];
             NotificationService.Notify(Notificar.Notificacion("advertencia", mensaje, ""));
         }
     }
