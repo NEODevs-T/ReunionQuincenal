@@ -2,27 +2,42 @@
 @inject ILocalStorageService LocalStorage
 @inject AuthenticationStateProvider AuthStateProvider
 @inject ILocalStorageService LocalStorage
+@inject IDiccionarioTraduccionesService DiccionarioTraduccionesService
+@inject LocalizationService LocalizationService
+@inject ITranslationService Translator
 
-@using System.Globalization
 @using ReunionWeb.Resources
+@using System.Globalization
+@using ReunionWeb.Services
 
+
+@if (!traduccionesCargadas || dataIsLoaded == 1)
+{
+
+}
+else
+{
 <AuthorizeView>
     <Authorized>
-       <strong>¡@ValidationMessages.Hola @context.User.Identity?.Name!</strong> 
-         <BSButton   Color="BSColor.Danger"  Size="Size.ExtraSmall" OnClick="Logout">  @ValidationMessages.CerrarSesion <span class="oi oi-out"></span></BSButton>
+       <strong>¡@DiccionarioTraduccionesService.Traducciones["Hola"] @context.User.Identity?.Name!</strong> 
+         <BSButton   Color="BSColor.Danger"  Size="Size.ExtraSmall" OnClick="Logout">  @DiccionarioTraduccionesService.Traducciones["CerrarSesion"] <span class="oi oi-out"></span></BSButton>
     </Authorized>
     <NotAuthorized>
-                 <BSButton   Color="BSColor.Success"  Size="Size.ExtraSmall" OnClick="Login">  @ValidationMessages.IniciarSesion <span class="oi oi-in"></span></BSButton>
+                 <BSButton   Color="BSColor.Success"  Size="Size.ExtraSmall" OnClick="Login">  @DiccionarioTraduccionesService.Traducciones["IniciarSesion"] <span class="oi oi-in"></span></BSButton>
 
     </NotAuthorized>
 </AuthorizeView>
-
+}
 
 @code {
                 [CascadingParameter]
     private Task<AuthenticationState>? authenticationState { get; set; }
     private int idPais { get; set; }
     private List<Claim> claims { get; set; }
+
+    private bool traduccionesCargadas = false;
+    private int dataIsLoaded = 0;
+
 
     private async Task CreateData()
     {
@@ -34,26 +49,46 @@
         if (int.TryParse(idPaisClaim, out int paisTemp))
         {
             idPais = paisTemp;
-            var culture = new System.Globalization.CultureInfo(paisTemp == 5 ? "en" : "es");
-            System.Globalization.CultureInfo.DefaultThreadCurrentCulture = culture;
-            System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = culture;
-            await LocalStorage.SetItemAsync("userCulture", culture.Name);
         }
+    }
+
+        protected override async Task OnInitializedAsync()
+    {
+        await CreateData();
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        await LocalizationService.EstablecerCulturaDesdeTokenAsync();
+        CultureInfo.CurrentCulture = CultureInfo.DefaultThreadCurrentCulture;
+        CultureInfo.CurrentUICulture = CultureInfo.DefaultThreadCurrentUICulture;
+        await DiccionarioTraduccionesService.CargarTraduccionesAsync();
+        traduccionesCargadas = true;
     }
 
     void Login()
     {
         NavigationManager.NavigateTo("login");
     }
+
     async Task Logout()
     {
-        await LocalStorage.RemoveItemAsync("OdtValue");
-        await LocalStorage.RemoveItemAsync("ReunionQuincenalToken");
-        await AuthStateProvider.GetAuthenticationStateAsync();
-        var cultureName = await LocalStorage.GetItemAsync<string>("userCulture");
-        string redirectUrl = cultureName == "en" 
-            ? $"{NavigationManager.BaseUri}en/home" 
-            : $"{NavigationManager.BaseUri}es/inicio";
-        NavigationManager.NavigateTo(redirectUrl, forceLoad: true);
+    await LocalStorage.RemoveItemAsync("OdtValue");
+    await LocalStorage.RemoveItemAsync("ReunionQuincenalToken");
+
+    var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+    var user = authState.User;
+
+    var idPaisClaim = user.Claims.FirstOrDefault(c => c.Type == "IdPais")?.Value;
+
+    string cultureName = "es"; // valor por defecto
+    if (int.TryParse(idPaisClaim, out int paisTemp))
+    {
+        cultureName = paisTemp == 5 ? "en" : "es";
+    }
+
+    string redirectUrl = cultureName == "en"
+        ? $"{NavigationManager.BaseUri}en/home"
+        : $"{NavigationManager.BaseUri}es/inicio";
+
+    NavigationManager.NavigateTo(redirectUrl, forceLoad: true);
     }
 }

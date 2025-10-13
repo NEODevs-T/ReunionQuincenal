@@ -211,80 +211,79 @@
     {
         mensaje = "";
         user.Proyecto = "ReunionQuincenal";
-        var culture = idioma == 1 ? new CultureInfo("es") : new CultureInfo("en");
+
+        // Establecer cultura inicial según idioma seleccionado
+        var culturaInicial = idioma == 1 ? "es" : "en";
+        var culture = new CultureInfo(culturaInicial);
         CultureInfo.DefaultThreadCurrentCulture = culture;
         CultureInfo.DefaultThreadCurrentUICulture = culture;
-        if (e.Validate())
+
+        if (!e.Validate())
+            return;
+
+        carga = true;
+
+        var result = await Http.PostAsJsonAsync("http://neo.paveca.com.ve/Authentication/api/Auth/Login", user);
+        var ValidarToken = await result.Content.ReadAsStringAsync();
+
+        if (string.IsNullOrEmpty(ValidarToken))
         {
-            carga = true;
-            var result = await Http.PostAsJsonAsync("http://neo.paveca.com.ve/Authentication/api/Auth/Login", user);
-            var ValidarToken = await result.Content.ReadAsStringAsync();
-            if (ValidarToken != null)
-            {
-                if (ValidarToken == "NotFoundUser")
-                {
-                    if (idioma == 1)
-                    {
-                        mensaje = "Verifique el usuario.";
-                        NotificationService.Notify(Notificar.Notificacion("advertencia", "Atención",mensaje));
-                    }else if(idioma == 2)
-                    {
-                        mensaje = "Check the user.";
-                        NotificationService.Notify(Notificar.Notificacion("advertencia", "Attention",mensaje));
-                    }
-                    carga = false;
-                }
-                else if (ValidarToken == "WrongPassword")
-                {
-                    if (idioma == 1)
-                    {
-                        mensaje = "Contraseña Incorrecta.";
-                        NotificationService.Notify(Notificar.Notificacion("error", "Atención", mensaje));
-                    }else if(idioma ==2)
-                    {
-                        mensaje = "Check the password";
-                        NotificationService.Notify(Notificar.Notificacion("advertencia", "Attention",mensaje));
-                    }
-                    carga = false;
-                }
-                else if (ValidarToken == "null")
-                {
-                    if (idioma == 1)
-                    {
-                        mensaje = "Este usuario no está registrado en este proyecto."; 
-                        NotificationService.Notify(Notificar.Notificacion("error", "Atención", mensaje));
-                    }else if (idioma == 2)
-                    {
-                        mensaje = "This user don't register in this project";
-                        NotificationService.Notify(Notificar.Notificacion("error", "Attention", mensaje));
-                    }
-                    carga = false;
-                }
-                else
-                {
-                    if (idioma == 1)
-                    {
-                        mensaje = "Accediendo...";
-                    }else if (idioma == 2)
-                    {
-                        mensaje = "Accessing...";
-                    }
-                    Console.WriteLine(ValidarToken);
-                    await LocalStorage.SetItemAsync("ReunionQuincenalToken", ValidarToken);
-                    var authState = await AuthStateProvider.GetAuthenticationStateAsync();
-                    var userA = authState.User;
-                    claims = Enumerable.ToList(userA.Claims);
-                    user = new UserLoginDto();
-                    carga = false;
-                    mensaje = ""; 
-                    var cultureName = idioma == 2 ? "en" : "es";
-                    string homeUrl = cultureName == "en" 
-                        ? $"{NavigationManager.BaseUri}en/home" 
-                        : $"{NavigationManager.BaseUri}es/inicio";
-                    NavigationManager.NavigateTo(homeUrl);
-                }
-            }
+            carga = false;
+            return;
         }
+
+        switch (ValidarToken)
+        {
+            case "NotFoundUser":
+                mensaje = idioma == 1 ? "Verifique el usuario." : "Check the user.";
+                NotificationService.Notify(Notificar.Notificacion("advertencia", idioma == 1 ? "Atención" : "Attention", mensaje));
+                break;
+
+            case "WrongPassword":
+                mensaje = idioma == 1 ? "Contraseña Incorrecta." : "Check the password";
+                NotificationService.Notify(Notificar.Notificacion("error", idioma == 1 ? "Atención" : "Attention", mensaje));
+                break;
+
+            case "null":
+                mensaje = idioma == 1
+                    ? "Este usuario no está registrado en este proyecto."
+                    : "This user isn't registered in this project.";
+                NotificationService.Notify(Notificar.Notificacion("error", idioma == 1 ? "Atención" : "Attention", mensaje));
+                break;
+
+            default:
+                // Token válido: guardar y aplicar cultura desde el claim
+                await LocalStorage.SetItemAsync("ReunionQuincenalToken", ValidarToken);
+
+                var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+                var userA = authState.User;
+                claims = userA.Claims.ToList();
+
+                var idPaisClaim = claims.FirstOrDefault(c => c.Type == "IdPais")?.Value;
+                string cultureName = "es"; // valor por defecto
+
+                if (int.TryParse(idPaisClaim, out int paisTemp))
+                {
+                    cultureName = paisTemp == 5 ? "en" : "es";
+                }
+
+                var culturaFinal = new CultureInfo(cultureName);
+                CultureInfo.DefaultThreadCurrentCulture = culturaFinal;
+                CultureInfo.DefaultThreadCurrentUICulture = culturaFinal;
+
+                await LocalStorage.SetItemAsync("userCulture", cultureName);
+
+                user = new UserLoginDto();
+                mensaje = "";
+                string homeUrl = cultureName == "en"
+                    ? $"{NavigationManager.BaseUri}en/home"
+                    : $"{NavigationManager.BaseUri}es/inicio";
+
+                NavigationManager.NavigateTo(homeUrl);
+                break;
+        }
+
+        carga = false;
     }
 
 }
