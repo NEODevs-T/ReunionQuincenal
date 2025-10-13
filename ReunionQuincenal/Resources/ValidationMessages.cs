@@ -183,6 +183,7 @@ namespace ReunionWeb.Resources
         public static string PendienteFaltaRepuesto => _resourceManager.GetString("PendienteFaltaRepuesto", CultureInfo.CurrentUICulture);
         public static string FormatoDeReunion => _resourceManager.GetString("FormatoDeReunion", CultureInfo.CurrentUICulture);
         public static string Horas => _resourceManager.GetString("Horas", CultureInfo.CurrentUICulture);
+        public static string NoResponsable => _resourceManager.GetString("NoResponsable", CultureInfo.CurrentUICulture);
 
 
         public static string MapResponsableKey(string nombre)

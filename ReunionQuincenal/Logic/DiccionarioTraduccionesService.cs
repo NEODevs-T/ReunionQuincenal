@@ -46,7 +46,7 @@ namespace ReunionWeb.Services
                 "Linea", "Listo", "LlDisp", "MExito", "Mes",
                 "NEquipo", "NFDatos", "NPA1", "NPA2", "NSDatos",
                 "Nequipos", "NoAgregada", "NoCargadoP", "NoConforme", "NoExisteEseCargo",
-                "NoHayDatos", "NoHayDatos2", "NoHayDescrip", "NoHayEquipos", "NoHayFecha",
+                "NoHayDatos", "NoHayDatos2", "NoResponsable", "NoHayDescrip", "NoHayEquipos", "NoHayFecha",
                 "NoHayFiltros", "NoHayRegistros", "NoHayRegistros2", "NoRechazada", "Nombre",
                 "NombreDelEquipo", "NuevaFechaDeTrabajo", "Nuevo", "ODT", "ObservacionesDeCalidad",
                 "Ordenar", "OrgDelProducto", "ParadaMayor", "Pendiente", "PendientesDiaria", "PendienteFaltaRepuesto", "PendientesLibro",

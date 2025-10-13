@@ -39,12 +39,12 @@ else
         </RadzenColumn>
         <RadzenColumn Width="250px">
             <RadzenLabel Text="@DiccionarioTraduccionesService.Traducciones["Empresa"]" />
-            <RadzenDropDown @bind-Value="empresa" Data="@empresas" TextProperty="Nombre" ValueProperty="Id" Style="width: 100%;" Placeholder="Seleccione una empresa"
+            <RadzenDropDown @bind-Value="empresa" Data="@empresas" TextProperty="Nombre" ValueProperty="Id" Style="width: 100%;" Placeholder="@DiccionarioTraduccionesService.Traducciones["SeleccioneUnaEmpresa"]"
                             Change="@(args => OnEmpresaChanged(args))" />
         </RadzenColumn>
         <RadzenColumn Width="250px">
-            <RadzenLabel Text="@DiccionarioTraduccionesService.Traducciones["Area"]" />
-            <RadzenDropDown @bind-Value="area" Data="@areas" TextProperty="Nombre" ValueProperty="Id" Style="width: 100%;" Placeholder="Seleccione un centro" Disabled="@((string.IsNullOrEmpty(empresa)) || !areas.Any())" />
+            <RadzenLabel Text="@DiccionarioTraduccionesService.Traducciones["Centro"]" />
+            <RadzenDropDown @bind-Value="area" Data="@areas" TextProperty="Nombre" ValueProperty="Id" Style="width: 100%;" Placeholder="@DiccionarioTraduccionesService.Traducciones["SeleccioneUnCentro"]" Disabled="@((string.IsNullOrEmpty(empresa)) || !areas.Any())" />
         </RadzenColumn>
         <RadzenColumn Width="150px" Style="display: flex; align-items: flex-start; padding-top: 30px;">
             <RadzenButton Text="@DiccionarioTraduccionesService.Traducciones["Consultar"]"

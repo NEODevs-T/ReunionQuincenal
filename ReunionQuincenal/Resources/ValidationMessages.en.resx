@@ -104,6 +104,7 @@
 <data name="RequiredPassword" xml:space="preserve"><value>Please enter the password.</value></data>
 <data name="RequiredUserName" xml:space="preserve"><value>Please enter the username.</value></data>
 <data name="Responsable" xml:space="preserve"><value>Responsible</value></data>
+<data name="NoResponsable" xml:space="preserve"><value>Responsible not defined</value></data>
 <data name="Reunion" xml:space="preserve"><value>Meeting</value></data>
 <data name="SArea" xml:space="preserve"><value>Select the area.</value></data>
 <data name="SCentro" xml:space="preserve"><value>Select the center.</value></data>
