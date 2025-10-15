@@ -151,11 +151,11 @@ else if (PizarraData.reudiatablas.Count() > 0 && confirmacion == true)
 
     <RadzenDataGrid @ref="reunion" AllowFiltering="true" FilterPopupRenderMode="PopupRenderMode.OnDemand"
         class="tabla-radzen" AllowPaging="true" PageSize="10" AllowSorting="true"
-        Data="@(PizarraData.reudiatablas.Where(x => 
-            (IdKsf == 0 || x.Ksf == KsfData.ksfs.FirstOrDefault(k => k.Idksf == IdKsf)?.KsfNombre) &&
-            (idrespo == 0 || x.IdResReu == idrespo) &&
-            (Codigo == "Todo" || x.RdcodDis == Codigo) &&
-            (Status == "Todo" || x.Rdstatus == Status)))"
+Data="@(PizarraData.reudiatablas.Where(x =>
+    (IdKsf == 0 || x.Idksf == IdKsf) &&
+    (idrespo == 0 || x.IdResReu == idrespo) &&
+    (Codigo == "Todo" || x.RdcodDis == Codigo) &&
+    (Status == "Todo" || x.Rdstatus == Status)))"
         TItem="ReunionDTO">
 
 

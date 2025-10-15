@@ -127,7 +127,7 @@ else
                     {
                         <BSCol Column="2">
                             <BSLabel>@DiccionarioTraduccionesService.Traducciones["Tiempo"] (@DiccionarioTraduccionesService.Traducciones["Horas"])</BSLabel>
-                            <BSInput InputType="InputType.Number" IsDisabled @bind-Value="DiscForm.Rdtiempo" />
+                            <BSInput InputType="InputType.Number" Min="0" IsDisabled @bind-Value="DiscForm.Rdtiempo" />
                      </BSCol>
 
                     }
@@ -135,7 +135,7 @@ else
                     {
                         <BSCol Column="2">
                             <BSLabel>@DiccionarioTraduccionesService.Traducciones["Tiempo"] (@DiccionarioTraduccionesService.Traducciones["Horas"])</BSLabel>
-                            <BSInput InputType="InputType.Number" @bind-Value="DiscForm.Rdtiempo" />
+                            <BSInput InputType="InputType.Number" Min="0" @bind-Value="DiscForm.Rdtiempo" />
                         </BSCol>
                     }
 
@@ -218,7 +218,7 @@ else
                             {
                                 <BSCol Column="2">
                                     <BSLabel>@DiccionarioTraduccionesService.Traducciones["Requisicion"]</BSLabel>
-                                    <BSInput InputType="InputType.Number" @bind-Value="DiscForm.RdcodRequi" ValidateOnInput="true" />
+                                    <BSInput InputType="InputType.Number" Min="0" @bind-Value="DiscForm.RdcodRequi" ValidateOnInput="true" />
                                 </BSCol>
 
                             }  
@@ -226,7 +226,7 @@ else
 
                                 <BSCol Column="2">
                                     <BSLabel>@DiccionarioTraduccionesService.Traducciones["Requisicion"]</BSLabel>
-                                    <BSInput InputType="InputType.Number" IsDisabled @bind-Value="DiscForm.RdcodRequi" ValidateOnInput="true" />
+                                    <BSInput InputType="InputType.Number" Min="0" IsDisabled @bind-Value="DiscForm.RdcodRequi" ValidateOnInput="true" />
                                 </BSCol>
                             }
                         } 
@@ -264,14 +264,14 @@ else
                         {
                             <BSCol Column="2">
                                 <BSLabel>ODT</BSLabel>
-                                <BSInput InputType="InputType.Text" @bind-Value="DiscForm.Rdodt" ValidateOnInput="true" />
+                                <BSInput InputType="InputType.Number" Min="0" @bind-Value="DiscForm.Rdodt" ValidateOnInput="true" />
                             </BSCol>
                         }
                         else
                         {
                             <BSCol Column="2">
                                 <BSLabel>ODT</BSLabel>
-                                <BSInput InputType="InputType.Text" IsDisabled @bind-Value="DiscForm.Rdodt" ValidateOnInput="true" />
+                                <BSInput InputType="InputType.Number" Min="0" IsDisabled @bind-Value="DiscForm.Rdodt" ValidateOnInput="true" />
                          </BSCol>
                         }
                     }
@@ -363,7 +363,7 @@ else
                  <BSRow>
 
 
-                     <BSInput InputType="InputType.Text" hidden @bind-Value="DiscForm.Rdtiempo" />
+                     <BSInput InputType="InputType.Number" hidden @bind-Value="DiscForm.Rdtiempo" />
 
                      @if (planificador == "Admin" || planificador == "Planificador" || planificador == "SuperAdmin")
                     {
@@ -476,14 +476,14 @@ else
                         {
                             <BSCol Column="2">
                                 <BSLabel>ODT</BSLabel>
-                                <BSInput InputType="InputType.Text" @bind-Value="DiscForm.Rdodt" />
+                                <BSInput InputType="InputType.Number" Min="0" @bind-Value="DiscForm.Rdodt" />
                             </BSCol>
                         }
                         else
                         {
                             <BSCol Column="2">
                                 <BSLabel>ODT</BSLabel>
-                                <BSInput InputType="InputType.Text" IsDisabled @bind-Value="DiscForm.Rdodt" />
+                                <BSInput InputType="InputType.Number" Min="0" IsDisabled @bind-Value="DiscForm.Rdodt" />
                          </BSCol>
                         }
                     }
