@@ -718,40 +718,44 @@ else if (dataIsLoaded == 2 && PizarraData.reudiatablas.Count() == 0)
         }
     }
 
-    private async Task BuscarxOdt()
+private async Task BuscarxOdt()
+{
+    if (valueodt && !string.IsNullOrEmpty(BuscarOdt))
     {
-
-
-        if (valueodt && !string.IsNullOrEmpty(BuscarOdt))
+        if (IdCentro != 0 && IdDiv != 0)
         {
-            if (IdCentro != 0 & IdDiv != 0)
+            if (dataIsLoaded != 1)
             {
+                dataIsLoaded = 1;
 
-
-                if (dataIsLoaded != 1)
-                {
-                    dataIsLoaded = 1;
-                    listareu = await PizarraData.GetByODT(BuscarOdt, IdCentro.ToString(), IdDiv.ToString());
-                    dataIsLoaded = 2;
-
-                }
-
-                if (listareu.Count() > 0)
-                { await LocalStorage.SetItemAsStringAsync("OdtValue", BuscarOdt); }
+                listareu = await PizarraData.GetByODT(BuscarOdt, IdCentro.ToString(), IdDiv.ToString(), 3);
+                
+                dataIsLoaded = 2;
             }
-            else
-            {
 
-                NotificationService.Notify(Notificar.Notificacion("advertencia", DiccionarioTraduccionesService.Traducciones["Atencion"], DiccionarioTraduccionesService.Traducciones["SVLista"]));
+            if (listareu.Count() > 0)
+            {
+                await LocalStorage.SetItemAsStringAsync("OdtValue", BuscarOdt);
             }
         }
         else
         {
-            NotificationService.Notify(Notificar.Notificacion("advertencia", DiccionarioTraduccionesService.Traducciones["ODT"], ""));
+            NotificationService.Notify(Notificar.Notificacion(
+                "advertencia",
+                DiccionarioTraduccionesService.Traducciones["Atencion"],
+                DiccionarioTraduccionesService.Traducciones["SVLista"]
+            ));
         }
-
-
     }
+    else
+    {
+        NotificationService.Notify(Notificar.Notificacion(
+            "advertencia",
+            DiccionarioTraduccionesService.Traducciones["ODT"],
+            ""
+        ));
+    }
+}
 
     private async Task Cambio()
     {

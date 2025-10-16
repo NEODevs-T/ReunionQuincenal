@@ -46,13 +46,14 @@ public class PizarraData : IPizarraData
         return calentrabajo = await cliente.GetFromJsonAsync<List<CalendarioTrabajoDTO>>(url) ?? new List<CalendarioTrabajoDTO>();
     }
 
-    public async Task<List<ReunionDTO>> GetByODT(string ODT, string idcentro, string iddiv)
+    public async Task<List<ReunionDTO>> GetByODT(string ODT, string idcentro, string iddiv, int reunion)
     {
-        url = $"{BaseUrl}GetByODT/{ODT}/{idcentro}/{iddiv}";
+        var encodedOdt = Uri.EscapeDataString(ODT.Trim());
+        url = $"{BaseUrl}/GetByODT/{encodedOdt}/{idcentro}/{iddiv}/{reunion}";
         return reunionditablas = await _http.GetFromJsonAsync<List<ReunionDTO>>(url) ?? new List<ReunionDTO>();
-
     }
 
+    
     //obtener discrepancias para pendientes y reunion 
     public async Task<List<ReunionDTO>> GetPendientes(string idcentro, string iddiv, DateTime f1, DateTime f2, string tipo, string estado)
     {

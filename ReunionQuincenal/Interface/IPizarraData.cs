@@ -16,7 +16,7 @@ interface IPizarraData
     List<ReunionDTO> listaCambiReu { get; set; }
 
     Task<List<CalendarioTrabajoDTO>> GetTrabajosCalendario(string pais, string centro, string division);
-    Task<List<ReunionDTO>> GetByODT(string ODT, string idcentro, string iddiv);
+    Task<List<ReunionDTO>> GetByODT(string ODT, string idcentro, string iddiv, int reunion);
     Task<List<ReunionDTO>> GetPendientes(string idcentro, string iddiv, DateTime f1, DateTime f2, string tipo, string estado);
     Task<List<ReunionDTO>> GetHistoricos(string idcentro, string iddiv, DateTime f1, DateTime f2, string tipo, string estado);
     Task<ReunionDTO> GetDiscrepantacia(int id);
