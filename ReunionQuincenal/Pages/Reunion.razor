@@ -103,7 +103,7 @@ else
 <p>
 </p>
 
-@if (PizarraData.reudiatablas.Count() > 0 && dataIsLoaded == 2)
+@if (registrosVisibles.Count > 0 && dataIsLoaded == 2)
 {
     <BSContainer>
 
@@ -135,11 +135,9 @@ else
                 </BSTR>
             </BSTHead>
             <BSTBody>
-                @foreach (var d in PizarraData.reudiatablas)
+                @foreach (var d in registrosVisibles)
                 {
-                    @if (d.Rdstatus != "Rechazada" && d.Rdstatus != "Listo" & d.RdfecTra <= DateTime.Now | (d.Rdstatus != "Listo" & (d.Rdodt == "" | d.Rdodt is null)))
-                    //@if (d.Rdstatus != "Listo")
-                    {
+                        //@if (d.Rdstatus != "Listo")
                         @if (Codigo == d.RdcodDis | Codigo == "Todo")
                         {
 
@@ -224,7 +222,6 @@ else
 
                             </BSTR>
                         }
-                    }
                 }
 
 
@@ -233,11 +230,11 @@ else
         </BSTable>
     </BSContainer>
 }
-else if (dataIsLoaded == 1 && PizarraData.reudiatablas.Count() == 0)
+else if (dataIsLoaded == 1 && registrosVisibles.Count == 0)
 {
     <div class="loader"></div>
 }
-else if (dataIsLoaded == 2 && PizarraData.reudiatablas.Count() == 0)
+else if (dataIsLoaded == 2 && registrosVisibles.Count == 0)
 {
     <div style="text-align: center; padding: 20px; font-size: 18px; color: gray;">
     <p>@DiccionarioTraduccionesService.Traducciones["NoHayDatos2"]</p>
@@ -287,6 +284,13 @@ else if (dataIsLoaded == 2 && PizarraData.reudiatablas.Count() == 0)
 
 
     private List<Claim> claims { get; set; }
+
+        List<ReunionDTO> registrosVisibles => PizarraData.reudiatablas
+        .Where(d => d.Rdstatus != "Rechazada"
+                && d.Rdstatus != "Listo"
+                && d.RdfecTra.Date == DateTime.Now.Date
+                && (string.IsNullOrEmpty(d.Rdodt)))
+        .ToList();
 
     private async Task CreateData()
 
