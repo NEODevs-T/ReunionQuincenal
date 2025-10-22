@@ -307,7 +307,7 @@ else
                                                         }
                                                         </BSCol>
                                                         <BSCol>
-                                                            @if (UsrRol == "Admin")
+                                                            @if (UsrAdmin != "PrimeUser")
                                                         {
                                                             <BSButton Color="BSColor.Primary" IsOutlined @onclick="(() => GetHistory(d.IdReuDia))" Target="History"><i class="oi oi-eye"></i></BSButton>
                                                         }
