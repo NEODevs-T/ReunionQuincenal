@@ -72,8 +72,8 @@ else
         <BSCol ColumnLarge="3" ColumnSmall="6">
             <BSLabel>@DiccionarioTraduccionesService.Traducciones["Estado"]</BSLabel>
             <BSInput InputType="InputType.Select" @bind-Value="Status" IsDisabled=@valueodt>
-                <option value="Total Pendiente">@DiccionarioTraduccionesService.Traducciones["TotalPendiente"]</option>
                 <option value="Todo">@DiccionarioTraduccionesService.Traducciones["Todo"]</option>
+                <option value="Total Pendiente">@DiccionarioTraduccionesService.Traducciones["TotalPendiente"]</option>
                 <option value="Pendiente">@DiccionarioTraduccionesService.Traducciones["Pendiente"]</option>
                 <option value="Pendiente-Responsable">@DiccionarioTraduccionesService.Traducciones["Pendiente"] / @DiccionarioTraduccionesService.Traducciones["Responsable"]</option>
                 <option value="No Conforme">@DiccionarioTraduccionesService.Traducciones["NoConforme"]</option>
