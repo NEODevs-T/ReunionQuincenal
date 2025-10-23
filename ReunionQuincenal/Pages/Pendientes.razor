@@ -307,7 +307,7 @@ else
                                                         }
                                                         </BSCol>
                                                         <BSCol>
-                                                            @if (UsrAdmin != "PrimeUser")
+                                                            @if (UsrAdmin == "Admin")
                                                         {
                                                             <BSButton Color="BSColor.Primary" IsOutlined @onclick="(() => GetHistory(d.IdReuDia))" Target="History"><i class="oi oi-eye"></i></BSButton>
                                                         }
@@ -346,7 +346,7 @@ else
                             <BSTR>
                                 <BSTD>@d.Cbfecha</BSTD>
                                     <BSTD>@DiccionarioTraduccionesService.Traducciones[ValidationMessages.MapStatusKey(d.Cbstat)]
-                            )</BSTD>
+                            </BSTD>
                                     <BSTD>@d.Cbuser</BSTD>
                                 </BSTR>
                         }
@@ -397,7 +397,7 @@ else
             }
         </Content>
         <Footer Context="modal">
-            <BSButton MarginStart="Margins.Auto" Color="BSColor.Success" @onclick="modal.HideAsync">Aceptar</BSButton>
+            <BSButton MarginStart="Margins.Auto" Color="BSColor.Success" @onclick="modal.HideAsync">@DiccionarioTraduccionesService.Traducciones["Aceptar"]</BSButton>
 
         </Footer>
     </BSModal>
@@ -619,12 +619,18 @@ else if (dataIsLoaded == 2 && PizarraData.reudiatablas.Count() == 0)
         //TODO: Crear logica con funcion qur retorne esto.se usa en hoistoricos e impresiones tambien
         switch (claims.FirstOrDefault(c => c.Type.Contains("role"))?.Value)
         {
-            
             case "Admin":
+                UsrAdmin = "Admin";
+                await MaestraData.GetCentrosxEmpresa("All" + claims.FirstOrDefault(c => c.Type.Contains("IdEmpresa"))?.Value);
+                break;
+
             case "PrimeUser":
+                UsrAdmin = "PrimeUser";
+                await MaestraData.GetCentrosxEmpresa("All" + claims.FirstOrDefault(c => c.Type.Contains("IdEmpresa"))?.Value);
+                break;
+
             case "SuperAdmin":
                 UsrAdmin = "SuperAdmin";
-                UsrAdmin = "PrimeUser";
                 await MaestraData.GetCentrosxEmpresa("All" + claims.FirstOrDefault(c => c.Type.Contains("IdEmpresa"))?.Value);
                 break;
 

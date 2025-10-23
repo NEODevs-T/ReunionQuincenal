@@ -50,7 +50,7 @@ namespace ReunionWeb.Services
                 "NoHayFiltros", "NoHayRegistros", "NoHayRegistros2", "NoRechazada", "Nombre",
                 "NombreDelEquipo", "NuevaFechaDeTrabajo", "Nuevo", "ODT", "ObservacionesDeCalidad",
                 "Ordenar", "OrgDelProducto", "ParadaMayor", "Pendiente", "PendientesDiaria", "PendienteFaltaRepuesto", "PendientesLibro",
-                "Personal", "PlanDeAccion", "Planificacion", "PorcentajeAsistencia", "PorcentajeDeAsistencia",
+                "PendienteResponsable","Personal", "PlanDeAccion", "Planificacion", "PorcentajeAsistencia", "PorcentajeDeAsistencia",
                 "PorcentajeGlobal", "Presencia", "ProximaFecha", "ProximaParada", "RExitoso",
                 "RHorario", "Reload", "RequiredPassword", "RequiredUserName", "Requisicion",
                 "Responsable", "Reunion", "ReunionDiariaAgregada", "ReunionesAsistidas", "ReunionQuincenal", "ReunionQuincenalAgregada", 

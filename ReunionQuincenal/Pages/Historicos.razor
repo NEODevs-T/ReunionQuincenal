@@ -239,10 +239,10 @@ else
             <RadzenDataGridColumn TItem="ReunionDTO" Title="@DiccionarioTraduccionesService.Traducciones["Estado"]" Property="Rdstatus" Width="90px">
                 <Template>
                 @{
-                    var clave = context.Rdstatus;
+                    var clave = ValidationMessages.MapStatusKey(context.Rdstatus);
                     var traduccion = DiccionarioTraduccionesService.Traducciones.ContainsKey(clave)
-                    ? DiccionarioTraduccionesService.Traducciones[clave]
-                    : clave;
+                        ? DiccionarioTraduccionesService.Traducciones[clave]
+                        : clave;
                 }
                 <span>@traduccion</span>
                 </Template>

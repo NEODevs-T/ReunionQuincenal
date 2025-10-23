@@ -94,6 +94,7 @@
 <data name="Ordenar" xml:space="preserve"><value>Order</value></data>
 <data name="OrgDelProducto" xml:space="preserve"><value>Product Origin</value></data>
 <data name="Pendiente" xml:space="preserve"><value>Pending</value></data>
+<data name="PendienteResponsable" xml:space="preserve"><value>Pending (Responsible)</value></data>
 <data name="Personal" xml:space="preserve"><value>Personnel</value></data>
 <data name="PlanDeAccion" xml:space="preserve"><value>Action Plan</value></data>
 <data name="Por_Definir" xml:space="preserve"><value>To Be Defined</value></data>
