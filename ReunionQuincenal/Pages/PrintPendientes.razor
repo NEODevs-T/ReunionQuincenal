@@ -79,6 +79,9 @@ else
 <p></p>
 
 <body>
+    
+@if (registrosVisibles.Count > 0 && dataIsLoaded == 2)
+{
     @if (reudiatablas != null && PizarraData.reudiatablas.Count() > 0 && dataIsLoaded == 2)
     {
 
@@ -171,21 +174,16 @@ else
                                             <BSTD>@textoTraducido</BSTD>
                                         }
                                         @{
-                                            var estadoTraducido = d.Rdstatus switch
+                                        var clavee = ValidationMessages.MapStatusKey(d.Rdstatus);
+                                        var estadoTraducido = DiccionarioTraduccionesService.Traducciones.ContainsKey(clavee)
+                                            ? DiccionarioTraduccionesService.Traducciones[clavee]
+                                            : clavee;
+                                        var claseEstado = d.Rdstatus switch
                                             {
-                                                "Listo" => idPais == 5 ? "Ready" : "Listo",
-                                                "Cerrado" => idPais == 5 ? "Closed" : "Cerrado",
-                                                _ => idPais == 5 ? "Pending" : "Pendiente"
+                                            "Listo" => "listo",
+                                            "Cerrado" => "Cerrado",
+                                            _ => "pendiente"
                                             };
-
-                                            var claseEstado = d.Rdstatus switch
-                                            {
-                                                "Listo" => "listo",
-                                                "Cerrado" => "Cerrado",
-                                                _ => "pendiente"
-                                                };
-
-                                            var codRequiTexto = d.RdcodRequi == null ? "N/A" : d.RdcodRequi;
                                         }
                                         <BSTD Class="@claseEstado">@estadoTraducido</BSTD>
                                         <BSTD>@d.Rdodt</BSTD>
@@ -207,10 +205,31 @@ else
             </BSTBody>
 
         </BSTable>
+}
+
+
     }
+
+
+
+
+else if (dataIsLoaded == 2 && registrosVisibles.Count == 0)
+{
+    <div style="text-align: center; padding: 20px; font-size: 18px; color: gray;">
+        <p>@DiccionarioTraduccionesService.Traducciones["NoHayDatos2"]</p>
+    </div>
+}
 </body>
 }
 @code {
+
+        List<ReunionDTO> registrosVisibles => PizarraData.reudiatablas
+        .Where(d => d.Rdstatus != "Rechazada"
+                && d.Rdstatus != "Listo"
+                && d.RdfecTra.Date == DateTime.Now.Date
+                && (string.IsNullOrEmpty(d.Rdodt)))
+        .ToList();
+
     [Parameter]
     public string? accion { get; set; }//centro
     [Parameter]

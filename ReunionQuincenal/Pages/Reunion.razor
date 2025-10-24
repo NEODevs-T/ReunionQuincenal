@@ -176,39 +176,35 @@ else
                                 @{
                                     var nombreResponsable = RespoReuData.resporeus
                                         .FirstOrDefault(x => x.IdResReu == d.IdResReu)?.Rrnombre;
-
                                     var clave = ValidationMessages.MapResponsableKey(nombreResponsable);
                                     var textoTraducido = DiccionarioTraduccionesService.Traducciones.TryGetValue(clave, out var traduccion)
                                         ? traduccion
                                         : nombreResponsable;
                                 }
-                                    @if (nombreResponsable == "Por Definir")
-                                    {
-                                        <BSTD Class="Definir">@textoTraducido</BSTD>
-                                    }
-                                    else
-                                    {
-                                        <BSTD>@textoTraducido</BSTD>
-                                    }
+                                @if (nombreResponsable == "Por Definir")
+                                {
+                                <BSTD Class="Definir">@textoTraducido</BSTD>
+                                }
+                                else
+                                {
+                                <BSTD>@textoTraducido</BSTD>
+                                }
                                 @{
-                                    var estadoTraducido = d.Rdstatus switch
-                                    {
-                                        "Revisar" => idPais == 5 ? "Review" : "Revisar",
-                                        "Listo" => idPais == 5 ? "Ready" : "Listo",
-                                        "Cerrado" => idPais == 5 ? "Closed" : "Cerrado",
-                                        _ => idPais == 5 ? "Pending" : "Pendiente"
-                                    };
-
+                                    var clavee = ValidationMessages.MapStatusKey(d.Rdstatus);
+                                    var estadoTraducido = DiccionarioTraduccionesService.Traducciones.ContainsKey(clavee)
+                                        ? DiccionarioTraduccionesService.Traducciones[clavee]
+                                        : clavee;
                                     var claseEstado = d.Rdstatus switch
                                     {
-                                        "Revisar" => "cabecera",
-                                        "Listo" => "listo",
-                                        "Cerrado" => "Cerrado",
-                                        _ => ""
+                                    "Listo" => "listo",
+                                    "Cerrado" => "Cerrado",
+                                    _ => "pendiente"
                                     };
-                                    var codRequiTexto = d.RdcodRequi ?? "N/A";
                                 }
-                                <BSTD class="@claseEstado">@estadoTraducido</BSTD>
+                                <BSTD Class="@claseEstado">@estadoTraducido</BSTD>
+                                @{
+                                    var codRequiTexto = d.RdcodRequi == null ? "N/A" : d.RdcodRequi;
+                                }
                                 <BSTD>@codRequiTexto</BSTD>
                                 <BSTD>@d.Rdodt</BSTD>
                                 <BSTD>@d.RdfecTra.ToString("dd/MM/yyyy") </BSTD>
