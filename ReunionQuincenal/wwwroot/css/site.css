@@ -289,9 +289,20 @@ textarea {
         content: "An error has occurred."
     }
 
-    .scroll-container {
+.scrollable-container {
+    height: 500px; /* altura fija */
+    width: 1100px;
+    overflow-y: auto;
     overflow-x: auto;
-    width: 100%;
+    display: block;
+}
+
+.scrollable-container1 {
+    height: 480px; /* altura fija */
+    width: 1200px;
+    overflow-y: auto;
+    overflow-x: auto;
+    display: block;
 }
 
 .fixed-grid .rz-datatable-table {

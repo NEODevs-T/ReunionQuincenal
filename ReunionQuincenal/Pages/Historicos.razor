@@ -147,7 +147,7 @@ else
 
 @if (tabla.Count() > 0 && dataIsLoaded == 2)
 {
-
+<div class="scrollable-container">
     <RadzenDataGrid @ref="@ReuTabla" Data="@PizarraData.reudiatablas" class="rz-shadow-2" AllowFiltering="true" AllowColumnResize="true"
         AllowAlternatingRows="true" FilterMode="FilterMode.Advanced" AllowSorting="true" PageSize="30" AllowPaging="true"
         PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true" TItem="ReunionDTO"
@@ -168,13 +168,13 @@ else
         </Template>
         </RadzenDataGridColumn>*@
 
-            <RadzenDataGridColumn TItem="ReunionDTO" Title="#" Frozen="true" Width="35px" Filterable=false>
+            <RadzenDataGridColumn TItem="ReunionDTO" Title="#" Width="35px" Filterable=false>
                 <Template>
 
                     @(tabla.IndexOf(context) + 1)
                 </Template>
             </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="ReunionDTO" Title="@DiccionarioTraduccionesService.Traducciones["Linea"]" Frozen="true" Property="Rdarea" Width="80px">
+            <RadzenDataGridColumn TItem="ReunionDTO" Title="@DiccionarioTraduccionesService.Traducciones["Linea"]" Property="Rdarea" Width="80px">
                 <Template>
                     @context.Rdarea
                 </Template>
@@ -182,13 +182,13 @@ else
 
 
 
-            <RadzenDataGridColumn TItem="ReunionDTO" Title="@DiccionarioTraduccionesService.Traducciones["CodigoDeEquipo"]" Frozen="true" Property="RdcodEq" Width="80px">
+            <RadzenDataGridColumn TItem="ReunionDTO" Title="@DiccionarioTraduccionesService.Traducciones["CodigoDeEquipo"]" Property="RdcodEq" Width="80px">
                 <Template>
                     @context.RdcodEq
                 </Template>
             </RadzenDataGridColumn>
 
-            <RadzenDataGridColumn TItem="ReunionDTO" Title="@DiccionarioTraduccionesService.Traducciones["NombreDelEquipo"]" Frozen="true" Property="RdcodEq" Width="80px">
+            <RadzenDataGridColumn TItem="ReunionDTO" Title="@DiccionarioTraduccionesService.Traducciones["NombreDelEquipo"]" Property="RdcodEq" Width="80px">
                 <Template>
                     @(string.IsNullOrWhiteSpace(context.EnombreEam) ? "EQUIPO NO ENCONTRADO" : context.EnombreEam)
                 </Template>
@@ -264,6 +264,7 @@ else
 
         </Columns>
     </RadzenDataGrid>
+    </div>
 }
 else if (dataIsLoaded == 1 && tabla.Count() == 0)
 {
