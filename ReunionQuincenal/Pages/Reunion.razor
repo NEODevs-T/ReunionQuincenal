@@ -390,7 +390,11 @@ else if (dataIsLoaded == 2 && registrosVisibles.Count == 0)
     }
     public async Task PrintDocument()
     {
-        await IJS.InvokeAsync<object>("open", new object[] { $"TablaReunion/{IdCentro.ToString()}/{IdDiv.ToString()}/{DateTime.Now.AddDays(-1).ToString("dd-MM-yyyy")}/{DateTime.Now.ToString("dd-MM-yyyy")}/1", "_blank" });
+        string idiomaRuta = idPais == 5 ? "en" : "es";
+        string nombrePagina = idPais == 5 ? "TableMeeting" : "TablaReunion";
+        string url = $"{idiomaRuta}/{nombrePagina}/{IdCentro}/{IdDiv}/{DateTime.Now.AddDays(-1):dd-MM-yyyy}/{DateTime.Now:dd-MM-yyyy}/1";
+        await IJS.InvokeAsync<object>("open", new object[] { url, "_blank" });
+        //await IJS.InvokeAsync<object>("open", new object[] { $"TablaReunion/{IdCentro.ToString()}/{IdDiv.ToString()}/{DateTime.Now.AddDays(-1).ToString("dd-MM-yyyy")}/{DateTime.Now.ToString("dd-MM-yyyy")}/1", "_blank" });
     }
 
 }

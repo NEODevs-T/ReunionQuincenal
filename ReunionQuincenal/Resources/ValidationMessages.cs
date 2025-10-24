@@ -216,43 +216,6 @@ namespace ReunionWeb.Resources
                 _ => status // fallback por si no hay traducción
             };
         }
-
-        public static string TraducirKsf(int idPais, int idKsf, List<KsfDTO> ksfs)
-        {
-            var ksf = ksfs.FirstOrDefault(x => x.Idksf == idKsf);
-            if (ksf == null) return string.Empty;
-
-            return idPais == 5 ? ksf.KsfEnglish : ksf.KsfNombre;
-        }
-
-        public static string TraducirKsfManual(string ksfOriginal, int idPais)
-{
-    if (string.IsNullOrWhiteSpace(ksfOriginal))
-        return string.Empty;
-
-    // Diccionario de traducciones manuales
-    var traducciones = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
-    {
-        { "Producción", "Production" },
-        { "Mantenimiento", "Maintenance" },
-        { "Calidad", "Quality" },
-        { "Seguridad", "Security" },
-        { "Auditoría", "Audit" },
-        { "Preventivo", "Preventive" },
-        { "RRHH", "HR" },
-        { "Ambiente", "Ambience" },
-        { "Reunión Diaria", "Daily Meeting" }
-    };
-
-    // Si el idioma es inglés (idPais == 5), traducir
-    if (idPais == 5 && traducciones.ContainsKey(ksfOriginal))
-        return traducciones[ksfOriginal];
-
-    // Si no se requiere traducción o no se encuentra, devolver el original
-    return ksfOriginal;
-}
-
-
     }   
 
 }

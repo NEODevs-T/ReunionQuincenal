@@ -242,30 +242,6 @@ else
 
     }
 
-    private string TraducirKsfManual(string ksfOriginal)
-    {
-        if (string.IsNullOrWhiteSpace(ksfOriginal))
-            return string.Empty;
-
-        var traducciones = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
-        {
-            { "Producción", "Production" },
-            { "Mantenimiento", "Maintenance" },
-            { "Calidad", "Quality" },
-            { "Seguridad", "Safety" },
-            { "Auditoría", "Audit" },
-            { "Preventivo", "Preventive" },
-            { "RRHH", "HR" },
-            { "Ambiente", "Environment" },
-            { "Reunión Diaria", "Daily Meeting" }
-        };
-
-        return idPais == 5 && traducciones.ContainsKey(ksfOriginal)
-            ? traducciones[ksfOriginal]
-            : ksfOriginal;
-    }
-
-
     protected override async Task OnInitializedAsync()
     {
         await CreateData();

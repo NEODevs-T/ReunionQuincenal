@@ -75,7 +75,7 @@ else
                 <option value="Todo">@DiccionarioTraduccionesService.Traducciones["Todo"]</option>
                 <option value="Total Pendiente">@DiccionarioTraduccionesService.Traducciones["TotalPendiente"]</option>
                 <option value="Pendiente">@DiccionarioTraduccionesService.Traducciones["Pendiente"]</option>
-                <option value="Pendiente-Responsable">@DiccionarioTraduccionesService.Traducciones["Pendiente"] / @DiccionarioTraduccionesService.Traducciones["Responsable"]</option>
+                <option value="Pendiente%2FResponsable">@DiccionarioTraduccionesService.Traducciones["Pendiente"] / @DiccionarioTraduccionesService.Traducciones["Responsable"]</option>
                 <option value="No Conforme">@DiccionarioTraduccionesService.Traducciones["NoConforme"]</option>
                 <option value="Listo">@DiccionarioTraduccionesService.Traducciones["Listo"]</option>
                 <option value="Cerrado">@DiccionarioTraduccionesService.Traducciones["Cerrado"]</option>
@@ -278,12 +278,10 @@ else
                                                     <BSTD>@textoTraducido</BSTD>
                                                 }
                                                 @{
-                                                    var estadoTraducido = d.Rdstatus switch
-                                                    {
-                                                        "Listo" => idPais == 5 ? "Ready" : "Listo",
-                                                        "Cerrado" => idPais == 5 ? "Closed" : "Cerrado",
-                                                        _ => idPais == 5 ? "Pending" : "Pendiente"
-                                                    };
+                                                    var clavee = ValidationMessages.MapStatusKey(d.Rdstatus);
+                                                    var estadoTraducido = DiccionarioTraduccionesService.Traducciones.ContainsKey(clavee)
+                                                        ? DiccionarioTraduccionesService.Traducciones[clavee]
+                                                        : clavee;
 
                                                     var claseEstado = d.Rdstatus switch
                                                     {
@@ -291,10 +289,12 @@ else
                                                         "Cerrado" => "Cerrado",
                                                         _ => "pendiente"
                                                     };
-
-                                                    var codRequiTexto = d.RdcodRequi == null ? "N/A" : d.RdcodRequi;
                                                 }
                                                 <BSTD Class="@claseEstado">@estadoTraducido</BSTD>
+
+                                                @{
+                                                    var codRequiTexto = d.RdcodRequi == null ? "N/A" : d.RdcodRequi;
+                                                }
                                                 <BSTD>@codRequiTexto</BSTD>
                                             <BSTD>@d.Rdodt</BSTD>
                                                 <BSTD>@d.RdfecReu.ToString("dd/MM/yyyy")</BSTD>
