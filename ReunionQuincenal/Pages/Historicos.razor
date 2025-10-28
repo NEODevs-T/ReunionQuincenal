@@ -168,13 +168,16 @@ else
         </Template>
         </RadzenDataGridColumn>*@
 
-            <RadzenDataGridColumn TItem="ReunionDTO" Title="#" Width="35px" Filterable=false>
+            <RadzenDataGridColumn TItem="ReunionDTO" Title="#" Width="40px" Filterable=false>
                 <Template>
 
                     @(tabla.IndexOf(context) + 1)
                 </Template>
             </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="ReunionDTO" Title="@DiccionarioTraduccionesService.Traducciones["Linea"]" Property="Rdarea" Width="80px">
+            <RadzenDataGridColumn TItem="ReunionDTO" Property="Rdarea" Width="120px" TextAlign="TextAlign.Center">
+                <HeaderTemplate>
+                    <span stytle="white-space: nowrap;">@DiccionarioTraduccionesService.Traducciones["Linea"]</span>
+                </HeaderTemplate>
                 <Template>
                     @context.Rdarea
                 </Template>
@@ -182,61 +185,91 @@ else
 
 
 
-            <RadzenDataGridColumn TItem="ReunionDTO" Title="@DiccionarioTraduccionesService.Traducciones["CodigoDeEquipo"]" Property="RdcodEq" Width="80px">
+            <RadzenDataGridColumn TItem="ReunionDTO" Property="RdcodEq" Width="180px" TextAlign="TextAlign.Center">
+                <HeaderTemplate>
+                    <span style="white-space: nowrap;">@DiccionarioTraduccionesService.Traducciones["CodigoDeEquipo"]</span>
+                </HeaderTemplate>
                 <Template>
                     @context.RdcodEq
                 </Template>
             </RadzenDataGridColumn>
 
-            <RadzenDataGridColumn TItem="ReunionDTO" Title="@DiccionarioTraduccionesService.Traducciones["NombreDelEquipo"]" Property="RdcodEq" Width="80px">
+            <RadzenDataGridColumn TItem="ReunionDTO" Property="RdcodEq" Width="180px" TextAlign="TextAlign.Center">
+                <HeaderTemplate>
+                    <span style="white-space: nowrap;">@DiccionarioTraduccionesService.Traducciones["NombreDelEquipo"]</span>
+                </HeaderTemplate>
                 <Template>
-                    @(string.IsNullOrWhiteSpace(context.EnombreEam) ? "EQUIPO NO ENCONTRADO" : context.EnombreEam)
+                    @(string.IsNullOrWhiteSpace(context.EnombreEam) ? (idPais == 5 ? "EQUIPMENT NOT FOUND" : "EQUIPO NO ENCONTRADO") : context.EnombreEam)
                 </Template>
             </RadzenDataGridColumn>
 
-            <RadzenDataGridColumn TItem="ReunionDTO" Title="KSF" Property="Ksf" Width="80px">
+            <RadzenDataGridColumn TItem="ReunionDTO" Property="Ksf" Width="100px" TextAlign="TextAlign.Center">
+                <HeaderTemplate>
+                    <span style="white-space: nowrap;">KSF</span>
+                </HeaderTemplate>
                 <Template>
                     @context.Ksf
                 </Template>
             </RadzenDataGridColumn>
 
-            <RadzenDataGridColumn TItem="ReunionDTO" Title="@DiccionarioTraduccionesService.Traducciones["Discrepancia"]" Property="Rddisc" Width="220px">
+            <RadzenDataGridColumn TItem="ReunionDTO" Property="Rddisc" Width="220px" TextAlign="TextAlign.Center">
+                <HeaderTemplate>
+                    <span style="white-space: nowrap;">@DiccionarioTraduccionesService.Traducciones["Discrepancia"]</span>
+                </HeaderTemplate>
                 <Template>
                     @context.Rddisc
                 </Template>
             </RadzenDataGridColumn>
 
-            <RadzenDataGridColumn TItem="ReunionDTO" Title="@DiccionarioTraduccionesService.Traducciones["Codigo"]" Property="RdcodDis" Width="60px">
+            <RadzenDataGridColumn TItem="ReunionDTO" Property="RdcodDis" Width="120px" TextAlign="TextAlign.Center">
+                <HeaderTemplate>
+                    <span style="white-space: nowrap;">@DiccionarioTraduccionesService.Traducciones["Codigo"]</span>
+                </HeaderTemplate>
                 <Template>
                     @context.RdcodDis
                 </Template>
             </RadzenDataGridColumn>
 
-            <RadzenDataGridColumn TItem="ReunionDTO" Title="@DiccionarioTraduccionesService.Traducciones["Accion"]" Property="RdplanAcc" Width="200px">
+            <RadzenDataGridColumn TItem="ReunionDTO" Property="RdplanAcc" Width="200px" TextAlign="TextAlign.Center">
+                <HeaderTemplate>
+                    <span style="white-space: nowrap;">@DiccionarioTraduccionesService.Traducciones["Accion"]</span>
+                </HeaderTemplate>
                 <Template>
                     @context.RdplanAcc
                 </Template>
             </RadzenDataGridColumn>
 
-            <RadzenDataGridColumn TItem="ReunionDTO" Title="@DiccionarioTraduccionesService.Traducciones["Tiempo"]" Property="Rdtiempo" Width="60px">
+            <RadzenDataGridColumn TItem="ReunionDTO" Property="Rdtiempo" Width="150px" TextAlign="TextAlign.Center">
+                <HeaderTemplate>
+                    <span style="white-space: nowrap;">@DiccionarioTraduccionesService.Traducciones["Tiempo"]</span>
+                </HeaderTemplate>
                 <Template>
                     @context.Rdtiempo
                 </Template>
             </RadzenDataGridColumn>
 
-            <RadzenDataGridColumn TItem="ReunionDTO" Title="@DiccionarioTraduccionesService.Traducciones["Responsable"]" Property="Responsable" Width="100px">
+            <RadzenDataGridColumn TItem="ReunionDTO" Property="Responsable" Width="150px" TextAlign="TextAlign.Center">
+                <HeaderTemplate>
+                    <span style="white-space: nowrap;">@DiccionarioTraduccionesService.Traducciones["Responsable"]</span>
+                </HeaderTemplate>
                 <Template>
                     @DiccionarioTraduccionesService.Traducciones[context.Responsable]
                 </Template>
             </RadzenDataGridColumn>
 
-            <RadzenDataGridColumn TItem="ReunionDTO" Title="ODT" Property="Rdodt" Width="100px">
+            <RadzenDataGridColumn TItem="ReunionDTO" Property="Rdodt" Width="120px" TextAlign="TextAlign.Center">
+                <HeaderTemplate>
+                    <span style="white-space: nowrap;">ODT</span>
+                </HeaderTemplate>
                 <Template>
                     @context.Rdodt
                 </Template>
             </RadzenDataGridColumn>
 
-            <RadzenDataGridColumn TItem="ReunionDTO" Title="@DiccionarioTraduccionesService.Traducciones["Estado"]" Property="Rdstatus" Width="90px">
+            <RadzenDataGridColumn TItem="ReunionDTO" Property="Rdstatus" Width="120px" TextAlign="TextAlign.Center">
+                <HeaderTemplate>
+                    <span style="white-space: nowrap;">@DiccionarioTraduccionesService.Traducciones["Estado"]</span>
+                </HeaderTemplate>
                 <Template>
                 @{
                     var clave = ValidationMessages.MapStatusKey(context.Rdstatus);
@@ -248,13 +281,20 @@ else
                 </Template>
             </RadzenDataGridColumn>
 
-            <RadzenDataGridColumn TItem="ReunionDTO" Title="@DiccionarioTraduccionesService.Traducciones["FReunion"]" Property="RdfecReu" Width="90px">
+
+            <RadzenDataGridColumn TItem="ReunionDTO" Property="RdfecReu" Width="130px" TextAlign="TextAlign.Center">
+                <HeaderTemplate>
+                    <span style="white-space: nowrap;">@DiccionarioTraduccionesService.Traducciones["FReunion"]</span>
+                </HeaderTemplate>
                 <Template>
                     @context.RdfecReu.ToString("yyyy/MM/dd")
                 </Template>
             </RadzenDataGridColumn>
 
-            <RadzenDataGridColumn TItem="ReunionDTO" Title="@DiccionarioTraduccionesService.Traducciones["FTrabajo"]" Property="RdfecTra" Width="90px">
+            <RadzenDataGridColumn TItem="ReunionDTO" Property="RdfecTra" Width="120px" TextAlign="TextAlign.Center">
+                <HeaderTemplate>
+                    <span style="white-space: nowrap;">@DiccionarioTraduccionesService.Traducciones["FTrabajo"]</span>
+                </HeaderTemplate>
                 <Template>
                     @context.RdfecTra.ToString("yyyy/MM/dd")
                 </Template>

@@ -292,21 +292,28 @@ textarea {
 .scrollable-container {
     height: 500px; /* altura fija */
     width: 1100px;
-    overflow-y: auto;
-    overflow-x: auto;
+    overflow-y: auto; /* scroll vertical si hay más contenido */
+    overflow-x: auto; /* scroll horizontal si hay muchas columnas */
     display: block;
+}
+
+.scrollable-container .rz-datatable {
+    height: 100%;
+    max-height: 100%;
+    box-sizing: border-box;
 }
 
 .scrollable-container1 {
-    height: 480px; /* altura fija */
+    height: 480px;
     width: 1200px;
-    overflow-y: auto;
     overflow-x: auto;
+    overflow-y: auto;
     display: block;
+    position: relative; /* importante para aislar el scroll */
+}
+.scrollable-container1 table {
+    min-width: 1300px; /* más ancho que el contenedor */
 }
 
-.fixed-grid .rz-datatable-table {
-    min-width: 2400px;
-}
 
 
