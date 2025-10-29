@@ -148,7 +148,7 @@ else
 @if (tabla.Count() > 0 && dataIsLoaded == 2)
 {
 <div class="scrollable-container">
-    <RadzenDataGrid @ref="@ReuTabla" Data="@PizarraData.reudiatablas" class="rz-shadow-2" AllowFiltering="true" AllowColumnResize="true"
+    <RadzenDataGrid @ref="@ReuTabla" Data="@tabla" class="rz-shadow-2" AllowFiltering="true" AllowColumnResize="true"
         AllowAlternatingRows="true" FilterMode="FilterMode.Advanced" AllowSorting="true" PageSize="30" AllowPaging="true"
         PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true" TItem="ReunionDTO"
         LogicalFilterOperator="LogicalFilterOperator.Or" OrOperatorText="O" AndOperatorText="Y" EqualsText="Igual a"
@@ -451,14 +451,18 @@ else if (dataIsLoaded == 2 && tabla.Count() == 0)
             if (dataIsLoaded != 1)
             {
                 dataIsLoaded = 1;
-                tabla = await PizarraData.GetHistoricos(IdCentro.ToString(), IdDiv.ToString(), fecha1, fecha2, tipoconsulta, Uri.EscapeDataString(Status));
-                foreach(var d in PizarraData.reudiatablas)
+                tabla = await PizarraData.GetHistoricos(IdCentro.ToString(), IdDiv.ToString(), fecha1, fecha2, tipoconsulta, Status);
+                foreach(var d in tabla)
                 {
                     d.Ksf = KsfData.ksfs.Where(x => x.Idksf == d.Idksf).Select(x => idPais == 5 ? x.KsfEnglish : x.KsfNombre).FirstOrDefault();
                     var nombreOriginal = RespoReuData.resporeus.Where(x => x.IdResReu == d.IdResReu).FirstOrDefault()?.Rrnombre ?? "";
                     var clave = ValidationMessages.MapResponsableKey(nombreOriginal);
                     d.Responsable = clave; 
                 }
+                
+                tabla = tipoconsulta == "0"
+                ? tabla.OrderBy(x => x.RdfecReu).ToList()
+                : tabla.OrderBy(x => x.RdfecTra).ToList();
                 
                 dataIsLoaded = 2;
             }
