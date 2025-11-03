@@ -290,12 +290,14 @@ textarea {
     }
 
 .scrollable-container {
-    height: 500px; /* altura fija */
-    width: 1100px;
-    overflow-y: auto; /* scroll vertical si hay más contenido */
-    overflow-x: auto; /* scroll horizontal si hay muchas columnas */
+    height: 80vh; /* 80% de la altura de la ventana */
+    width: 90vw;  /* 90% del ancho de la ventana */
+    overflow-y: auto;
+    overflow-x: auto;
     display: block;
+    margin: 0 auto; /* centra horizontalmente */
 }
+
 
 .scrollable-container .rz-datatable {
     height: 100%;
@@ -303,16 +305,30 @@ textarea {
     box-sizing: border-box;
 }
 
-.scrollable-container1 {
-    height: 480px;
-    width: 1200px;
-    overflow-x: auto;
-    overflow-y: auto;
-    display: block;
-    position: relative; /* importante para aislar el scroll */
+.tabla-contenedor {
+  width: clamp(600px, 80vw, 1200px); /* adaptable pero con límites */
+  height: calc(88vh - 200px);
+  overflow: hidden; /* evita scroll global */
+  display: flex;
+  flex-direction: column;
+  margin: 0 auto;
 }
-.scrollable-container1 table {
-    min-width: 1300px; /* más ancho que el contenedor */
+
+.tabla-scroll {
+  overflow-y: auto; /* solo scroll vertical */
+  flex-grow: 1;
+  max-width: 100%;
+}
+
+.tabla-scroll table {
+  min-width: 100%; /* mantiene la tabla dentro del contenedor */
+  border-collapse: collapse;
+}
+
+table th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
 }
 
 

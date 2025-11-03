@@ -55,7 +55,7 @@
 <data name="Exito" xml:space="preserve"><value>success</value></data>
 <data name="FReunion" xml:space="preserve"><value>M. Date</value></data>
 <data name="FTrabajo" xml:space="preserve"><value>W. Date</value></data>
-<data name="FechaDeReunion" xml:space="preserve"><value>Metting Date</value></data>
+<data name="FechaDeReunion" xml:space="preserve"><value>Meeting Date</value></data>
 <data name="FechaDelCambio" xml:space="preserve"><value>Change Date</value></data>
 <data name="Filtrar" xml:space="preserve"><value>To Filter</value></data>
 <data name="FiltroFechaDeReunion" xml:space="preserve"><value>Meeting Date Filter</value></data>
@@ -73,7 +73,7 @@
 <data name="Mtto_Mecanico" xml:space="preserve"><value>Mechanical Maint.</value></data>
 <data name="Mtto_Instrumentacion" xml:space="preserve"><value>Instrumentation Maint.</value></data>
 <data name="Mtto_Infraestructura" xml:space="preserve"><value>Infrastructure Maint.</value></data>
-<data name="NEquipo" xml:space="preserve"><value>Equi. Number</value></data>
+<data name="NEquipo" xml:space="preserve"><value>Equip. Number</value></data>
 <data name="NFDatos" xml:space="preserve"><value>No data found to process.</value></data>
 <data name="NPA1" xml:space="preserve"><value>Cannot be closed without an Action Plan.</value></data>
 <data name="NPA2" xml:space="preserve"><value>Cannot be saved with an empty Action Plan.</value></data>
@@ -144,7 +144,7 @@
 <data name="BuscarCargo2" xml:space="preserve"><value>Search Position ...</value></data>
 <data name="SeleccioneDML" xml:space="preserve"><value>Select the non-working days you want to exclude:</value></data>
 <data name="AgregarFecha" xml:space="preserve"><value>Add date</value></data>
-<data name="FechasSeleccionadas" xml:space="preserve"><value>Selected datess</value></data>
+<data name="FechasSeleccionadas" xml:space="preserve"><value>Selected dates</value></data>
 <data name="Cancelar" xml:space="preserve"><value>Cancel</value></data>
 <data name="NoHayFiltros" xml:space="preserve"><value>There are no records for the selected filters.</value></data>
 <data name="IniciarSesion" xml:space="preserve"><value>Sign In</value></data>
@@ -178,8 +178,8 @@
 <data name="VerifiqueCampos" xml:space="preserve"><value>Check all fields</value></data>
 <data name="Dia" xml:space="preserve"><value>Day</value></data>
 <data name="Semana" xml:space="preserve"><value>Week</value></data>
-<data name="Mes" xml:space="preserve"><value>Mouth</value></data>
-<data name="Planificacion" xml:space="preserve"><value>Planification</value></data>
+<data name="Mes" xml:space="preserve"><value>Month</value></data>
+<data name="Planificacion" xml:space="preserve"><value>Planning</value></data>
 <data name="Año" xml:space="preserve"><value>Year</value></data>
 <data name="Limite" xml:space="preserve"><value>You have reached the limit for changing the Work Date.</value></data>
 <data name="FalloR" xml:space="preserve"><value>Registration failed, please try again.</value></data>

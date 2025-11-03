@@ -196,10 +196,10 @@ else
 @*Tabla vieja*@
 @if (PizarraData.reudiatablas.Count() > 0 &&  dataIsLoaded == 2)
 {
-    <div class="scrollable-container1">
-    <table class="table table-striped">
-    <div class=" pt-3">
-
+<div class="tabla-contenedor">
+    <div class="tabla-scroll">
+        <div class=" pt-3">
+                <table>
         <BSTable IsStriped="true" IsBordered="true">
             <BSTHead Class="cabecera">
                 <BSTR>
@@ -326,9 +326,10 @@ else
                 }
             </BSTBody>
         </BSTable>
-    </div>
             </table>
     </div>
+    </div>
+</div>
 
     @*Mostrar la trazabilidad*@
     <BSModal IsCentered="true" DataId="History">
