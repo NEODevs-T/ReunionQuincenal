@@ -173,7 +173,7 @@ else
                 <BSInput InputType="InputType.Select" IsDisabled=@valueodt @bind-Value="IdKsf">
 
                     <option value="0">@DiccionarioTraduccionesService.Traducciones["Todo"]</option>
-                    @foreach (var d in KsfData.ksfs.Where(x => x.Idksf != 6))
+                    @foreach (var d in KsfData.ksfs.Where(x => x.Idksf != 6 && x.Idksf != 29))
                     {
                         var texto = idPais == 5? d.KsfEnglish : d.KsfNombre;
                         <option value="@d.Idksf">@texto</option>

@@ -72,7 +72,7 @@ else
                          <BSInput InputType="InputType.Select" @bind-Value="DiscForm.Idksf">
 
                              <option value="">@DiccionarioTraduccionesService.Traducciones["Seleccione"]...</option>
-                            @foreach (var d in KsfData.ksfs.Where(x => x.Idksf != 6))
+                            @foreach (var d in KsfData.ksfs.Where(x => x.Idksf != 6 && x.Idksf != 29))
                             {
                                 var texto = idPais == 5? d.KsfEnglish : d.KsfNombre;
                                 <option value="@d.Idksf">@texto</option>
@@ -325,7 +325,7 @@ else
                      <BSInput InputType="InputType.Select" hidden @bind-Value="DiscForm.Idksf">
 
                          <option value="">@DiccionarioTraduccionesService.Traducciones["Seleccione"]...</option>
-                            @foreach (var d in KsfData.ksfs.Where(x => x.Idksf != 6))
+                            @foreach (var d in KsfData.ksfs.Where(x => x.Idksf != 6 && x.Idksf != 29))
                             {
                                 var texto = idPais == 5? d.KsfEnglish : d.KsfNombre;
                                 <option value="@d.Idksf">@texto</option>
