@@ -201,9 +201,8 @@ else
 
                 @foreach (var d in RespoReuData.resporeus)
                 {
-                    <option 
-                    value="@d.IdResReu"> @DiccionarioTraduccionesService.Traducciones[ValidationMessages.MapResponsableKey(d.Rrnombre)]
-                    </option>
+                    var texto = idPais == 5? d.Rrenglish : d.Rrnombre;
+                    <option value="@d.IdResReu">@texto</option>
                 }
             </BSInput>
         </BSCol>

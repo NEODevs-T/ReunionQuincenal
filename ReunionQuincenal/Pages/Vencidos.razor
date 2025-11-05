@@ -118,7 +118,8 @@ else if (PizarraData.reudiatablas.Count() > 0 && confirmacion == true)
                 <option value="0">@DiccionarioTraduccionesService.Traducciones["Todo"]</option>
                 @foreach (var d in RespoReuData.resporeus)
                 {
-                    <option value="@d.IdResReu">@DiccionarioTraduccionesService.Traducciones[ValidationMessages.MapResponsableKey(d.Rrnombre)]</option>
+                    var texto = idPais == 5? d.Rrenglish : d.Rrnombre;
+                    <option value="@d.IdResReu">@texto</option>
                 }
             </BSInput>
         </BSCol>
@@ -211,14 +212,9 @@ Data="@(PizarraData.reudiatablas.Where(x =>
 
             <RadzenDataGridColumn Width="8%" TItem="ReunionDTO" Title="@DiccionarioTraduccionesService.Traducciones["Responsable"]" Filterable="false" Sortable="false">
                 <Template Context="data">
-                    @if (!string.IsNullOrWhiteSpace(data.Responsable) && DiccionarioTraduccionesService.Traducciones.ContainsKey(data.Responsable))
-                    {
-                        @DiccionarioTraduccionesService.Traducciones[data.Responsable]
-                    }
-                    else
-                    {
-                        <span>@DiccionarioTraduccionesService.Traducciones["NoResponsable"]</span>
-                    }
+                @(!string.IsNullOrWhiteSpace(data.Responsable)
+                    ? data.Responsable 
+                    : DiccionarioTraduccionesService.Traducciones["NoResponsable"])
                 </Template>
             </RadzenDataGridColumn>
 
@@ -474,9 +470,7 @@ else if (PizarraData.reudiatablas.Count() == 0 && confirmacion == true)
             foreach (var d in tabla)
                 {
                     d.Ksf = KsfData.ksfs.Where(x => x.Idksf == d.Idksf).Select(x => idPais == 5 ? x.KsfEnglish : x.KsfNombre).FirstOrDefault();
-                    var nombreOriginal = RespoReuData.resporeus.Where(x => x.IdResReu == d.IdResReu).FirstOrDefault()?.Rrnombre ?? "";
-                    var clave = ValidationMessages.MapResponsableKey(nombreOriginal);
-                    d.Responsable = clave; 
+                    d.Responsable = RespoReuData.resporeus.Where(x => x.IdResReu == d.IdResReu).Select(x => idPais == 5 ? x.Rrenglish : x.Rrnombre).FirstOrDefault();
                 }
         } 
         else

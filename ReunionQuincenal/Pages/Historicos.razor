@@ -253,7 +253,7 @@ else
                     <span style="white-space: nowrap;">@DiccionarioTraduccionesService.Traducciones["Responsable"]</span>
                 </HeaderTemplate>
                 <Template>
-                    @DiccionarioTraduccionesService.Traducciones[context.Responsable]
+                    @context.Responsable
                 </Template>
             </RadzenDataGridColumn>
 
@@ -455,9 +455,7 @@ else if (dataIsLoaded == 2 && tabla.Count() == 0)
                 foreach(var d in tabla)
                 {
                     d.Ksf = KsfData.ksfs.Where(x => x.Idksf == d.Idksf).Select(x => idPais == 5 ? x.KsfEnglish : x.KsfNombre).FirstOrDefault();
-                    var nombreOriginal = RespoReuData.resporeus.Where(x => x.IdResReu == d.IdResReu).FirstOrDefault()?.Rrnombre ?? "";
-                    var clave = ValidationMessages.MapResponsableKey(nombreOriginal);
-                    d.Responsable = clave; 
+                    d.Responsable = RespoReuData.resporeus.Where(x => x.IdResReu == d.IdResReu).Select(x => idPais == 5 ? x.Rrenglish : x.Rrnombre).FirstOrDefault();
                 }
                 
                 tabla = tipoconsulta == "0"

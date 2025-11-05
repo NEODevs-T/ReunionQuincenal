@@ -69,19 +69,6 @@ namespace ReunionWeb.Services
                 Traducciones[clave] = traduccion;
             }
 
-            var listaResponsbale = await _respoReuData.GetResReu();
-            if (listaResponsbale != null)
-            {
-                foreach (var d in listaResponsbale)
-                {
-                    var respo = ValidationMessages.MapResponsableKey(d.Rrnombre);
-                    if (!Traducciones.ContainsKey(respo))
-                    {
-                        Traducciones[respo] = _translator.Traducir(respo);
-                    }
-                }
-            }
-
             await Task.CompletedTask;
         }
     }

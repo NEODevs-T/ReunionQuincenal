@@ -55,24 +55,22 @@ else
     <BSCol Column="3">
         <BSLabel>@DiccionarioTraduccionesService.Traducciones["Responsable"]</BSLabel>
         <BSInput InputType="InputType.Select" @bind-Value="idrespo">
-            <option value=0>@DiccionarioTraduccionesService.Traducciones["Todo"]</option>
-            @if (resporeu != null)
-            @foreach (var d in resporeu)
+        <option value=0>@DiccionarioTraduccionesService.Traducciones["Todo"]</option>
+            @foreach (var d in RespoReuData.resporeus)
             {
-                <option value="@d.IdResReu">@DiccionarioTraduccionesService.Traducciones[ValidationMessages.MapResponsableKey(d.Rrnombre)]</option>
+                var texto = idPais == 5? d.Rrenglish : d.Rrnombre;
+                <option value="@d.IdResReu">@texto</option>
             }
         </BSInput>
     </BSCol>
-        @{
-            var clave = ValidationMessages.MapResponsableKey(linea ?? string.Empty);
-            var lineaTraducida = DiccionarioTraduccionesService.Traducciones.TryGetValue(clave, out var traduccion)
-                ? traduccion
-                : linea;
-        }
-    <BSCol Column="3">
-        <BSLabel>@DiccionarioTraduccionesService.Traducciones["Linea"]</BSLabel>
-        <BSInput InputType="InputType.Text" @bind-Value="@lineaTraducida" IsReadonly=true />
-    </BSCol>
+@{
+    var lineaTraducida = idPais == 5 ? "All" : "Todos";
+}
+<BSCol Column="3">
+    <BSLabel>@DiccionarioTraduccionesService.Traducciones["Linea"]</BSLabel>
+    <BSInput InputType="InputType.Text" @bind-Value="@lineaTraducida" IsReadonly="true" />
+</BSCol>
+
 
 </BSRow>
 <button type="button" onclick="window.print()" class="btn btn-success"><span class="oi oi-print"></span></button>
@@ -124,13 +122,6 @@ else
                 @* @foreach (var d in DbReunionService.reudiatablas)*@
                 @foreach (var d in listareu)
                 {
-                    var nombreOriginal = RespoReuData.resporeus
-                        .Where(x => x.IdResReu == d.IdResReu)
-                        .FirstOrDefault()?.Rrnombre;
-
-                    var claveResponsable = ValidationMessages.MapResponsableKey(nombreOriginal ?? string.Empty);
-                    d.Responsable = DiccionarioTraduccionesService.Traducciones.TryGetValue(claveResponsable, out var traduccionResponsable)
-                        ? traduccionResponsable : nombreOriginal;
                     @if (linea == "Todo" | linea == d.Rdarea)
                     {
                         @if (Codigo == d.RdcodDis | Codigo == "Todo")
@@ -156,23 +147,12 @@ else
                                         <BSTD Class="textotabla">@d.RdplanAcc</BSTD>
                                         <BSTD>@d.Rdtiempo</BSTD>
                                         @{
-                                            var nombreResponsable = RespoReuData.resporeus
-                                                .FirstOrDefault(x => x.IdResReu == d.IdResReu)?.Rrnombre;
-
-                                            var clave = ValidationMessages.MapResponsableKey(nombreResponsable ?? string.Empty);
-                                            var textoTraducido = DiccionarioTraduccionesService.Traducciones.TryGetValue(clave, out var traduccion)
-                                                ? traduccion
-                                                : nombreResponsable;
+                                            var responsable = RespoReuData.resporeus.FirstOrDefault(x => x.IdResReu == d.IdResReu);
+                                            var nombreResponsable = idPais == 5 
+                                                ? responsable?.Rrenglish 
+                                                : responsable?.Rrnombre ?? string.Empty;
                                         }
-
-                                        @if (nombreResponsable == "Por Definir")
-                                        {
-                                            <BSTD Class="Definir">@textoTraducido</BSTD>
-                                        }
-                                        else
-                                        {
-                                            <BSTD>@textoTraducido</BSTD>
-                                        }
+                                        <BSTD class="@(nombreResponsable == "Por Definir" ? "Definir" : "")">@nombreResponsable</BSTD>
                                         @{
                                         var clavee = ValidationMessages.MapStatusKey(d.Rdstatus);
                                         var estadoTraducido = DiccionarioTraduccionesService.Traducciones.ContainsKey(clavee)

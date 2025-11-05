@@ -174,20 +174,17 @@ else
                                 }
                                 <BSTD>@d.Rdtiempo</BSTD>
                                 @{
-                                    var nombreResponsable = RespoReuData.resporeus
-                                        .FirstOrDefault(x => x.IdResReu == d.IdResReu)?.Rrnombre;
-                                    var clave = ValidationMessages.MapResponsableKey(nombreResponsable);
-                                    var textoTraducido = DiccionarioTraduccionesService.Traducciones.TryGetValue(clave, out var traduccion)
-                                        ? traduccion
-                                        : nombreResponsable;
+                                    var responsable = RespoReuData.resporeus.FirstOrDefault(x => x.IdResReu == d.IdResReu);
+                                    var nombreResponsable = idPais == 5 ? responsable?.Rrenglish : responsable?.Rrnombre;
                                 }
-                                @if (nombreResponsable == "Por Definir")
+
+                                @if (responsable?.Rrnombre == "Por Definir")
                                 {
-                                <BSTD Class="Definir">@textoTraducido</BSTD>
+                                    <BSTD Class="Definir">@nombreResponsable</BSTD>
                                 }
                                 else
                                 {
-                                <BSTD>@textoTraducido</BSTD>
+                                    <BSTD>@nombreResponsable</BSTD>
                                 }
                                 @{
                                     var clavee = ValidationMessages.MapStatusKey(d.Rdstatus);
