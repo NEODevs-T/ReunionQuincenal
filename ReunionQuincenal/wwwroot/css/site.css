@@ -306,23 +306,26 @@ textarea {
 }
 
 .tabla-contenedor {
-  width: clamp(600px, 80vw, 1200px); /* adaptable pero con límites */
-  height: calc(88vh - 200px);
-  overflow: hidden; /* evita scroll global */
-  display: flex;
-  flex-direction: column;
-  margin: 0 auto;
+    width: 100%; /* Ocupa todo el ancho disponible */
+    max-width: 100%; /* Evita límites */
+    height: calc(88vh - 200px);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    margin: 0 auto;
 }
 
 .tabla-scroll {
-  overflow-y: auto; /* solo scroll vertical */
-  flex-grow: 1;
-  max-width: 100%;
+    overflow-y: auto;
+    overflow-x: auto; /* Agrega scroll horizontal si es necesario */
+    flex-grow: 1;
+    width: 100%;
 }
 
 .tabla-scroll table {
-  min-width: 100%; /* mantiene la tabla dentro del contenedor */
-  border-collapse: collapse;
+    width: 100%; /* Asegura que la tabla ocupe todo el contenedor */
+    border-collapse: collapse;
+    table-layout: auto; /* Ajusta columnas según contenido */
 }
 
 table th {
@@ -332,4 +335,13 @@ table th {
 }
 
 
+@media (max-width: 768px) {
+    .tabla-contenedor {
+        width: 100%;
+        padding: 0 5px;
+    }
+    .tabla-scroll table {
+        font-size: 14px;
+    }
+}
 
