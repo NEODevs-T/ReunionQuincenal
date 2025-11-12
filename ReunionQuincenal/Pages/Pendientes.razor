@@ -47,7 +47,7 @@ else
 
         <BSCol ColumnLarge="3" ColumnSmall="6">
             <BSLabel>@DiccionarioTraduccionesService.Traducciones["Division"]</BSLabel>
-            <BSInput InputType="InputType.Select" @bind-Value="IdDiv">
+            <BSInput InputType="InputType.Select" @bind-Value="IdDiv" @onchange="BuscarLineas">
                 <option value="0">@DiccionarioTraduccionesService.Traducciones["Seleccione"]</option>
                 @foreach (var d in MaestraData.divisions)
                 {
@@ -891,4 +891,20 @@ private async Task BuscarxOdt()
     {
         return ft.Date < DateTime.Now.Date && estado.StartsWith("Pendiente") ? "Vencido" : "";
     }
+
+       protected async Task BuscarLineas(ChangeEventArgs e)
+{
+    IdDiv = int.Parse(e.Value.ToString());
+    try
+    {
+        if (IdDiv != 0)
+        {
+            MaestraData.lineas = await MaestraData.ObtenerLasLineasPorDivision(IdDiv);
+        }
+    }
+    catch (Exception ex)
+    {
+        NotificationService.Notify(Notificar.Notificacion("error", "Error", DiccionarioTraduccionesService.Traducciones["SLinea"]));
+    }
+}
 }
