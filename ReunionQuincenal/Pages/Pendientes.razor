@@ -59,15 +59,14 @@ else
         {
             <BSCol ColumnLarge="3" ColumnSmall="6">
                 <BSLabel>@DiccionarioTraduccionesService.Traducciones["Linea"]</BSLabel>
-                <BSInput InputType="InputType.Select" @bind-Value="NombreLinea" IsDisabled=@valueodt>
-                    <option value="Todo">@DiccionarioTraduccionesService.Traducciones["Todo"]</option>
+                <BSInput InputType="InputType.Select" TValue="int" Value="LineaSeleccionada" ValueChanged="@(async e => await OnLineaChanged(e))" IsDisabled="@valueodt">
+                    <option value="0">@DiccionarioTraduccionesService.Traducciones["Todo"]</option>
                     @foreach (var d in MaestraData.lineas)
                     {
-                                <option value="@d.Linea">@d.Linea</option>
+                        <option value="@d.IdLinea">@d.Linea</option>
                     }
                 </BSInput>
             </BSCol>
-
         }
         <BSCol ColumnLarge="3" ColumnSmall="6">
             <BSLabel>@DiccionarioTraduccionesService.Traducciones["Estado"]</BSLabel>
@@ -231,8 +230,7 @@ else
                     {
                         @if (Codigo == d.RdcodDis | Codigo == "Todo")
                         {
-
-                            @if (NombreLinea == "Todo" | NombreLinea == d.Rdarea)
+                            @if (IdMasterSeleccionado == 0 | IdMasterSeleccionado == d.IdMaster)
                             {
                                 @if (idrespo == 0 | idrespo == d.IdResReu)
                                 {
@@ -578,6 +576,8 @@ else if (dataIsLoaded == 2 && PizarraData.reudiatablas.Count() == 0)
     private List<Claim> claims { get; set; }
     private int idPais {get; set;}
     private bool traduccionesCargadas = false;
+    private int IdMasterSeleccionado { get; set; } = 0;
+    private int LineaSeleccionada { get; set; } = 0;
 
     private async Task CreateData()
 
@@ -690,6 +690,8 @@ else if (dataIsLoaded == 2 && PizarraData.reudiatablas.Count() == 0)
     {
             IdCentro = int.Parse(e.Value.ToString());
             IdDiv = 0;
+            IdMasterSeleccionado = 0;
+            NombreLinea = "Todo";
             try{
                 if(IdCentro != 0){
                     MaestraData.divisions = await MaestraData.ObtenerDivisionDelCentro(IdCentro);
@@ -710,8 +712,13 @@ else if (dataIsLoaded == 2 && PizarraData.reudiatablas.Count() == 0)
                 dataIsLoaded = 1;
                 await PizarraData.GetPendientes(IdCentro.ToString(), IdDiv.ToString(), fecha1, fecha2, tipoconsulta, Status);
                 ObtenerReunionesPorRol();//actualizar tabla
+                if (IdMasterSeleccionado > 0)
+                {
+                    listareu = listareu
+                        .Where(r => r.IdMaster == IdMasterSeleccionado)
+                        .ToList();
+                }
                 dataIsLoaded = 2;
-
             }
 
         }
@@ -782,7 +789,8 @@ private async Task BuscarxOdt()
 
         IdCentro = idcentro;
         IdDiv = 0;
-
+        IdMasterSeleccionado = 0;
+        NombreLinea = "Todo";
         MaestraData.divisions = MaestraData.divisions
         .Where(c => c.IdCentro == idcentro)
         @* .SelectMany(c => c.Divisions) *@
@@ -840,7 +848,10 @@ private async Task BuscarxOdt()
                     IdCentro = int.Parse(accion);
                     IdDiv = int.Parse(division);
                     Status = est;
-                    NombreLinea = linea;
+                    if (!string.IsNullOrEmpty(linea) && linea != "Todo")
+                    {
+                        NombreLinea = linea;
+                    }
                     tipoconsulta = tipo;
                     dataIsLoaded = 1;
                     await PizarraData.GetPendientes(accion, division, date1, date2, tipo, est);
@@ -891,20 +902,55 @@ private async Task BuscarxOdt()
     {
         return ft.Date < DateTime.Now.Date && estado.StartsWith("Pendiente") ? "Vencido" : "";
     }
-
-       protected async Task BuscarLineas(ChangeEventArgs e)
-{
-    IdDiv = int.Parse(e.Value.ToString());
-    try
+    protected async Task BuscarLineas(ChangeEventArgs e)
     {
-        if (IdDiv != 0)
+        IdDiv = int.Parse(e.Value.ToString());
+        try
         {
-            MaestraData.lineas = await MaestraData.ObtenerLasLineasPorDivision(IdDiv);
+            if (IdDiv != 0)
+            {
+                MaestraData.lineas = await MaestraData.ObtenerLasLineasPorDivision(IdDiv);
+            }
+        }
+        catch (Exception ex)
+        {
+            NotificationService.Notify(Notificar.Notificacion("error", "Error", DiccionarioTraduccionesService.Traducciones["SLinea"]));
         }
     }
-    catch (Exception ex)
+
+    private void SeleccionarLinea(int valor)
     {
-        NotificationService.Notify(Notificar.Notificacion("error", "Error", DiccionarioTraduccionesService.Traducciones["SLinea"]));
+        LineaSeleccionada = valor;
+
+        if (LineaSeleccionada == 0)
+        {
+            IdMasterSeleccionado = 0;
+            NombreLinea = "Todo";
+        }
+        else
+        {
+            var lineaSeleccionada = MaestraData.lineas.FirstOrDefault(x => x.IdLinea == LineaSeleccionada);
+            IdMasterSeleccionado = lineaSeleccionada?.IdMaster ?? 0;
+            NombreLinea = lineaSeleccionada?.Linea ?? "Todo";
+        }
     }
-}
+
+    private async Task OnLineaChanged(int valor)
+    {
+        LineaSeleccionada = valor;
+
+        if (LineaSeleccionada == 0)
+        {
+            IdMasterSeleccionado = 0;
+            NombreLinea = "Todo";
+        }
+        else
+        {
+            var lineaSeleccionada = MaestraData.lineas.FirstOrDefault(x => x.IdLinea == LineaSeleccionada);
+            IdMasterSeleccionado = lineaSeleccionada?.IdMaster ?? 0;
+            NombreLinea = lineaSeleccionada?.Linea ?? "Todo";
+        }
+
+        await Get();
+    }
 }

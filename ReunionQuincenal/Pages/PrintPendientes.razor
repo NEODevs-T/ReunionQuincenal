@@ -203,13 +203,6 @@ else if (dataIsLoaded == 2 && registrosVisibles.Count == 0)
 }
 @code {
 
-        List<ReunionDTO> registrosVisibles => PizarraData.reudiatablas
-        .Where(d => d.Rdstatus != "Rechazada"
-                && d.Rdstatus != "Listo"
-                && d.RdfecTra.Date == DateTime.Now.Date
-                && (string.IsNullOrEmpty(d.Rdodt)))
-        .ToList();
-
     [Parameter]
     public string? accion { get; set; }//centro
     [Parameter]
@@ -261,6 +254,12 @@ else if (dataIsLoaded == 2 && registrosVisibles.Count == 0)
     List<ReunionDTO> listareu = new List<ReunionDTO>();//filtar los responsables
 
     private List<Claim> claims { get; set; }
+
+            List<ReunionDTO> registrosVisibles => PizarraData.reudiatablas
+        .Where(d => d.Rdstatus != "Rechazada"
+                && d.Rdstatus != "Listo"
+                && (string.IsNullOrEmpty(d.Rdodt)))
+        .ToList();
 
     private async Task CreateData()
 
