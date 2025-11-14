@@ -60,7 +60,7 @@ namespace ReunionWeb.Services
                 "SeleccioneUnaEmpresa", "Semana", "StatusNuevo", "Suplencia", "TCargos",
                 "Tiempo", "Todo", "Todos", "TodosCampos", "TotalPendiente",
                 "Trazabilidad", "Usuario", "VencidasDiaria", "VencidasTurno", "Vencidos", "VerifiqueCampos", "Horas",
-                "hay_registros_vencidos"
+                "hay_registros_vencidos", "ReunionesConSuplencias", "PorcentajeSuplencia"
             };
 
             foreach (var clave in claves)

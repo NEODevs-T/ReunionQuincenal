@@ -135,7 +135,9 @@
 <data name="DiasNoLaborables" xml:space="preserve"><value>Días no laborables</value></data>
 <data name="FiltrarPorCargo" xml:space="preserve"><value>Filtrar por Cargo</value></data>
 <data name="BuscarCargo" xml:space="preserve"><value>Buscar Cargo</value></data>
-<data name="PorcentajeGlobal" xml:space="preserve"><value>Porcentaje Global</value></data>
+<data name="ReunionesConSuplencias" xml:space="preserve"><value>Reuniones con Suplencias</value></data>
+<data name="PorcentajeGlobal" xml:space="preserve"><value>Porcentaje Total</value></data>
+<data name="PorcentajeSuplencia" xml:space="preserve"><value>Porcentaje Suplencia</value></data>
 <data name="NoExisteEseCargo" xml:space="preserve"><value>No existe ese Cargo</value></data>
 <data name="LimpiarFiltros" xml:space="preserve"><value>Limpiar Filtros</value></data>
 <data name="ReunionesProgramadas" xml:space="preserve"><value>Reuniones Programadas</value></data>

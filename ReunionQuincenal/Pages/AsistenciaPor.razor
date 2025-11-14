@@ -77,10 +77,6 @@ else
 @if (registros != null && registros.Any())
 {
     <div style="margin-bottom:10px;">
-        <b>@DiccionarioTraduccionesService.Traducciones["PorcentajeGlobal"]:</b>
-        <span style="color:@GetColor(porcentajeGlobal)">
-            @porcentajeGlobal.ToString("0.00")%
-        </span>
     </div>
     @if (registrosFiltrados != null && !registrosFiltrados.Any() && !string.IsNullOrEmpty(filtroCargo))
     {
@@ -108,6 +104,13 @@ else
                 </FooterTemplate>
             </RadzenDataGridColumn>
             <RadzenDataGridColumn TItem="AsistenReuPorcetanjeDTO" Property="PorcentajeAsistencia" Title="@DiccionarioTraduccionesService.Traducciones["PorcentajeAsistencia"]">
+                <FooterTemplate>
+                    <b>@DiccionarioTraduccionesService.Traducciones["PorcentajeGlobal"]:</b>
+                    <span 
+                    style="color:@GetColor(porcentajeGlobal)">
+                    @porcentajeGlobal.ToString("0.00")%
+                    </span>
+                    </FooterTemplate>
                 <Template Context="data">
                     <span title="@DiccionarioTraduccionesService.Traducciones["PorcentajeAsistencia"]"
                         style="color:@GetColor(data.PorcentajeAsistencia); font-weight:bold;">
