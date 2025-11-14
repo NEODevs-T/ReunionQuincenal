@@ -135,7 +135,9 @@
 <data name="DiasNoLaborables" xml:space="preserve"><value>Non-Working Days</value></data>
 <data name="FiltrarPorCargo" xml:space="preserve"><value>Filter by Position</value></data>
 <data name="BuscarCargo" xml:space="preserve"><value>Search Position</value></data>
+<data name="ReunionesConSuplencias" xml:space="preserve"><value>Meetings with Substitute</value></data>
 <data name="PorcentajeGlobal" xml:space="preserve"><value>Global Percentage</value></data>
+<data name="PorcentajeSuplencia" xml:space="preserve"><value>Substitute Percentage</value></data>
 <data name="NoExisteEseCargo" xml:space="preserve"><value>That position does not exist</value></data>
 <data name="LimpiarFiltros" xml:space="preserve"><value>Clear Filters</value></data>
 <data name="ReunionesProgramadas" xml:space="preserve"><value>Scheduled Meetings</value></data>
