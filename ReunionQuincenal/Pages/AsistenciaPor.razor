@@ -107,13 +107,13 @@ else
                 <FooterTemplate>
                     <b>@DiccionarioTraduccionesService.Traducciones["PorcentajeGlobal"]:</b>
                     <span 
-                    style="color:@GetColor(porcentajeGlobal)">
+                    style="color:@GetColor(porcentajeGlobal, true)">
                     @porcentajeGlobal.ToString("0.00")%
                     </span>
                     </FooterTemplate>
                 <Template Context="data">
                     <span title="@DiccionarioTraduccionesService.Traducciones["PorcentajeAsistencia"]"
-                        style="color:@GetColor(data.PorcentajeAsistencia); font-weight:bold;">
+                        style="color:@GetColor(data.PorcentajeAsistencia, true); font-weight:bold;">
                         @data.PorcentajeAsistencia.ToString("0.00")%
                         @if (data.PorcentajeAsistencia >= 90)
                         {
@@ -135,21 +135,21 @@ else
                     <FooterTemplate>
                     <b>@DiccionarioTraduccionesService.Traducciones["PorcentajeGlobal"]:</b>
                     <span 
-                    style="color:@GetColor(porcentajeSuplencia)">
+                    style="color:@GetColor(porcentajeSuplencia, false)">
                     @porcentajeSuplencia.ToString("0.00")%
                     </span>
                     </FooterTemplate>
                     <Template Context="data">
-                        <span title="@DiccionarioTraduccionesService.Traducciones["PorcentajeAsistencia"]"
-                                style="color:@GetColor(data.PorcentajeSuplencia); font-weight:bold;">
+                        <span title="@DiccionarioTraduccionesService.Traducciones["PorcentajeSuplencia"]"
+                                style="color:@GetColor(data.PorcentajeSuplencia, false); font-weight:bold;">
                             @data.PorcentajeSuplencia.ToString("0.00")%
                             @if (data.PorcentajeSuplencia >= 90)
                             {
-                                <RadzenIcon Icon="check_circle" Style="color:rgb(112, 143, 112);vertical-align:middle;" />
+                                <RadzenIcon Icon="error" Style="color:red;vertical-align:middle;" />
                             }
                             else if (data.PorcentajeSuplencia < 60)
                             {
-                                <RadzenIcon Icon="error" Style="color:red;vertical-align:middle;" />
+                                <RadzenIcon Icon="check_circle" Style="color:rgb(112, 143, 112);vertical-align:middle;" />
                             }
                         </span>
                     </Template>
@@ -291,14 +291,26 @@ void LimpiarFiltros()
     registros = null;
     registrosFiltrados = null;
 }
-private string GetColor(double porcentaje)
+private string GetColor(double porcentaje, bool mayorEsMejor)
 {
-    if (porcentaje >= 90)
-        return "green";
-    else if (porcentaje >= 60)
-        return "orange";
+    if (mayorEsMejor)
+    {
+        if (porcentaje >= 90)
+            return "green";
+        else if (porcentaje >= 60)
+            return "orange";
+        else
+            return "red";
+    }
     else
-        return "red";
+    {
+        if (porcentaje <= 60)
+            return "green";
+        else if (porcentaje <= 90)
+            return "orange";
+        else
+            return "red";
+    }
 }
 public class Empresa
 {
