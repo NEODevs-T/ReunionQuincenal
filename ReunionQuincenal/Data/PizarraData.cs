@@ -21,7 +21,7 @@ public class PizarraData : IPizarraData
         _navigationManager = navigationManager;
     }
 
-    private const string BaseUrl = "http://neo.paveca.com.ve/apineomaster/api/Pizarra";
+    private const string BaseUrl = "http://neo.grandbay-corp.com/ApiNeoMasterP/api/Pizarra";
     private const string BaseUrl2 = "http://localhost:5021/api/Pizarra";
     private HttpClient cliente { get; set; } = new HttpClient();
     private HttpClient _http { get; set; } = new HttpClient();
@@ -232,7 +232,7 @@ public class PizarraData : IPizarraData
 
     public async Task<CentroDivisionDTO> GetCentroDivi(string centro, string division, int tipo)
     {
-        url = $"http://neo.paveca.com.ve/apineomaster/api/Maestra/GetCentroDivi/{centro}/{division}/{tipo}";
+        url = $"http://neo.grandbay-corp.com/ApiNeoMasterP/api/Maestra/GetCentroDivi/{centro}/{division}/{tipo}";
         cliente = _clientFactory.CreateClient();
         return await cliente.GetFromJsonAsync<CentroDivisionDTO>(url) ?? new CentroDivisionDTO();
 

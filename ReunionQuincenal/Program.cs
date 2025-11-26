@@ -60,7 +60,7 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Error");
 }
 
-app.UsePathBase("/reunionquincenalDESARROLLO");
+app.UsePathBase("/reunionquincenal");
 app.UseStaticFiles();
 
 app.UseRouting();

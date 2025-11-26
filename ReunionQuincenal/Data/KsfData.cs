@@ -20,7 +20,7 @@ public class KsfData: IKsfData
 
     }
 
-    private const string BaseUrl = "http://neo.paveca.com.ve/apineomaster/api/Ksf";
+    private const string BaseUrl = "http://neo.grandbay-corp.com/ApiNeoMasterP/api/Ksf";
     private HttpClient cliente { get; set; } = new HttpClient();
     private HttpClient _http { get; set; } = new HttpClient();
     private HttpResponseMessage? mensaje { get; set; } = new HttpResponseMessage();

@@ -19,7 +19,7 @@ public class MaestraData : IMaestraData
 
     }
 
-    private const string BaseUrl = "http://neo.paveca.com.ve/apineomaster/api/Maestra";
+    private const string BaseUrl = "http://neo.grandbay-corp.com/ApiNeoMasterP/api/Maestra";
     private const string BaseUrl2 = "http://localhost:5021/api/Maestra";
     private HttpClient cliente { get; set; } = new HttpClient();
     private HttpClient _http { get; set; } = new HttpClient();

@@ -20,7 +20,7 @@ public class CargoReuData : ICargoReuData
 
     }
 
-    private const string BaseUrl = "http://neo.paveca.com.ve/apineomaster/api/CargoReu";
+    private const string BaseUrl = "http://neo.grandbay-corp.com/ApiNeoMasterP/api/CargoReu";
     private HttpClient cliente { get; set; } = new HttpClient();
     private HttpClient _http { get; set; } = new HttpClient();
     private HttpResponseMessage? mensaje { get; set; } = new HttpResponseMessage();
@@ -40,7 +40,7 @@ public class CargoReuData : ICargoReuData
 
     public async Task<List<CarReuDTO>> GetCargosReunion()
     {
-        return await _http.GetFromJsonAsync<List<CarReuDTO>>("http://neo.paveca.com.ve/apineomaster/api/AsistenciaReu/GetCargoReuDiaria");
+        return await _http.GetFromJsonAsync<List<CarReuDTO>>("http://neo.grandbay-corp.com/ApiNeoMasterP/api/AsistenciaReu/GetCargoReuDiaria");
     }
 
 }

@@ -19,7 +19,7 @@ public class AvisadorData: IAvisadorData
         _navigationManager = navigationManager;
     }
 
-    private const string BaseUrl = "http://neo.paveca.com.ve/apineomaster/api/Avisador";
+    private const string BaseUrl = "http://neo.grandbay-corp.com/ApiNeoMasterP/api/Avisador";
     private const string BaseUrl2 = "http://localhost:5021/api/Avisador";
 
     private readonly IHttpClientFactory _clientFactory;

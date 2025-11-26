@@ -20,7 +20,7 @@ namespace ReunionWeb.Data;
 
     }
 
-    private const string BaseUrl = "http://neo.paveca.com.ve/apineomaster/api/RespoReunion";
+    private const string BaseUrl = "http://neo.grandbay-corp.com/ApiNeoMasterP/api/RespoReunion";
     private HttpClient cliente { get; set; } = new HttpClient();
     private HttpClient _http { get; set; } = new HttpClient();
     private HttpResponseMessage? mensaje { get; set; } = new HttpResponseMessage();

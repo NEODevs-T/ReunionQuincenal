@@ -28,7 +28,7 @@ public class DbReunionService : IDbReunionService
     }
     // **-------> CONEXION A LA API <--------**
     private readonly IHttpClientFactory _clientFactory;
-    private const string BaseUrl = "http://neo.paveca.com.ve/apineomaster/api/DbReunionService";
+    private const string BaseUrl = "http://neo.grandbay-corp.com/ApiNeoMasterP/api/DbReunionService";
     private HttpClient cliente { get; set; } = new HttpClient();
     private HttpResponseMessage? mensaje { get; set; } = new HttpResponseMessage();
     private string url { get; set; } = "";

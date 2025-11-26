@@ -11,8 +11,8 @@ public class APIReunionService : IAPIReunionService
 {
         // **-------> CONEXION A LA API <--------**
         private readonly IHttpClientFactory _clientFactory;
-        private const string BaseUrlMaestra = "http://neo.paveca.com.ve/apineomaster/api/Maestra";
-        private const string BaseUrlLineas = "http://neo.paveca.com.ve/apineomaster/api/Lineas";
+        private const string BaseUrlMaestra = "http://neo.grandbay-corp.com/ApiNeoMasterP/api/Maestra";
+        private const string BaseUrlLineas = "http://neo.grandbay-corp.com/ApiNeoMasterP/api/Lineas";
         private const string BaseUrl = "http://localhost:5021/api/Maestra";
         private const string ViejaUrl1 = "http://neo.paveca.com.ve/ReunionApi/Lineas";
         private const string ViejaUrl2 = "http://neo.paveca.com.ve/ReunionApi/Empresas";
