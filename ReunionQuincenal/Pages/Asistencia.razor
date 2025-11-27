@@ -18,7 +18,7 @@
 @using ReunionWeb.Resources
 @using System.Globalization
 @using ReunionWeb.Services
-@attribute [Authorize(Roles = "Admin, AdminChempro, SupIntendente, PrimeUser, SupIntendenteGeneral, SuperAdmin")]
+@attribute [Authorize(Roles = "Admin, AdminChempro, SupIntendente, PrimeUser, SuperUser, SupIntendenteGeneral, SuperAdmin")]
 
 
 
@@ -194,7 +194,7 @@ else if (dataIsLoaded == 1 && RespoReuData.resporeus.Count() == 0)
         await DiccionarioTraduccionesService.CargarTraduccionesAsync();
         traduccionesCargadas = true;
         UsrRol = claims.FirstOrDefault(c => c.Type.Contains("role"))?.Value;
-        if (UsrRol == "Admin" | UsrRol == "SuperAdmin" | UsrRol == "PrimeUser")
+        if (UsrRol == "Admin" | UsrRol == "SuperAdmin" | UsrRol == "SuperUser" | UsrRol == "PrimeUser")
         {
 
             await MaestraData.GetCentrosxEmpresa("All" + claims.FirstOrDefault(c => c.Type.Contains("IdEmpresa"))?.Value);
