@@ -278,12 +278,37 @@ else if (dataIsLoaded == 2 && registrosVisibles.Count == 0)
 
     private List<Claim> claims { get; set; }
 
-        List<ReunionDTO> registrosVisibles => PizarraData.reudiatablas
-        .Where(d => d.Rdstatus != "Rechazada"
-                && d.Rdstatus != "Listo"
-                && d.RdfecTra.Date == DateTime.Now.Date
-                && (string.IsNullOrEmpty(d.Rdodt)))
-        .ToList();
+List<ReunionDTO> registrosVisibles
+{
+    get
+    {
+        DateTime fechaInicio;
+        DateTime fechaFin;
+
+        // Lógica de lunes igual que en la API
+        if (DateTime.Today.DayOfWeek == DayOfWeek.Monday)
+        {
+            fechaInicio = DateTime.Now.AddDays(-3);
+            fechaFin = DateTime.Now.AddDays(+1);
+        }
+        else
+        {
+            fechaInicio = DateTime.Now.AddDays(-1);
+            fechaFin = DateTime.Now.AddDays(+1);
+        }
+
+        return PizarraData.reudiatablas
+            .Where(d => d.Rdstatus != "Rechazada"
+                     && d.Rdstatus != "Listo"
+                     && d.Rdstatus != "Cerrado"
+                     &&
+                     (
+                         (d.RdfecReu.Date >= fechaInicio.Date && d.RdfecReu.Date <= fechaFin.Date)
+                     )
+            )
+            .ToList();
+    }
+}
 
     private async Task CreateData()
 
