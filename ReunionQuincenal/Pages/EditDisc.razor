@@ -10,6 +10,7 @@
 @inject IMaestraData MaestraData
 @inject NavigationManager NavigationManager
 @inject AuthenticationStateProvider AuthStateProvider
+@inject AuthenticationStateProvider AuthenticationStateProvider
 @inject ILocalStorageService LocalStorage
 @inject IDiccionarioTraduccionesService DiccionarioTraduccionesService
 @inject LocalizationService LocalizationService
@@ -30,7 +31,7 @@ else
 <h3>@DiccionarioTraduccionesService.Traducciones["EditarDiscrepancia"]</h3>
 
 <h4></h4>
-<AuthorizeView Roles="Admin,AdminChempro, SuperUser, PrimeUser">
+<AuthorizeView Roles="Admin,AdminChempro, SuperUser, PrimeUser, Planificador, SuperAdmin">
 
     <Authorized>
 
@@ -213,7 +214,7 @@ else
                     }
                      @if(DiscForm.RdcodDis == "3")
                         {
-                            if (planificador == "Admin" || planificador == "Planificador" || planificador == "SuperAdmin")
+                            if (EsAdmin || EsSuperUser || EsPlanificador)  
                             {
                                 <BSCol Column="2">
                                     <BSLabel>@DiccionarioTraduccionesService.Traducciones["Requisicion"]</BSLabel>
@@ -570,8 +571,9 @@ else
     int dataIsLoaded = 0;
     private bool traduccionesCargadas = false;
     private int idPais { get; set; }
-
-
+    private bool EsSuperUser; //Variable para verificar que el usuario sea SuperIntendente
+    private bool EsAdmin; // Variable para verificar que el usuario sea Administrador
+    private bool EsPlanificador;
     private async Task CreateData()
     {
         var authState = await AuthStateProvider.GetAuthenticationStateAsync();
@@ -593,6 +595,11 @@ else
         CultureInfo.CurrentUICulture = CultureInfo.DefaultThreadCurrentUICulture;
         await DiccionarioTraduccionesService.CargarTraduccionesAsync();
                 traduccionesCargadas = true;
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        EsSuperUser = user.IsInRole("SuperUser");
+        EsAdmin = user.IsInRole("Admin");
+        EsPlanificador = user.IsInRole("Planificador");
     }
 
     protected override async Task OnParametersSetAsync()
