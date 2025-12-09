@@ -223,7 +223,7 @@
 
         carga = true;
 
-        var result = await Http.PostAsJsonAsync("http://neo.paveca.com.ve/Authentication/api/Auth/Login", user);
+        var result = await Http.PostAsJsonAsync("http://operaciones.papeleslatinos.com/AuthenticationP/api/Auth/Login", user);
         var ValidarToken = await result.Content.ReadAsStringAsync();
 
         if (string.IsNullOrEmpty(ValidarToken))
