@@ -663,6 +663,15 @@ else if (dataIsLoaded == 2 && PizarraData.reudiatablas.Count() == 0)
                 UsrRol = "Mtto";
                 await MaestraData.GetCentrosxEmpresa(claims.FirstOrDefault(c => c.Type.Contains("IdCentro"))?.Value);
                 break;
+            
+            case "Primeverificador":
+                UsrRol = "Compras";
+                await MaestraData.GetCentrosxEmpresa("All" + claims.FirstOrDefault(c => c.Type.Contains("IdEmpresa"))?.Value);
+                break;
+            case "Seguridad":
+                UsrRol = "Seguridad";
+                await MaestraData.GetCentrosxEmpresa("All" + claims.FirstOrDefault(c => c.Type.Contains("IdEmpresa"))?.Value);
+                break;
 
             default:
                 UsrRol = claims.FirstOrDefault(c => c.Type.Contains("role"))?.Value;
@@ -875,19 +884,45 @@ private async Task BuscarxOdt()
         }
 
     }
-    public void ObtenerReunionesPorRol()
+
+public void ObtenerReunionesPorRol()
+{
+    var fuente = PizarraData.reudiatablas ?? new List<ReunionDTO>();
+
+    if (!string.IsNullOrWhiteSpace(UsrRol))
     {
-        if (!string.IsNullOrEmpty(UsrRol))
-        {
-            listareu = PizarraData.reudiatablas.Where(r => r.Responsable.StartsWith(UsrRol)).ToList();
+        var rol = UsrRol.Trim();
 
-        }
-        else
-        {
-            listareu = PizarraData.reudiatablas;
-
-        }
+        listareu = fuente
+            .Where(r =>
+                r != null
+                && (
+                    // 1) Si el texto de Responsable viene en el DTO, úsalo
+                    (!string.IsNullOrWhiteSpace(r.Responsable)
+                        ? r.Responsable.Trim().StartsWith(rol, StringComparison.OrdinalIgnoreCase)
+                        // 2) Si viene vacío, mira el catálogo por IdResReu
+                        : EsResponsable(r.IdResReu, rol)
+                    )
+                )
+            )
+            .ToList();
     }
+    else
+    {
+        listareu = fuente;
+    }
+}
+
+private bool EsResponsable(int idResReu, string rol)
+{
+    var resp = RespoReuData.resporeus?.FirstOrDefault(x => x.IdResReu == idResReu);
+    var nombre = (idPais == 5 ? resp?.Rrenglish : resp?.Rrnombre)?.Trim();
+
+    // Ajusta StartsWith/Contains según cómo estén guardados los nombres
+    return !string.IsNullOrWhiteSpace(nombre)
+        && nombre.StartsWith(rol, StringComparison.OrdinalIgnoreCase);
+}
+
 
 
     public async Task PrintDocument()
