@@ -270,20 +270,25 @@ else
                                                 }
                                                 <BSTD class="@(nombreResponsable == "Por Definir" ? "Definir" : "")">@nombreResponsable</BSTD>
                                                 @{
-                                                    var clavee = ValidationMessages.MapStatusKey(d.Rdstatus);
-                                                    var estadoTraducido = DiccionarioTraduccionesService.Traducciones.ContainsKey(clavee)
-                                                        ? DiccionarioTraduccionesService.Traducciones[clavee]
-                                                        : clavee;
+                                                    var esVencido = d.RdfecTra.Date < DateTime.Now.Date
+                                                                    && (d.Rdstatus?.StartsWith("Pendiente", StringComparison.OrdinalIgnoreCase) ?? false);
 
-                                                    var claseEstado = d.Rdstatus switch
-                                                    {
-                                                        "Listo" => "listo",
-                                                        "Cerrado" => "Cerrado",
-                                                        _ => "pendiente"
-                                                    };
+                                                    var claveMostrada = esVencido ? "Vencidos" : ValidationMessages.MapStatusKey(d.Rdstatus);
+
+                                                    var estadoTraducido = DiccionarioTraduccionesService.Traducciones.ContainsKey(claveMostrada)
+                                                        ? DiccionarioTraduccionesService.Traducciones[claveMostrada]
+                                                        : claveMostrada;
+
+                                                    var claseEstado = esVencido
+                                                        ? "Vencido"
+                                                        : d.Rdstatus switch
+                                                        {
+                                                            "Listo"   => "listo",
+                                                            "Cerrado" => "Cerrado",
+                                                            _         => "pendiente"
+                                                        };
                                                 }
                                                 <BSTD Class="@claseEstado">@estadoTraducido</BSTD>
-
                                                 @{
                                                     var codRequiTexto = d.RdcodRequi == null ? "N/A" : d.RdcodRequi;
                                                 }
@@ -709,33 +714,69 @@ else if (dataIsLoaded == 2 && PizarraData.reudiatablas.Count() == 0)
                 mensaje = "Error: " + ex.Message;
             }
     }
-
-
+    
     protected async Task Get()
     {
         if (IdCentro != 0 & IdDiv != 0)
         {
-            // error = null;
             if (dataIsLoaded != 1)
             {
                 dataIsLoaded = 1;
-                await PizarraData.GetPendientes(IdCentro.ToString(), IdDiv.ToString(), fecha1, fecha2, tipoconsulta, Status);
-                ObtenerReunionesPorRol();//actualizar tabla
+
+                // 🔧 AJUSTE CRÍTICO:
+                var statusConsulta = EsOpcionVencidos(Status) ? "Total Pendiente" : Status;
+                statusConsulta = ValidationMessages.MapStatusKey(statusConsulta ?? string.Empty);
+
+                await PizarraData.GetPendientes(IdCentro.ToString(), IdDiv.ToString(),
+                                                fecha1, fecha2, tipoconsulta, statusConsulta);
+
+                ObtenerReunionesPorRol(); // actualiza listareu desde reudiatablas
+
                 if (IdMasterSeleccionado > 0)
                 {
                     listareu = listareu
                         .Where(r => r.IdMaster == IdMasterSeleccionado)
                         .ToList();
                 }
+
+                // 📌 Filtrado visual: solo si la opción seleccionada es "Vencidos"
+                if (EsOpcionVencidos(Status))
+                {
+                    listareu = listareu
+                        .Where(d => EsVencido(d.RdfecTra, d.Rdstatus))
+                        .OrderByDescending(d => EsVencido(d.RdfecTra, d.Rdstatus))
+                        .ThenBy(d => d.RdfecTra)
+                        .ToList();
+                }
+                else
+                {
+                    // (opcional) ordena mostrando primero vencidos
+                    listareu = listareu
+                        .OrderByDescending(d => EsVencido(d.RdfecTra, d.Rdstatus))
+                        .ThenBy(d => d.RdfecTra)
+                        .ToList();
+                }
+
                 dataIsLoaded = 2;
             }
-
         }
         else
         {
-            NotificationService.Notify(Notificar.Notificacion("advertencia", DiccionarioTraduccionesService.Traducciones["Atencion"], DiccionarioTraduccionesService.Traducciones["SVLista"]));
+            NotificationService.Notify(Notificar.Notificacion(
+                "advertencia",
+                DiccionarioTraduccionesService.Traducciones["Atencion"],
+                DiccionarioTraduccionesService.Traducciones["SVLista"]));
         }
     }
+
+
+
+private bool EsOpcionVencidos(string? s)
+{
+    var canonico = ValidationMessages.MapStatusKey((s ?? string.Empty).Trim());
+    return canonico.Equals("Vencidos", StringComparison.OrdinalIgnoreCase);
+}
+
 
 private async Task BuscarxOdt()
 {
@@ -822,6 +863,42 @@ private async Task BuscarxOdt()
     }
 
 
+    bool EsVencido(DateTime fechaTrabajo, string? estadoOriginal)
+    {
+        // Ignorar fechas no establecidas (DateTime.MinValue)
+        if (fechaTrabajo == default) return false;
+
+        var hoy = DateTime.Now.Date;
+        var estadoCanonico = ValidationMessages.MapStatusKey(estadoOriginal ?? string.Empty);
+
+        // "Abierto" = cualquier estado distinto de Listo/Cerrado
+        var abierto = !(estadoCanonico.Equals("Listo", StringComparison.OrdinalIgnoreCase)
+                    || estadoCanonico.Equals("Cerrado", StringComparison.OrdinalIgnoreCase));
+
+        return fechaTrabajo.Date < hoy && abierto;
+    }
+
+
+
+string GetVisualStatus(DateTime fechaTrabajo, string estadoOriginal)
+{
+    var claveEstado = EsVencido(fechaTrabajo, estadoOriginal)
+        ? "Vencidos"
+        : ValidationMessages.MapStatusKey(estadoOriginal);
+
+    return DiccionarioTraduccionesService.Traducciones.TryGetValue(claveEstado, out var traducido)
+        ? traducido
+        : claveEstado;
+}
+
+string GetClassVencido(DateTime ft, string estado)
+{
+    return EsVencido(ft, estado) ? "Vencido" : "";
+}
+
+    
+
+
     void Editar(int id)
     {
         var idioma = idPais == 5 ? "en" : "es";
@@ -830,60 +907,117 @@ private async Task BuscarxOdt()
         //NavigationManager.NavigateTo($"EditDisc/{id}/{tipoconsulta}/{NombreLinea}/{fecha1.ToString("dd-MM-yyyy")}/{fecha2.ToString("dd-MM-yyyy")}/{Status}");
     }
 
+    
     protected override async Task OnParametersSetAsync()
     {
         try
         {
-
-
             if (accion != null)
             {
-                //Si esta filtrando por ODT se consulta la odt si el campo es vacio se procede normal
+                // Si está filtrando por ODT se consulta la odt; si el campo es vacío se procede normal
                 BuscarOdt = await LocalStorage.GetItemAsStringAsync("OdtValue");
 
                 if (string.IsNullOrEmpty(BuscarOdt) && !valueodt)
                 {
                     valuvisualeodt = valueodt = false;
 
-
+                    // Parseo de las fechas de la ruta: dd-MM-yyyy
                     string[] fec1 = f1.Split('-');
                     string[] fec2 = f2.Split('-');
 
-                    //año, mes dia
                     DateTime date1 = new DateTime(int.Parse(fec1[2]), int.Parse(fec1[1]), int.Parse(fec1[0]));
                     DateTime date2 = new DateTime(int.Parse(fec2[2]), int.Parse(fec2[1]), int.Parse(fec2[0]));
                     fecha1 = date1;
                     fecha2 = date2;
+
                     IdCentro = int.Parse(accion);
-                    IdDiv = int.Parse(division);
-                    Status = est;
+                    IdDiv    = int.Parse(division);
+
+                    // 🔧 1) Normaliza el Status recibido de la ruta (puede venir traducido)
+                    Status = ValidationMessages.MapStatusKey(est ?? string.Empty);
+
                     if (!string.IsNullOrEmpty(linea) && linea != "Todo")
                     {
                         NombreLinea = linea;
                     }
+
                     tipoconsulta = tipo;
+
                     dataIsLoaded = 1;
-                    await PizarraData.GetPendientes(accion, division, date1, date2, tipo, est);
-                    ObtenerReunionesPorRol();//actualizar tabla
+
+                    // 🔧 2) Construye el estado REAL para consultar al backend.
+                    //     Si el usuario seleccionó "Vencidos" (visual),
+                    //     pedimos "Total Pendiente" (o el que tú uses para traer todos los abiertos).
+                    var statusConsulta = EsOpcionVencidos(Status) ? "Total Pendiente" : Status;
+
+                    // (Opcional) por si 'statusConsulta' viniera con una variante, lo dejamos canónico
+                    statusConsulta = ValidationMessages.MapStatusKey(statusConsulta ?? string.Empty);
+
+                    // ✅ Llama al backend con el estado de consulta (NO con "Vencidos")
+                    await PizarraData.GetPendientes(accion, division, date1, date2, tipo, statusConsulta);
+
+                    // Actualiza la lista en memoria según rol
+                    ObtenerReunionesPorRol();
+
+                    // Filtro por línea (si aplica)
+                    if (IdMasterSeleccionado > 0)
+                    {
+                        listareu = listareu
+                            .Where(r => r.IdMaster == IdMasterSeleccionado)
+                            .ToList();
+                    }
+
+                    // 🔧 3) Aplica el filtro VISUAL de vencidos en cliente
+                    if (EsOpcionVencidos(Status))
+                    {
+                        listareu = listareu
+                            .Where(d => EsVencido(d.RdfecTra, d.Rdstatus))
+                            .OrderByDescending(d => EsVencido(d.RdfecTra, d.Rdstatus))
+                            .ThenBy(d => d.RdfecTra)
+                            .ToList();
+                    }
+                    else
+                    {
+                        // (Opcional) ordena mostrando primero los vencidos
+                        listareu = listareu
+                            .OrderByDescending(d => EsVencido(d.RdfecTra, d.Rdstatus))
+                            .ThenBy(d => d.RdfecTra)
+                            .ToList();
+                    }
 
                     dataIsLoaded = 2;
                 }
                 else
                 {
+                    // Cuando hay ODT en localStorage, conserva el flag visual y busca por ODT
                     valuvisualeodt = valueodt;
                     await BuscarxOdt();
 
-                }
+                    // Aplica el mismo filtro/orden tras la búsqueda por ODT, para coherencia
+                    if (EsOpcionVencidos(Status))
+                    {
+                        listareu = listareu
+                            .Where(d => EsVencido(d.RdfecTra, d.Rdstatus ?? string.Empty))
+                            .ToList();
+                    }
 
+                    listareu = listareu
+                        .OrderByDescending(d => EsVencido(d.RdfecTra, d.Rdstatus ?? string.Empty))
+                        .ThenBy(d => d.RdfecTra)
+                        .ToList();
+                }
             }
         }
         catch (Exception ex)
         {
-            NotificationService.Notify(Notificar.Notificacion("error", DiccionarioTraduccionesService.Traducciones["ErrorInesp"], DiccionarioTraduccionesService.Traducciones["Reload"]));
-
+            NotificationService.Notify(Notificar.Notificacion(
+                "error",
+                DiccionarioTraduccionesService.Traducciones["ErrorInesp"],
+                DiccionarioTraduccionesService.Traducciones["Reload"]));
         }
-
     }
+
+
 
 public void ObtenerReunionesPorRol()
 {
@@ -933,10 +1067,6 @@ private bool EsResponsable(int idResReu, string rol)
         await IJS.InvokeAsync<object>("open", new object[] { url, "_blank" });
     }
 
-    string GetClassVencido(DateTime ft, string estado)
-    {
-        return ft.Date < DateTime.Now.Date && estado.StartsWith("Pendiente") ? "Vencido" : "";
-    }
     protected async Task BuscarLineas(ChangeEventArgs e)
     {
         IdDiv = int.Parse(e.Value.ToString());
