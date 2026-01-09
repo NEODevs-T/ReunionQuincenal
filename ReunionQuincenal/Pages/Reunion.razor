@@ -297,14 +297,21 @@ List<ReunionDTO> registrosVisibles
             fechaFin = DateTime.Now.AddDays(+1);
         }
 
+        bool EsOdtVacia(string s) =>
+        string.IsNullOrWhiteSpace(s) || s.Trim().Length == 0;
+
         return PizarraData.reudiatablas
             .Where(d => d.Rdstatus != "Rechazada"
-                     && d.Rdstatus != "Listo"
-                     && d.Rdstatus != "Cerrado"
-                     &&
-                     (
-                         (d.RdfecReu.Date >= fechaInicio.Date && d.RdfecReu.Date <= fechaFin.Date)
-                     )
+                    && d.Rdstatus != "Listo"
+                    && d.Rdstatus != "Cerrado"
+                    &&
+                    (
+                        (d.RdfecReu.Date < DateTime.Today && EsOdtVacia(d.Rdodt))
+                        
+                        || (d.RdfecReu.Date == DateTime.Today
+                            && d.RdfecReu.Date >= fechaInicio.Date
+                            && d.RdfecReu.Date <= fechaFin.Date)
+                    )
             )
             .ToList();
     }
