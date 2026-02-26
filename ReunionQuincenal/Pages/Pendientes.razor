@@ -252,7 +252,7 @@ else
                                     @if (IdKsf == 0 | IdKsf == d.Idksf)
                                     {
 
-                                        <BSTR Class="@GetClassVencido(d.RdfecTra, d.Rdstatus)">
+                                        <BSTR Class="@GetRowClass(d)">
 
                                             @*<BSTD>@d.IdReuDia</BSTD>*@
                                             <BSTD>@d.Rdarea</BSTD>
@@ -284,16 +284,20 @@ else
                                                 }
                                                 <BSTD class="@(nombreResponsable == "Por Definir" ? "Definir" : "")">@nombreResponsable</BSTD>
                                                 @{
-                                                    var estadoTraducido = GetVisualStatus(d.RdfecTra, d.Rdstatus, d.Idksf);
+                                                    var estadoEf = EstadoEfectivo(d); // "VencidasDiaria" | "Vencidos" | original
+                                                    var claveTrad = ValidationMessages.MapStatusKey(estadoEf);
+                                                    var estadoTraducido = DiccionarioTraduccionesService.Traducciones.ContainsKey(claveTrad)
+                                                        ? DiccionarioTraduccionesService.Traducciones[claveTrad]
+                                                        : estadoEf;
 
-                                                    var claseEstado = EsVencido(d.RdfecTra, d.Rdstatus)
-                                                        ? "Vencido"
-                                                        : d.Rdstatus switch
-                                                        {
-                                                            "Listo"   => "listo",
-                                                            "Cerrado" => "Cerrado",
-                                                            _         => "pendiente"
-                                                        };
+                                                    var claseEstado = estadoEf switch
+                                                    {
+                                                        "VencidasDiaria" => "VencidoDiario",
+                                                        "Vencidos"       => "Vencido",
+                                                        "Listo"          => "listo",
+                                                        "Cerrado"        => "Cerrado",
+                                                        _                => "pendiente"
+                                                    };
                                                 }
                                                 <BSTD Class="@claseEstado">@estadoTraducido</BSTD>
                                                 @{
@@ -592,6 +596,52 @@ else if (dataIsLoaded == 2 && PizarraData.reudiatablas.Count() == 0)
     private int LineaSeleccionada { get; set; } = 0;
     private string CodigoEquipoSeleccionado {get; set; } = "Todo";
     private List<EquipoOpcion> EquiposOpciones { get; set; } = new();
+    private const string ESTADO_VENCIDOS = "Vencidos";
+    private const string ESTADO_VENCIDAS_DIARIA = "VencidasDiaria";
+
+    private bool EsPendiente(string? estado)
+    {
+        var e = (estado ?? string.Empty).Trim().ToLowerInvariant();
+        return e.StartsWith("pendiente") || e.StartsWith("pending");
+    }
+
+    private bool EsVencidoGeneral(ReunionDTO d)
+    {
+        return d.RdfecTra.Date < DateTime.Now.Date && EsPendiente(d.Rdstatus);
+    }
+
+    private bool EsVencidaDiaria(ReunionDTO d)
+    {
+        return d.Idksf == 6 && EsVencidoGeneral(d);
+    }
+
+    private string EstadoEfectivo(ReunionDTO d)
+    {
+        var original = d.Rdstatus ?? string.Empty;
+        if (EsVencidaDiaria(d))   return ESTADO_VENCIDAS_DIARIA;
+        if (EsVencidoGeneral(d))  return ESTADO_VENCIDOS;
+        return original;
+    }
+    
+    string GetRowClass(ReunionDTO d)
+    {
+        if (EsVencidaDiaria(d))  return "VencidoDiario"; // estilo distintivo para diaria (KSF=6)
+        if (EsVencidoGeneral(d)) return "Vencido";       // vencido general
+        return string.Empty;
+    }
+
+    private bool EsOpcionVencidasDiaria(string? s)
+{
+    var valor = (s ?? string.Empty).Trim();
+
+    var traducido = DiccionarioTraduccionesService.Traducciones.ContainsKey("VencidasDiaria")
+        ? DiccionarioTraduccionesService.Traducciones["VencidasDiaria"]
+        : "VencidasDiaria";
+
+    return valor.Equals("VencidasDiaria", StringComparison.OrdinalIgnoreCase)
+        || valor.Equals(traducido, StringComparison.OrdinalIgnoreCase)
+        || valor.Equals("Daily Overdue", StringComparison.OrdinalIgnoreCase);
+}
 
     private async Task CreateData()
 
@@ -1014,10 +1064,11 @@ else if (dataIsLoaded == 2 && PizarraData.reudiatablas.Count() == 0)
     void Editar(int id)
     {
         var idioma = idPais == 5 ? "en" : "es";
-        var url = $"{idioma}/EditDisc/{id}/{tipoconsulta}/{NombreLinea}/{fecha1:dd-MM-yyyy}/{fecha2:dd-MM-yyyy}/{Status}";
+        var lineaEncoded = Uri.EscapeDataString(NombreLinea ?? "Todo");
+        var statusEncoded = Uri.EscapeDataString(Status ?? "Todo");
+        var url = $"{idioma}/EditDisc/{id}/{tipoconsulta}/{lineaEncoded}/{fecha1:dd-MM-yyyy}/{fecha2:dd-MM-yyyy}/{statusEncoded}";
         NavigationManager.NavigateTo(url);
-        //NavigationManager.NavigateTo($"EditDisc/{id}/{tipoconsulta}/{NombreLinea}/{fecha1.ToString("dd-MM-yyyy")}/{fecha2.ToString("dd-MM-yyyy")}/{Status}");
-    }    
+    }   
     
     protected override async Task OnParametersSetAsync()
     {
@@ -1116,41 +1167,39 @@ else if (dataIsLoaded == 2 && PizarraData.reudiatablas.Count() == 0)
         }
     }
 
-    private void AplicarFiltroVisualDeVencidos()
-    {
-        if (EsOpcionVencidosGenerico(Status))
-        {
-            var canonico = ValidationMessages.MapStatusKey(Status ?? string.Empty);
+private void AplicarFiltroVisualDeVencidos()
+{
+    var canonico = ValidationMessages.MapStatusKey(Status ?? string.Empty);
 
-            if (canonico.Equals("VencidasDiaria", StringComparison.OrdinalIgnoreCase))
-            {
-                // Solo las vencidas de Reunión Diaria (Idksf == 6)
-                listareu = listareu
-                    .Where(d => d.Idksf == 6 && EsVencido(d.RdfecTra, d.Rdstatus))
-                    .OrderByDescending(d => d.RdfecReu)
-                    .ThenByDescending(d => d.RdfecTra)
-                    .ToList();
-            }
-            else
-            {
-                // Vencidos (general)
-                listareu = listareu
-                    .Where(d => EsVencido(d.RdfecTra, d.Rdstatus))
-                    .OrderByDescending(d => d.RdfecReu)
-                    .ThenByDescending(d => d.RdfecTra)
-                    .ToList();
-            }
-        }
-        else
-        {
-            // Mostrar primero los vencidos, sin filtrar por KSF
-            listareu = listareu
-                .OrderByDescending(d => EsVencido(d.RdfecTra, d.Rdstatus))
-                .ThenByDescending(d => d.RdfecReu)
-                .ThenByDescending(d => d.RdfecTra)
-                .ToList();
-        }
+    if (canonico.Equals("VencidasDiaria", StringComparison.OrdinalIgnoreCase))
+    {
+        // Solo vencidas diarias (KSF=6)
+        listareu = listareu
+            .Where(d => EsVencidaDiaria(d))
+            .OrderByDescending(d => d.RdfecReu)
+            .ThenByDescending(d => d.RdfecTra)
+            .ToList();
     }
+    else if (canonico.Equals("Vencidos", StringComparison.OrdinalIgnoreCase))
+    {
+        // Vencidos generales
+        listareu = listareu
+            .Where(d => EsVencidoGeneral(d))
+            .OrderByDescending(d => d.RdfecReu)
+            .ThenByDescending(d => d.RdfecTra)
+            .ToList();
+    }
+    else
+    {
+        // Sin filtro: mostrar primero las "VencidasDiaria", luego "Vencidos", luego fechas
+        listareu = listareu
+            .OrderByDescending(d => EsVencidaDiaria(d))  // primero KSF 6 vencidos
+            .ThenByDescending(d => EsVencidoGeneral(d))  // luego vencidos generales
+            .ThenByDescending(d => d.RdfecReu)
+            .ThenByDescending(d => d.RdfecTra)
+            .ToList();
+    }
+}
 
     // Parseo seguro de fecha de ruta "dd-MM-yyyy"
     private static bool TryParseFechaRuta(string? s, out DateTime result)
@@ -1204,9 +1253,14 @@ else if (dataIsLoaded == 2 && PizarraData.reudiatablas.Count() == 0)
 
     public async Task PrintDocument()
     {
-        string idiomaRuta = idPais == 5 ? "en" : "es";
+        string idiomaRuta   = idPais == 5 ? "en" : "es";
         string nombrePagina = idPais == 5 ? "TablePending" : "TablaPendientes";
-        string url = $"{idiomaRuta}/{nombrePagina}/{IdCentro}/{IdDiv}/{NombreLinea}/{fecha1:dd-MM-yyyy}/{fecha2:dd-MM-yyyy}/{tipoconsulta}/{Status}/{idrespo}";
+
+        string lineaEnc = Uri.EscapeDataString(NombreLinea ?? "Todo");
+        string estEnc   = Uri.EscapeDataString(Status ?? "Todo");
+
+        // OJO: La ruta de esta página incluye /{accion}/{division}/{linea}/{f1}/{f2}/{tipo}/{est}
+        string url = $"{idiomaRuta}/{nombrePagina}/{IdCentro}/{IdDiv}/{lineaEnc}/{fecha1:dd-MM-yyyy}/{fecha2:dd-MM-yyyy}/{tipoconsulta}/{estEnc}";
         await IJS.InvokeAsync<object>("open", new object[] { url, "_blank" });
     }
 

@@ -343,5 +343,18 @@ table th {
     .tabla-scroll table {
         font-size: 14px;
     }
+
+    
+/* Vencido general */
+.Vencido {
+    background-color: #f8d7da;   /* rojo claro estilo alert-danger */
+}
+
+/* VencidasDiaria (KSF = 6) con un plus visual */
+.VencidoDiario {
+    background-color: #ffd3bf;   /* rojo/naranja claro */
+    border-left: 4px solid #ff6a00;
+}
+
 }
 
