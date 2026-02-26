@@ -36,8 +36,11 @@ else
     <BSRow>
         <BSCol ColumnLarge="3" ColumnSmall="6">
             <BSLabel>@DiccionarioTraduccionesService.Traducciones["Centro"]</BSLabel>
-            <BSInput InputType="InputType.Select" @bind-Value="IdCentro" @onchange="BuscarDivision" >>
-                <option value="0"> @DiccionarioTraduccionesService.Traducciones["Seleccione"] </option>
+            <BSInput InputType="InputType.Select" @bind-Value="IdCentro" @onchange="BuscarDivision">
+                @if (UsrAdmin == "Admin" || UsrAdmin == "PrimeUser" || IdCentro == 0)
+                {
+                    <option value="0">@DiccionarioTraduccionesService.Traducciones["Seleccione"]</option>
+                }
                 @foreach (var d in MaestraData.centro)
                 {
                     <option value="@d.IdCentro">@d.Centro</option>
@@ -603,6 +606,28 @@ else if (dataIsLoaded == 2 && PizarraData.reudiatablas.Count() == 0)
         }
     }
 
+    private async Task SetCentroInicialAsync()
+    {
+        if (MaestraData?.centro == null || !MaestraData.centro.Any())
+            return;
+
+        var idCentroClaim = claims.FirstOrDefault(c => c.Type.Contains("IdCentro"))?.Value;
+        int.TryParse(idCentroClaim, out var idCentroClaimValue);
+
+        if (idCentroClaimValue > 0 && MaestraData.centro.Any(x => x.IdCentro == idCentroClaimValue))
+        {
+            IdCentro = idCentroClaimValue;
+        }
+        else
+        {
+            IdCentro = MaestraData.centro.First().IdCentro;
+        }
+
+        // Disparar la lógica de división manualmente
+        await BuscarDivision(new ChangeEventArgs { Value = IdCentro });
+        StateHasChanged();
+    }
+
         private class EquipoOpcion
     {
         public string Codigo { get; set;} = string.Empty;
@@ -734,6 +759,20 @@ else if (dataIsLoaded == 2 && PizarraData.reudiatablas.Count() == 0)
                 UsrRol = claims.FirstOrDefault(c => c.Type.Contains("role"))?.Value;
                 await MaestraData.GetCentrosxEmpresa(claims.FirstOrDefault(c => c.Type.Contains("IdCentro"))?.Value);
                 break;
+        }
+        
+        // ---- DECISIÓN: Admin mantiene "Seleccione"; otros roles seleccionan un centro ----
+        var mantenerPlaceholder = UsrAdmin == "Admin" || UsrAdmin == "PrimeUser";
+        if (mantenerPlaceholder)
+        {
+            // Admin: mantenemos IdCentro = 0 para que se vea "Seleccione"
+            IdCentro = 0;
+            // No llamamos BuscarDivision aún porque no hay un centro seleccionado.
+        }
+        else
+        {
+            // Otros roles: seleccionamos automáticamente el centro
+            await SetCentroInicialAsync(); // método auxiliar más abajo
         }
 
 

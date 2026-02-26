@@ -46,7 +46,10 @@ else
         <BSCol Column="3">
             <BSLabel>@DiccionarioTraduccionesService.Traducciones["Centro"]</BSLabel>
             <BSInput InputType="InputType.Select" @onchange="BuscarDivision" @bind-Value="idCent">
-                <option value="0">@DiccionarioTraduccionesService.Traducciones["Seleccione"]...</option>
+                @if (UsrAdmin == "Admin" || UsrAdmin == "PrimeUser" || IdCentro == 0)
+                {
+                    <option value="0">@DiccionarioTraduccionesService.Traducciones["Seleccione"]...</option>
+                }
                 @foreach (var d in MaestraData.centro)
                 {
                     <option value="@d.IdCentro">@d.Centro</option>
@@ -236,6 +239,7 @@ else
     CambStatDTO CambStata = new CambStatDTO();//Formulario para agregar que usuario hizo el cambio de status.
     CambFecDTO CambFech = new CambFecDTO();//Formulario para agregar que usuario hizo el cambio de fecha.
     ReunionDTO regisReuDia = new ReunionDTO();
+    private string UsrAdmin { get; set; } = ""; 
     private int idCent { get; set; }
     private int idDiv { get; set; }
     private int idLin { get; set; }
@@ -244,6 +248,7 @@ else
     private string Notificacion = "";
     private bool isDesactivado { get; set; } = false;
     private List<AsistenReuDTO> listaAsistencia { get; set; } = new List<AsistenReuDTO>();
+    private int IdCentro { get; set; }
     int reunionQuincenal = 3;
     private bool traduccionesCargadas = false;
     int dataIsLoaded = 0;
@@ -261,6 +266,28 @@ else
         }
     }
 
+    private async Task SetCentroInicialAsync()
+    {
+        // Verificar que la lista esté lista
+        if (MaestraData?.centro == null || !MaestraData.centro.Any())
+            return;
+        // Tomar IdCentro del claim si existe
+        var idCentroClaimStr = claims?.FirstOrDefault(c => c.Type.Contains("IdCentro"))?.Value;
+        int.TryParse(idCentroClaimStr, out var idCentroClaim);
+        // Si el claim está en la lista, úsalo; si no, usa el primero
+        if (idCentroClaim > 0 && MaestraData.centro.Any(x => x.IdCentro == idCentroClaim))
+        {
+            idCent = idCentroClaim;
+        }
+        else
+        {
+            idCent = MaestraData.centro.First().IdCentro;
+        }
+        // Disparar lógica dependiente manualmente (porque cambiar por código no invoca @onchange)
+        await BuscarDivision(new ChangeEventArgs { Value = idCent });
+        StateHasChanged();
+    }
+
     protected override async Task OnInitializedAsync()
     {
 
@@ -273,22 +300,45 @@ else
         await KsfData.Getksf();
         await RespoReuData.GetResReu();
 
-        if (claims != null && claims.Count > 1 && (claims[1]?.Value == "Admin" || claims[1]?.Value == "SuperAdmin" || claims[1]?.Value == "PrimeUser"))
-        {
+        var UsrAdmin = claims?.FirstOrDefault(c => c.Type.Contains("role"))?.Value;
+        var idEmpresa = claims?.FirstOrDefault(c => c.Type.Contains("IdEmpresa"))?.Value;
+        var idCentroClaim = claims?.FirstOrDefault(c => c.Type.Contains("IdCentro"))?.Value;
 
-            await MaestraData.GetCentrosxEmpresa("All" + claims[10].Value);
+        // --- Cargar centros según el UsrAdmin ---
+        var esRolConAll = UsrAdmin == "Admin" || UsrAdmin == "SuperAdmin" || UsrAdmin == "PrimeUser";
+        if (esRolConAll && !string.IsNullOrWhiteSpace(idEmpresa))
+        {
+            await MaestraData.GetCentrosxEmpresa("All" + idEmpresa);
         }
         else
         {
-            await MaestraData.GetCentrosxEmpresa(claims[11].Value);
+            await MaestraData.GetCentrosxEmpresa(idCentroClaim);
         }
 
+        // Inicializaciones
         idCent = 0;
         idDiv = 0;
         idLin = 0;
         idEqui = 0;
+        
+        // Filtrar responsables
+        RespoReuData.resporeus = RespoReuData.resporeus
+            .Where(a => a.Rrdesc == claims.FirstOrDefault(c => c.Type.Contains("Empresa"))?.Value
+                    || string.IsNullOrEmpty(a.Rrdesc))
+            .ToList();
 
-        RespoReuData.resporeus = RespoReuData.resporeus.Where(a => a.Rrdesc == claims.FirstOrDefault(c => c.Type.Contains("Empresa"))?.Value || string.IsNullOrEmpty(a.Rrdesc)).ToList();
+        // --- Decisión: mantener "Seleccione" para Admin/SuperAdmin/PrimeUser ---
+        if (esRolConAll)
+        {
+            // Mantener placeholder: no seleccionar automáticamente
+            idCent = 0;
+            // No se llama BuscarDivision aún (no hay centro elegido)
+        }
+        else
+        {
+            // Otros roles: seleccionar automáticamente
+            await SetCentroInicialAsync();
+        }    
     }
 
 
