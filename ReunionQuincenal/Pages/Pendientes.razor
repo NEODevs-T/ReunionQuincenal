@@ -599,6 +599,28 @@ else if (dataIsLoaded == 2 && PizarraData.reudiatablas.Count() == 0)
     private const string ESTADO_VENCIDOS = "Vencidos";
     private const string ESTADO_VENCIDAS_DIARIA = "VencidasDiaria";
 
+    
+    private bool EsOpcionTotalPendiente(string? s)
+    {
+        // Trabaja SIEMPRE con clave canónica
+        var canonico = ValidationMessages.MapStatusKey((s ?? string.Empty).Trim());
+
+        // Acepta también variantes legadas o traducidas por si llegan desde la ruta o UI sin normalizar
+        if (canonico.Equals("TotalPendiente", StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        var valor = (s ?? string.Empty).Trim();
+        var tieneDic = DiccionarioTraduccionesService.Traducciones != null
+                    && DiccionarioTraduccionesService.Traducciones.ContainsKey("TotalPendiente");
+        var traducidoTP = tieneDic
+            ? DiccionarioTraduccionesService.Traducciones["TotalPendiente"]
+            : "Total Pendiente";
+
+        return valor.Equals("Total Pendiente", StringComparison.OrdinalIgnoreCase)
+            || valor.Equals("Total Pending", StringComparison.OrdinalIgnoreCase)
+            || valor.Equals(traducidoTP, StringComparison.OrdinalIgnoreCase);
+    }
+
     private bool EsPendiente(string? estado)
     {
         var e = (estado ?? string.Empty).Trim().ToLowerInvariant();
@@ -615,13 +637,17 @@ else if (dataIsLoaded == 2 && PizarraData.reudiatablas.Count() == 0)
         return d.Idksf == 6 && EsVencidoGeneral(d);
     }
 
+
     private string EstadoEfectivo(ReunionDTO d)
     {
         var original = d.Rdstatus ?? string.Empty;
-        if (EsVencidaDiaria(d))   return ESTADO_VENCIDAS_DIARIA;
-        if (EsVencidoGeneral(d))  return ESTADO_VENCIDOS;
+
+        if (EsVencido(d.RdfecTra, original))
+            return d.Idksf == 6 ? "VencidasDiaria" : "Vencidos";
+
         return original;
     }
+
     
     string GetRowClass(ReunionDTO d)
     {
@@ -859,67 +885,97 @@ else if (dataIsLoaded == 2 && PizarraData.reudiatablas.Count() == 0)
 
     protected async Task Get()
     {
+        Status = Uri.UnescapeDataString(Status ?? string.Empty);
+        Status = ValidationMessages.MapStatusKey((Status ?? string.Empty).Trim());
+
         if (IdCentro != 0 && IdDiv != 0)
         {
             if (dataIsLoaded != 1)
             {
                 dataIsLoaded = 1;
 
-                // 🔧 AJUSTE CRÍTICO:
-                var statusConsulta = EsOpcionVencidosGenerico(Status) ? "Total Pendiente" : Status;
-                statusConsulta = ValidationMessages.MapStatusKey(statusConsulta ?? string.Empty);
+                // === Consulta al backend (igual que en Pendiente): Vencidos/TotalPendiente son "visuales" -> se consulta "Todo"
+            var statusConsulta = Status;
+            if (EsOpcionVencidosGenerico(statusConsulta) || EsOpcionTotalPendiente(statusConsulta))
+                statusConsulta = "Todo";
 
-                await PizarraData.GetPendientes(
-                    IdCentro.ToString(), 
-                    IdDiv.ToString(),
-                    fecha1, fecha2, 
-                    tipoconsulta, 
-                    statusConsulta
-                );
+            statusConsulta = ValidationMessages.MapStatusKey(statusConsulta ?? string.Empty);
 
-                // actualiza listareu desde reudiatablas
+            // 🔥 NECESARIO PARA QUE "Pendiente/Responsable" FUNCIONE
+            var statusConsultaSegment = Uri.EscapeDataString(statusConsulta);
+
+            await PizarraData.GetPendientes(
+                IdCentro.ToString(),
+                IdDiv.ToString(),
+                fecha1,
+                fecha2,
+                tipoconsulta,
+                statusConsultaSegment
+            );
+
+                // === Mismos pasos que en Pendiente ===
                 ObtenerReunionesPorRol();
-                ConstruirCatalogoEquiposPorNombre();
-                AplicarFiltroPorCodigoSeleccionado();
 
                 if (IdMasterSeleccionado > 0)
                 {
+                    listareu = listareu.Where(r => r.IdMaster == IdMasterSeleccionado).ToList();
+                }
+
+                var stSel = ValidationMessages.MapStatusKey(Status ?? string.Empty);
+
+                // 2.1) VENCIDAS DIARIA (nuevo filtro específico)
+                // => solo "pendientes vencidos" con KSF=6
+                if (stSel.Equals("VencidasDiaria", StringComparison.OrdinalIgnoreCase))
+                {
                     listareu = listareu
-                        .Where(r => r.IdMaster == IdMasterSeleccionado)
+                        .Where(d => d.Idksf == 6 && EsVencidoGeneral(d)) // pendiente + fecha < hoy
                         .ToList();
                 }
-
-                // 📌 Filtrado visual: solo si la opción seleccionada es "Vencidos"
-                if (EsOpcionVencidosGenerico(Status))
+                else if (stSel.Equals("Vencidos", StringComparison.OrdinalIgnoreCase))
                 {
-                    var canonico = ValidationMessages.MapStatusKey(Status ?? string.Empty);
-
-                    if (canonico.Equals("VencidasDiaria", StringComparison.OrdinalIgnoreCase))
-                    {
-                        // Solo las vencidas de Reunión Diaria (Idksf == 6)
-                        listareu = listareu
-                            .Where(d => d.Idksf == 6 && EsVencido(d.RdfecTra, d.Rdstatus))
-                            .OrderByDescending(d => d.RdfecReu)
-                            .ToList();
-                    }
-                    else
-                    {
-                        // Vencidos (general)
-                        listareu = listareu
-                            .Where(d => EsVencido(d.RdfecTra, d.Rdstatus))
-                            .OrderByDescending(d => d.RdfecReu)
-                            .ToList();
-                    }
-                }
-                else
-                {
-                    // Mostrar primero los vencidos, sin filtrar por KSF
+                    // 2.2) VENCIDOS (como en Pendiente.txt) PERO separado del diario
+                    // => solo "pendientes vencidos" EXCLUYENDO KSF=6
                     listareu = listareu
-                        .OrderByDescending(d => EsVencido(d.RdfecTra, d.Rdstatus))
-                        .ThenByDescending(d => d.RdfecReu)
+                        .Where(d => EsVencidoGeneral(d) && d.Idksf != 6)
                         .ToList();
                 }
+                else if (EsOpcionTotalPendiente(stSel))
+                {
+                    // 2.3) TOTAL PENDIENTE (idéntico a Pendiente.txt)
+                    // => estado ORIGINAL que empieza por "Pendiente"
+                    listareu = listareu
+                        .Where(d => (ValidationMessages.MapStatusKey(d.Rdstatus ?? string.Empty))
+                                    .StartsWith("Pendiente", StringComparison.OrdinalIgnoreCase))
+                        .ToList();
+                }
+                // resto de estados: sin filtro adicional aquí (igual que en Pendiente.txt)
 
+                // === Catálogo y filtro por equipo (se mantiene como en tu código)
+                ConstruirCatalogoEquiposPorNombre();
+                AplicarFiltroPorCodigoSeleccionado();
+
+                // === Regla "permite vencidos" (idéntica a Pendiente.txt, con VencidasDiaria añadida)
+                var permiteVencidos =
+                    stSel.Equals("Vencidos", StringComparison.OrdinalIgnoreCase)
+                    || stSel.Equals("VencidasDiaria", StringComparison.OrdinalIgnoreCase)   // ← NUEVO
+                    || EsOpcionTotalPendiente(stSel)
+                    || ValidationMessages.MapStatusKey("Todo").Equals(stSel, StringComparison.OrdinalIgnoreCase);
+
+                if (!permiteVencidos)
+                {
+                    // Quita registros que, "visual/effective", quedaron como vencidos
+                    var VencidosKey = ValidationMessages.MapStatusKey("Vencidos");
+                    var VediKey     = ValidationMessages.MapStatusKey("VencidasDiaria");
+
+                    listareu = listareu
+                        .Where(d =>
+                        {
+                            var ef = ValidationMessages.MapStatusKey(EstadoEfectivo(d) ?? string.Empty);
+                            return !ef.Equals(VencidosKey, StringComparison.OrdinalIgnoreCase)
+                                && !ef.Equals(VediKey, StringComparison.OrdinalIgnoreCase);
+                        })
+                        .ToList();
+                }
                 dataIsLoaded = 2;
             }
         }
@@ -1110,8 +1166,8 @@ else if (dataIsLoaded == 2 && PizarraData.reudiatablas.Count() == 0)
                     IdDiv    = idDivTemp;
 
                     // 1) Normaliza el Status recibido de la ruta (puede venir traducido)
-                    Status = ValidationMessages.MapStatusKey((est ?? string.Empty).Trim());
-
+                    Status = ValidationMessages.MapStatusKey(Uri.UnescapeDataString(est ?? string.Empty).Trim());
+                    
                     if (!string.IsNullOrEmpty(linea) && !string.Equals(linea, "Todo", StringComparison.OrdinalIgnoreCase))
                     {
                         NombreLinea = linea;
@@ -1122,12 +1178,20 @@ else if (dataIsLoaded == 2 && PizarraData.reudiatablas.Count() == 0)
                     dataIsLoaded = 1;
 
                     // 2) Construye el estado REAL para consultar al backend.
-                    var statusConsulta = EsOpcionVencidosGenerico(Status) ? "Total Pendiente" : Status;
-                    statusConsulta = ValidationMessages.MapStatusKey(statusConsulta ?? string.Empty);
+var statusConsulta = Status;
 
-                    // Llama al backend con el estado de consulta (NO con "Vencidos")
-                    await PizarraData.GetPendientes(accion, division, date1, date2, tipo, statusConsulta);
+if (EsOpcionVencidosGenerico(statusConsulta) || EsOpcionTotalPendiente(statusConsulta))
+{
+    statusConsulta = "Todo";
+}
 
+statusConsulta = ValidationMessages.MapStatusKey(statusConsulta ?? string.Empty);
+
+// ⬇️ ENCODAR SIEMPRE ANTES DE ENVIAR COMO SEGMENTO DE RUTA
+var statusConsultaSegment = Uri.EscapeDataString(statusConsulta);
+
+// Llama al backend con el estado de consulta (NO con "Vencidos")
+await PizarraData.GetPendientes(accion, division, date1, date2, tipo, statusConsultaSegment);
                     // Actualiza la lista en memoria según rol
                     ObtenerReunionesPorRol();
                     ConstruirCatalogoEquiposPorNombre();
@@ -1167,39 +1231,50 @@ else if (dataIsLoaded == 2 && PizarraData.reudiatablas.Count() == 0)
         }
     }
 
-private void AplicarFiltroVisualDeVencidos()
-{
-    var canonico = ValidationMessages.MapStatusKey(Status ?? string.Empty);
+    private void AplicarFiltroVisualDeVencidos()
+    {
+        var stSel = ValidationMessages.MapStatusKey(Status ?? string.Empty);
 
-    if (canonico.Equals("VencidasDiaria", StringComparison.OrdinalIgnoreCase))
-    {
-        // Solo vencidas diarias (KSF=6)
-        listareu = listareu
-            .Where(d => EsVencidaDiaria(d))
-            .OrderByDescending(d => d.RdfecReu)
-            .ThenByDescending(d => d.RdfecTra)
-            .ToList();
+        if (stSel.Equals("VencidasDiaria", StringComparison.OrdinalIgnoreCase))
+        {
+            listareu = listareu
+                .Where(d => d.Idksf == 6 && EsVencidoGeneral(d))
+                .ToList();
+        }
+        else if (stSel.Equals("Vencidos", StringComparison.OrdinalIgnoreCase))
+        {
+            listareu = listareu
+                .Where(d => EsVencidoGeneral(d) && d.Idksf != 6)
+                .ToList();
+        }
+        else if (EsOpcionTotalPendiente(stSel))
+        {
+            listareu = listareu
+                .Where(d => (ValidationMessages.MapStatusKey(d.Rdstatus ?? string.Empty))
+                            .StartsWith("Pendiente", StringComparison.OrdinalIgnoreCase))
+                .ToList();
+        }
+        // Regla "permite vencidos" (igual que en Get)
+        var permiteVencidos =
+            stSel.Equals("Vencidos", StringComparison.OrdinalIgnoreCase)
+            || stSel.Equals("VencidasDiaria", StringComparison.OrdinalIgnoreCase)
+            || EsOpcionTotalPendiente(stSel)
+            || ValidationMessages.MapStatusKey("Todo").Equals(stSel, StringComparison.OrdinalIgnoreCase);
+
+        if (!permiteVencidos)
+        {
+            var VencidosKey = ValidationMessages.MapStatusKey("Vencidos");
+            var VediKey     = ValidationMessages.MapStatusKey("VencidasDiaria");
+
+            listareu = listareu
+                .Where(d => {
+                    var ef = ValidationMessages.MapStatusKey(EstadoEfectivo(d) ?? string.Empty);
+                    return !ef.Equals(VencidosKey, StringComparison.OrdinalIgnoreCase)
+                        && !ef.Equals(VediKey, StringComparison.OrdinalIgnoreCase);
+                })
+                .ToList();
+        }
     }
-    else if (canonico.Equals("Vencidos", StringComparison.OrdinalIgnoreCase))
-    {
-        // Vencidos generales
-        listareu = listareu
-            .Where(d => EsVencidoGeneral(d))
-            .OrderByDescending(d => d.RdfecReu)
-            .ThenByDescending(d => d.RdfecTra)
-            .ToList();
-    }
-    else
-    {
-        // Sin filtro: mostrar primero las "VencidasDiaria", luego "Vencidos", luego fechas
-        listareu = listareu
-            .OrderByDescending(d => EsVencidaDiaria(d))  // primero KSF 6 vencidos
-            .ThenByDescending(d => EsVencidoGeneral(d))  // luego vencidos generales
-            .ThenByDescending(d => d.RdfecReu)
-            .ThenByDescending(d => d.RdfecTra)
-            .ToList();
-    }
-}
 
     // Parseo seguro de fecha de ruta "dd-MM-yyyy"
     private static bool TryParseFechaRuta(string? s, out DateTime result)

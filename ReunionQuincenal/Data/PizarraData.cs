@@ -53,16 +53,27 @@ public class PizarraData : IPizarraData
         return reunionditablas = await _http.GetFromJsonAsync<List<ReunionDTO>>(url) ?? new List<ReunionDTO>();
     }
 
-    
-    //obtener discrepancias para pendientes y reunion 
     public async Task<List<ReunionDTO>> GetPendientes(string idcentro, string iddiv, DateTime f1, DateTime f2, string tipo, string estado)
     {
-        int reunionQuincenal = 3;
-        string f1Formatiado = f1.ToString("yyyy-MM-dd");
-        string f2Formatiado = f2.ToString("yyyy-MM-dd");
-        url = $"{BaseUrl}/GetPendientes/{idcentro}/{iddiv}/{f1Formatiado}/{f2Formatiado}/{tipo}/{estado}/{reunionQuincenal}";
-        return reudiatablas = await _http.GetFromJsonAsync<List<ReunionDTO>>(url) ?? new List<ReunionDTO>();
+        const int reunionQuincenal = 3;
 
+        string f1Formateado = f1.ToString("yyyy-MM-dd");
+        string f2Formateado = f2.ToString("yyyy-MM-dd");
+
+        string estadoNormalizado = estado ?? string.Empty;
+        for (int i = 0; i < 2; i++)
+        {
+            string dec = Uri.UnescapeDataString(estadoNormalizado);
+            if (dec == estadoNormalizado) break;   // ya no hay más para decodificar
+            estadoNormalizado = dec;
+        }
+
+        string estadoEncoded = Uri.EscapeDataString(estadoNormalizado);
+
+        url = $"{BaseUrl}/GetPendientes/{idcentro}/{iddiv}/{f1Formateado}/{f2Formateado}/{tipo}/{estadoEncoded}/{reunionQuincenal}";
+
+        return reudiatablas = await _http.GetFromJsonAsync<List<ReunionDTO>>(url)
+                            ?? new List<ReunionDTO>();
     }
 
     public async Task<List<ReunionDTO>> GetPendientesTurno(string idcentro, string iddiv)

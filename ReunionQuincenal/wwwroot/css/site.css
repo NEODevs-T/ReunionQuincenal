@@ -71,6 +71,21 @@ td > .pendiente, .pendiente, tr > .pendiente, span > .pendiente {
 .Vencido {
     background-color: rgb(244, 85, 81, 0.65) !important;
 }
+/* 🔴 Resaltado de VENCIDAS DIARIA (KSF=6) */
+table tr.VencidoDiario > td,
+table .VencidoDiario,
+table .VencidoDiario td,
+tr.VencidoDiario > td,           /* refuerzo */
+tr.VencidoDiario td,             /* refuerzo */
+td.VencidoDiario {               /* si solo se marcó la celda */
+    background-color: rgba(244, 85, 81, 0.65) !important;
+    color: #a80000 !important;
+}
+/* Por si el estado está marcado solo en la celda de Estado */
+td.VencidoDiario {
+    background-color: rgba(244, 85, 81, 0.65) !important;
+    color: #a80000 !important;
+}
 
 .fondo {
     display: flex;
@@ -344,17 +359,6 @@ table th {
         font-size: 14px;
     }
 
-    
-/* Vencido general */
-.Vencido {
-    background-color: #f8d7da;   /* rojo claro estilo alert-danger */
-}
-
-/* VencidasDiaria (KSF = 6) con un plus visual */
-.VencidoDiario {
-    background-color: #ffd3bf;   /* rojo/naranja claro */
-    border-left: 4px solid #ff6a00;
-}
 
 }
 
