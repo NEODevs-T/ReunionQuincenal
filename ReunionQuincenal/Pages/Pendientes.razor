@@ -150,7 +150,8 @@ else
 
     </BSRow>
 
-
+<p></p>
+<p></p>
     @*Filltros extra*@
     <BSRow>
         @if (PizarraData.reudiatablas.Count() > 0 && dataIsLoaded == 2)
@@ -180,6 +181,17 @@ else
                         <option value="@d.Idksf">@texto</option>
                     }
                 </BSInput>
+            </BSCol>
+            
+            <BSCol Column="3">
+            <BSLabel>@DiccionarioTraduccionesService.Traducciones["NombreDelEquipo"]</BSLabel>
+            <BSInput InputType="InputType.Select" IsDisabled=@valueodt @bind-Value="CodigoEquipoSeleccionado" @onchange="OnEquipoChanged">
+            <option value="Todo">@DiccionarioTraduccionesService.Traducciones["Todo"]</option>
+            @foreach (var eq in EquiposOpciones)
+            {
+                <option value="@eq.Codigo">@eq.Codigo - @eq.Nombre</option>
+            }
+            </BSInput>
             </BSCol>
 
             <BSCol Column="3">
@@ -571,6 +583,8 @@ else if (dataIsLoaded == 2 && PizarraData.reudiatablas.Count() == 0)
     private bool traduccionesCargadas = false;
     private int IdMasterSeleccionado { get; set; } = 0;
     private int LineaSeleccionada { get; set; } = 0;
+    private string CodigoEquipoSeleccionado {get; set; } = "Todo";
+    private List<EquipoOpcion> EquiposOpciones { get; set; } = new();
 
     private async Task CreateData()
     {
@@ -582,6 +596,52 @@ else if (dataIsLoaded == 2 && PizarraData.reudiatablas.Count() == 0)
         {
             idPais = paisTemp;
         }
+    }
+
+    private class EquipoOpcion
+    {
+        public string Codigo { get; set;} = string.Empty;
+        public string Nombre {get; set;} = string.Empty;
+    }
+
+    private void ConstruirCatalogoEquiposPorNombre()
+    {
+        EquiposOpciones = listareu
+            .Select(r => new
+            {
+                Codigo = (r.RdcodEq ?? string.Empty).Trim(),
+                Nombre = string.IsNullOrWhiteSpace(r.EnombreEam)
+                    ? (idPais == 5 ? "EQUIPMENT NOT FOUND" : "EQUIPO NO ENCONTRADO")
+                    : r.EnombreEam.Trim()
+            })
+            .Where(x => !string.IsNullOrWhiteSpace(x.Codigo)) // siempre necesitamos el código
+            .GroupBy(x => x.Codigo, StringComparer.OrdinalIgnoreCase) // un código => una opción
+            .Select(g =>
+            {
+                // si hay varias filas con el mismo código, toma el primer nombre no vacío
+                var nombre = g.Select(x => x.Nombre)
+                            .FirstOrDefault(n => !string.IsNullOrWhiteSpace(n))
+                            ?? (idPais == 5 ? "EQUIPMENT NOT FOUND" : "EQUIPO NO ENCONTRADO");
+                return new EquipoOpcion { Codigo = g.Key, Nombre = nombre };
+                })
+            .OrderBy(x => x.Nombre, StringComparer.OrdinalIgnoreCase)
+            .ToList();
+    }
+    
+    private void AplicarFiltroPorCodigoSeleccionado()
+    {
+        if(!string.IsNullOrWhiteSpace(CodigoEquipoSeleccionado) && !CodigoEquipoSeleccionado.Equals("Todo",StringComparison.OrdinalIgnoreCase))
+        {
+            listareu = listareu
+                .Where(d => string.Equals(d.RdcodEq?.Trim(), CodigoEquipoSeleccionado.Trim(), StringComparison.OrdinalIgnoreCase))
+                .ToList();
+        }
+    }
+    
+    private async Task OnEquipoChanged(ChangeEventArgs e)
+    {
+        CodigoEquipoSeleccionado = e?.Value?.ToString() ?? "Todo";
+        await Get();
     }
 
     protected override async Task OnInitializedAsync()
@@ -720,6 +780,8 @@ else if (dataIsLoaded == 2 && PizarraData.reudiatablas.Count() == 0)
 
                 // actualiza listareu desde reudiatablas
                 ObtenerReunionesPorRol();
+                ConstruirCatalogoEquiposPorNombre();
+                AplicarFiltroPorCodigoSeleccionado();
 
                 if (IdMasterSeleccionado > 0)
                 {
@@ -937,6 +999,8 @@ else if (dataIsLoaded == 2 && PizarraData.reudiatablas.Count() == 0)
 
                     // Actualiza la lista en memoria según rol
                     ObtenerReunionesPorRol();
+                    ConstruirCatalogoEquiposPorNombre();
+                    AplicarFiltroPorCodigoSeleccionado();
 
                     // Filtro por línea (si aplica)
                     if (IdMasterSeleccionado > 0)
@@ -1069,12 +1133,20 @@ else if (dataIsLoaded == 2 && PizarraData.reudiatablas.Count() == 0)
         return !string.IsNullOrWhiteSpace(nombre) && nombre.StartsWith(rol, StringComparison.OrdinalIgnoreCase);
     }
 
-    public async Task PrintDocument()
+        public async Task PrintDocument()
     {
-        string idiomaRuta = idPais == 5 ? "en" : "es";
+        string idiomaRuta   = idPais == 5 ? "en" : "es";
         string nombrePagina = idPais == 5 ? "TablePending" : "TablaPendientes";
-        string url = $"{idiomaRuta}/{nombrePagina}/{IdCentro}/{IdDiv}/{NombreLinea}/{fecha1:dd-MM-yyyy}/{fecha2:dd-MM-yyyy}/{tipoconsulta}/{Status}/{idrespo}";
-        await IJS.InvokeAsync<object>("open", new object[] { url, "_blank" });
+
+        // Codificar TODOS los segmentos críticos
+        string segLinea   = Uri.EscapeDataString(NombreLinea ?? "Todo");
+        string segEstado  = Uri.EscapeDataString(Status ?? "Todo");
+        string segTipo    = Uri.EscapeDataString(tipoconsulta ?? "0");
+        string segCodigo  = Uri.EscapeDataString(Codigo ?? "Todo");
+        string segResp    = (idrespo).ToString();
+
+        string url = $"{idiomaRuta}/{nombrePagina}/{IdCentro}/{IdDiv}/{segLinea}/{fecha1:dd-MM-yyyy}/{fecha2:dd-MM-yyyy}/{segTipo}/{segEstado}/{segResp}";
+        await IJS.InvokeVoidAsync("open", url, "_blank");
     }
 
     protected async Task BuscarLineas(ChangeEventArgs e)

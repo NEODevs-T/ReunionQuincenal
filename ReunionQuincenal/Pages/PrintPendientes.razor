@@ -49,6 +49,7 @@ else
             <option value="Listo">@DiccionarioTraduccionesService.Traducciones["Listo"]</option>
             <option value="Cerrado">@DiccionarioTraduccionesService.Traducciones["Cerrado"]</option>
             <option value="Vencidos">@DiccionarioTraduccionesService.Traducciones["Vencidos"]</option>
+            <option value="VencidasDiaria">@DiccionarioTraduccionesService.Traducciones["VencidasDiaria"]</option>
         </BSInput>
     </BSCol>
 
@@ -80,7 +81,7 @@ else
     
 @if (registrosVisibles.Count > 0 && dataIsLoaded == 2)
 {
-    @if (reudiatablas != null && PizarraData.reudiatablas.Count() > 0 && dataIsLoaded == 2)
+    @if (PizarraData?.reudiatablas?.Count > 0 && dataIsLoaded == 2)
     {
 
 
@@ -111,23 +112,15 @@ else
             <BSTBody>
                 @* @if (UsrRol == "Calidad" | UsrRol == "Seguridad" | UsrRol.Substring(0,4).ToString()=="Mtto")
             @if (UsrRol == "Calidad" | UsrRol == "Seguridad" | UsrRol=="Mtto")*@
-                @if (UsrRol != "")
-                {
-                    listareu = PizarraData.reudiatablas.Where(r => r.Responsable.StartsWith(UsrRol)).ToList();
-                }
-                else
-                {
-                    listareu = PizarraData.reudiatablas;
-                }
+
                 @* @foreach (var d in DbReunionService.reudiatablas)*@
                 @foreach (var d in listareu)
                 {
-                    @if (linea == "Todo" | linea == d.Rdarea)
+                    @if (linea == "Todo" || linea == d.Rdarea)
                     {
-                        @if (Codigo == d.RdcodDis | Codigo == "Todo")
+                        @if (Codigo == d.RdcodDis || Codigo == "Todo")
                         {
-                            @if (Status == d.Rdstatus | Status == "Todo" | Status == "Total Pendiente" & (d.Rdstatus == "Pendiente" |
-                        d.Rdstatus == "Pendiente/Responsable"))
+                            @if (idrespo == 0 || idrespo == d.IdResReu)
                             {
                                 @if (idrespo == 0 | idrespo == d.IdResReu)
                                 {
@@ -154,18 +147,17 @@ else
                                         }
                                         <BSTD class="@(nombreResponsable == "Por Definir" ? "Definir" : "")">@nombreResponsable</BSTD>
                                         @{
-                                        var clavee = ValidationMessages.MapStatusKey(d.Rdstatus);
-                                        var estadoTraducido = DiccionarioTraduccionesService.Traducciones.ContainsKey(clavee)
-                                            ? DiccionarioTraduccionesService.Traducciones[clavee]
-                                            : clavee;
-                                        var claseEstado = d.Rdstatus switch
-                                            {
-                                            "Listo" => "listo",
-                                            "Cerrado" => "Cerrado",
-                                            _ => "pendiente"
-                                            };
+                                            var estadoTraducido = GetVisualStatus(d.RdfecTra, d.Rdstatus, d.Idksf);
+                                            var claseEstado = EsVencido(d.RdfecTra, d.Rdstatus)
+                                                    ? "Vencido"
+                                                    : d.Rdstatus switch
+                                                    {
+                                                        "Listo"   => "listo",
+                                                        "Cerrado" => "Cerrado",
+                                                        _         => "pendiente"
+                                                    };
                                         }
-                                        <BSTD Class="@claseEstado">@estadoTraducido</BSTD>
+                                        <BSTD class="@claseEstado">@estadoTraducido</BSTD>
                                         <BSTD>@d.Rdodt</BSTD>
                                         <BSTD>@d.RdfecReu.ToString("dd/MM/yyyy")</BSTD>
                                         <BSTD>@d.RdfecTra.ToString("dd/MM/yyyy")</BSTD>
@@ -217,14 +209,27 @@ else if (dataIsLoaded == 2 && registrosVisibles.Count == 0)
     public string? tipo { get; set; }
     [Parameter]
     public string? est { get; set; }
-    [Parameter]
-    public int? idrespo { get; set; }//responsable a filtar
-
+    [Parameter] public int? idrespo 
+    { 
+        get => _idrespo; 
+        set { _idrespo = value; ReaplicarFiltrosSiListo(); } 
+    }
     int dataIsLoaded = 0;
     int CentroComedor = 0;
 
-    private string Codigo { get; set; } = "Todo"; //Codigo
-    private string Status { get; set; } = "Total Pendiente"; //Status
+    private string _codigo = "Todo";
+    private string Codigo 
+    { 
+        get => _codigo; 
+        set { _codigo = value; ReaplicarFiltrosSiListo(); } 
+    } //Codigo
+
+    private string _status = "Total Pendiente";
+    private string Status 
+    { 
+        get => _status; 
+        set { _status = value; ReaplicarFiltrosSiListo(); } 
+    } //Status
     private string UsrAdmin { get; set; } = ""; //permisos de admin
     private string UsrRol { get; set; } = ""; //rol para filtrar
 
@@ -248,8 +253,8 @@ else if (dataIsLoaded == 2 && registrosVisibles.Count == 0)
     private List<ReunionDTO> reudiatablas { get; set; } = new();
     private bool traduccionesCargadas = false;
     private int idPais {get; set;}
-
-
+    private int? _idrespo;
+    private bool DatosListos => dataIsLoaded == 2 && PizarraData?.reudiatablas != null;
 
     List<ReunionDTO> listareu = new List<ReunionDTO>();//filtar los responsables
 
@@ -278,6 +283,54 @@ else if (dataIsLoaded == 2 && registrosVisibles.Count == 0)
         .Where(a => a.Rrdesc == empresa || string.IsNullOrEmpty(a.Rrdesc))
         .ToList();
         }
+    }
+
+        bool EsVencido(DateTime fechaTrabajo, string? estadoOriginal)
+    {
+        var estado = estadoOriginal ?? string.Empty;
+        return fechaTrabajo.Date < DateTime.Now.Date
+            && estado.StartsWith("Pendiente", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private string EstadoEfectivo(ReunionDTO d)
+    {
+        var original = d.Rdstatus ?? string.Empty;
+        return EsVencido(d.RdfecTra, original) ? "Vencidos" : original;
+    }
+
+    private bool EsOpcionTotalPendiente(string? s)
+    {
+        var valor = (s ?? string.Empty).Trim();
+        var tieneDic = DiccionarioTraduccionesService.Traducciones != null &&
+                    DiccionarioTraduccionesService.Traducciones.ContainsKey("TotalPendiente");
+        var traducidoTP = tieneDic ? DiccionarioTraduccionesService.Traducciones["TotalPendiente"] : "Total Pendiente";
+        return valor.Equals("Total Pendiente", StringComparison.OrdinalIgnoreCase)
+            || valor.Equals("Total Pending", StringComparison.OrdinalIgnoreCase)
+            || valor.Equals(traducidoTP, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private bool EsOpcionVencidosGenerico(string? s)
+    {
+        var canonico = ValidationMessages.MapStatusKey((s ?? string.Empty).Trim());
+        return canonico.Equals("Vencidos", StringComparison.OrdinalIgnoreCase)
+            || canonico.Equals("VencidasDiaria", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private bool EsOpcionTodo(string? s)
+    {
+        var valor = (s ?? string.Empty).Trim();
+        var traducidoTodo = DiccionarioTraduccionesService.Traducciones.ContainsKey("Todo")
+            ? DiccionarioTraduccionesService.Traducciones["Todo"]
+            : "Todo";
+        return valor.Equals("Todo", StringComparison.OrdinalIgnoreCase)
+            || valor.Equals(traducidoTodo, StringComparison.OrdinalIgnoreCase);
+    }
+    
+    string GetVisualStatus(DateTime fechaTrabajo, string estadoOriginal, int idKsf)
+    {
+        var esVenc = EsVencido(fechaTrabajo, estadoOriginal);
+        var claveEstado = esVenc ? (idKsf == 6 ? "VencidasDiaria" : "Vencidos") : ValidationMessages.MapStatusKey(estadoOriginal);
+        return DiccionarioTraduccionesService.Traducciones.TryGetValue(claveEstado, out var traducido) ? traducido : claveEstado;
     }
 
     protected override async Task OnInitializedAsync()
@@ -342,28 +395,164 @@ else if (dataIsLoaded == 2 && registrosVisibles.Count == 0)
                 break;
         }
 
-
-
-        if (accion != null)
+        if (!string.IsNullOrWhiteSpace(accion))
         {
-            string[] fec1 = f1.Split('-');
-            string[] fec2 = f2.Split('-');
-
-            //año, mes dia
-            DateTime date1 = new DateTime(int.Parse(fec1[2]), int.Parse(fec1[1]), int.Parse(fec1[0]));
-            DateTime date2 = new DateTime(int.Parse(fec2[2]), int.Parse(fec2[1]), int.Parse(fec2[0]));
-
-            dataIsLoaded = 1;
-            await PizarraData.GetPendientes(accion, division, date1, date2, tipo, est);
-            dataIsLoaded = 2;
-            foreach (var e in PizarraData.reudiatablas)
+            try
             {
-                e.Ksf = KsfData.ksfs.Where(x => x.Idksf == e.Idksf).FirstOrDefault().KsfNombre;
-                e.Responsable = RespoReuData.resporeus.Where(x => x.IdResReu == e.IdResReu).FirstOrDefault().Rrnombre;
+                // Fechas (robusto): dd-MM-yyyy
+                if (!DateTime.TryParseExact(f1 ?? string.Empty, "dd-MM-yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out var date1))
+                    date1 = DateTime.Now;
+                if (!DateTime.TryParseExact(f2 ?? string.Empty, "dd-MM-yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out var date2))
+                    date2 = DateTime.Now;
 
+                Status = est is null ? Status : Uri.UnescapeDataString(est);
+                linea  = string.IsNullOrWhiteSpace(linea) ? "Todo" : Uri.UnescapeDataString(linea);
+
+                dataIsLoaded = 1;
+
+                var estConsulta = Status;
+                if (EsOpcionVencidosGenerico(estConsulta) || EsOpcionTotalPendiente(estConsulta))
+                {
+                    estConsulta = "Todo";
+                }
+
+                await PizarraData.GetPendientes(accion, division, date1, date2, tipo, estConsulta);
+                dataIsLoaded = 2;
+
+                if (PizarraData?.reudiatablas is null)
+                {
+                    listareu = new();
+                    return;
+                }
+
+                foreach (var e in PizarraData.reudiatablas)
+                {
+                    e.Ksf = KsfData.ksfs.Where(x => x.Idksf == e.Idksf).FirstOrDefault()?.KsfNombre;
+                    e.Responsable = RespoReuData.resporeus.Where(x => x.IdResReu == e.IdResReu).FirstOrDefault()?.Rrnombre ?? string.Empty;
+                }
+
+                // Base por rol + filtros en memoria
+                ConstruirListaBase();
+                AplicarFiltrosEnMemoria();
             }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"[TablaPendientes] Error en OnParametersSetAsync: {ex}");
+                listareu = new();
+                dataIsLoaded = 2; // Evita estado de "cargando" infinito
+            }
+        }
+    }
 
+    private void ReaplicarFiltrosSiListo()
+    {
+        if (!DatosListos) return; // no ejecutar mientras carga
+        ConstruirListaBase();
+        AplicarFiltrosEnMemoria();
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void ConstruirListaBase()
+    {
+        if (PizarraData?.reudiatablas is null)
+        {
+            listareu = new();
+            return;
         }
 
+        if (!string.IsNullOrEmpty(UsrRol))
+            listareu = PizarraData.reudiatablas
+                .Where(r => !string.IsNullOrEmpty(r.Responsable) && r.Responsable.StartsWith(UsrRol))
+                .ToList();
+        else
+            listareu = PizarraData.reudiatablas.ToList();
+    }
+
+    private void AplicarFiltrosEnMemoria()
+    {
+        if (listareu is null) listareu = new();
+
+        if (EsOpcionVencidosGenerico(Status))
+        {
+            var canonico = ValidationMessages.MapStatusKey(Status ?? string.Empty);
+
+            if (canonico.Equals("VencidasDiaria", StringComparison.OrdinalIgnoreCase))
+            {
+                // ✅ Solo vencidos de Reunión Diaria
+                listareu = listareu
+                    .Where(d => d.Idksf == 6 && EsVencido(d.RdfecTra, d.Rdstatus ?? string.Empty))
+                    .ToList();
+            }
+            else
+            {
+                // ✅ Vencidos general: excluir los de Reunión Diaria
+                listareu = listareu
+                    .Where(d => d.Idksf != 6 && EsVencido(d.RdfecTra, d.Rdstatus ?? string.Empty))
+                    .ToList();
+            }
+        }
+        else if (EsOpcionTotalPendiente(Status))
+        {
+            listareu = listareu
+                .Where(d => (d.Rdstatus ?? string.Empty)
+                    .StartsWith("Pendiente", StringComparison.OrdinalIgnoreCase))
+                .ToList();
+        }
+        else if (EsOpcionTodo(Status))
+        {
+            // "Todo": no aplicar filtro por estado aquí
+        }
+        else
+        {
+            var s = (Status ?? string.Empty).Trim();
+
+            if (s.Equals("Pendiente", StringComparison.OrdinalIgnoreCase))
+            {
+                listareu = listareu
+                    .Where(d => string.Equals(d.Rdstatus ?? string.Empty,
+                                            "Pendiente",
+                                            StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+            }
+            else if (s.Equals("Pendiente/Responsable", StringComparison.OrdinalIgnoreCase))
+            {
+                listareu = listareu
+                    .Where(d => string.Equals(d.Rdstatus ?? string.Empty,
+                                            "Pendiente/Responsable",
+                                            StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+            }
+            else
+            {
+                listareu = listareu
+                    .Where(d => string.Equals(d.Rdstatus ?? string.Empty, s, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+            }
+        }
+
+        // Mantén el gating y el resto de filtros tal cual los tienes:
+        var permitirVencidos =
+            EsOpcionVencidosGenerico(Status) || EsOpcionTotalPendiente(Status) || EsOpcionTodo(Status);
+
+        if (!permitirVencidos)
+        {
+            listareu = listareu
+                .Where(d => EstadoEfectivo(d) != "Vencidos")
+                .ToList();
+        }
+
+        if (!string.Equals(Codigo, "Todo", StringComparison.OrdinalIgnoreCase))
+        {
+            listareu = listareu
+                .Where(d => string.Equals(d.RdcodDis, Codigo, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+        }
+
+        if (_idrespo.HasValue && _idrespo.Value > 0)
+        {
+            listareu = listareu
+                .Where(d => d.IdResReu == _idrespo.Value)
+                .ToList();
+        }
     }
 }
