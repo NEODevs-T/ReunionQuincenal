@@ -46,6 +46,7 @@ else
             <option value="Todo">@DiccionarioTraduccionesService.Traducciones["Todo"]</option>
             <option value="Pendiente">@DiccionarioTraduccionesService.Traducciones["Pendiente"]</option>
             <option value="Pendiente/Responsable">@DiccionarioTraduccionesService.Traducciones["Pendiente"] / @DiccionarioTraduccionesService.Traducciones["Responsable"]</option>
+            <option value="No Conforme">@DiccionarioTraduccionesService.Traducciones["NoConforme"]</option>           
             <option value="Listo">@DiccionarioTraduccionesService.Traducciones["Listo"]</option>
             <option value="Cerrado">@DiccionarioTraduccionesService.Traducciones["Cerrado"]</option>
             <option value="Vencidos">@DiccionarioTraduccionesService.Traducciones["Vencidos"]</option>
@@ -224,12 +225,6 @@ else if (dataIsLoaded == 2 && registrosVisibles.Count == 0)
         set { _codigo = value; ReaplicarFiltrosSiListo(); } 
     } //Codigo
 
-    private string _status = "Total Pendiente";
-    private string Status 
-    { 
-        get => _status; 
-        set { _status = value; ReaplicarFiltrosSiListo(); } 
-    } //Status
     private string UsrAdmin { get; set; } = ""; //permisos de admin
     private string UsrRol { get; set; } = ""; //rol para filtrar
 
@@ -255,16 +250,25 @@ else if (dataIsLoaded == 2 && registrosVisibles.Count == 0)
     private int idPais {get; set;}
     private int? _idrespo;
     private bool DatosListos => dataIsLoaded == 2 && PizarraData?.reudiatablas != null;
-
-    List<ReunionDTO> listareu = new List<ReunionDTO>();//filtar los responsables
-
+    private List<ReunionDTO> _sourceAll = new();
     private List<Claim> claims { get; set; }
+    private string _status = "Total Pendiente";   
+    List<ReunionDTO> listareu = new List<ReunionDTO>();//filtar los responsables
 
             List<ReunionDTO> registrosVisibles => PizarraData.reudiatablas
         .Where(d => d.Rdstatus != "Rechazada"
                 && d.Rdstatus != "Listo"
                 && (string.IsNullOrEmpty(d.Rdodt)))
         .ToList();
+    
+
+    private string Status
+    {
+        get => _status;
+        set { _status = value; ReaplicarFiltrosSiListo(); }
+    }
+
+
 
     private async Task CreateData()
 
@@ -285,13 +289,6 @@ else if (dataIsLoaded == 2 && registrosVisibles.Count == 0)
         }
     }
 
-        bool EsVencido(DateTime fechaTrabajo, string? estadoOriginal)
-    {
-        var estado = estadoOriginal ?? string.Empty;
-        return fechaTrabajo.Date < DateTime.Now.Date
-            && estado.StartsWith("Pendiente", StringComparison.OrdinalIgnoreCase);
-    }
-
     private string EstadoEfectivo(ReunionDTO d)
     {
         var original = d.Rdstatus ?? string.Empty;
@@ -309,11 +306,41 @@ else if (dataIsLoaded == 2 && registrosVisibles.Count == 0)
             || valor.Equals(traducidoTP, StringComparison.OrdinalIgnoreCase);
     }
 
-    private bool EsOpcionVencidosGenerico(string? s)
+
+    bool EsVencido(DateTime fechaTrabajo, string? estadoOriginal)
     {
-        var canonico = ValidationMessages.MapStatusKey((s ?? string.Empty).Trim());
-        return canonico.Equals("Vencidos", StringComparison.OrdinalIgnoreCase)
-            || canonico.Equals("VencidasDiaria", StringComparison.OrdinalIgnoreCase);
+        var estado = estadoOriginal ?? string.Empty;
+        return fechaTrabajo.Date < DateTime.Now.Date
+            && estado.StartsWith("Pendiente", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private bool EsOpcionVencidos(string? s)
+    {
+        var valor = (s ?? string.Empty).Trim();
+
+        // Soporta valores en ES, EN y el texto traducido desde el diccionario
+        var traducidoVencidos = DiccionarioTraduccionesService.Traducciones.ContainsKey("Vencidos")
+            ? DiccionarioTraduccionesService.Traducciones["Vencidos"]
+            : "Vencidos";
+
+        return valor.Equals("Vencidos", StringComparison.OrdinalIgnoreCase)
+            || valor.Equals("Expired", StringComparison.OrdinalIgnoreCase)
+            || valor.Equals("Overdue", StringComparison.OrdinalIgnoreCase)
+            || valor.Equals(traducidoVencidos, StringComparison.OrdinalIgnoreCase);
+    }
+
+
+    private bool EsOpcionVencidasDiaria(string? s)
+    {
+        var valor = (s ?? string.Empty).Trim();
+        // Apoya tanto el valor “clave” como el traducido
+        var traducido = DiccionarioTraduccionesService.Traducciones.ContainsKey("VencidasDiaria")
+            ? DiccionarioTraduccionesService.Traducciones["VencidasDiaria"]
+            : "VencidasDiaria";
+
+        return valor.Equals("VencidasDiaria", StringComparison.OrdinalIgnoreCase)
+            || valor.Equals("DailyOverdue", StringComparison.OrdinalIgnoreCase)
+            || valor.Equals(traducido, StringComparison.OrdinalIgnoreCase);
     }
 
     private bool EsOpcionTodo(string? s)
@@ -410,15 +437,17 @@ else if (dataIsLoaded == 2 && registrosVisibles.Count == 0)
 
                 dataIsLoaded = 1;
 
-                var estConsulta = Status;
-                if (EsOpcionVencidosGenerico(estConsulta) || EsOpcionTotalPendiente(estConsulta))
-                {
-                    estConsulta = "Todo";
-                }
+                var estConsulta = "Todo";
 
                 PizarraData.reudiatablas = await PizarraData.GetPendientes
-                (accion, division, date1, date2, tipo, est) 
-                ?? new List<ReunionDTO>();
+                (
+                    accion,
+                    division,
+                    date1,
+                    date2,
+                    tipo,
+                    estConsulta
+                ) ?? new List<ReunionDTO>();
                 dataIsLoaded = 2;
 
                 if (PizarraData?.reudiatablas is null)
@@ -433,6 +462,7 @@ else if (dataIsLoaded == 2 && registrosVisibles.Count == 0)
                     e.Responsable = RespoReuData.resporeus.Where(x => x.IdResReu == e.IdResReu).FirstOrDefault()?.Rrnombre ?? string.Empty;
                 }
 
+                _sourceAll = PizarraData.reudiatablas.ToList();
                 // Base por rol + filtros en memoria
                 ConstruirListaBase();
                 AplicarFiltrosEnMemoria();
@@ -456,42 +486,37 @@ else if (dataIsLoaded == 2 && registrosVisibles.Count == 0)
 
     private void ConstruirListaBase()
     {
-        if (PizarraData?.reudiatablas is null)
+        if (_sourceAll is null)
         {
             listareu = new();
             return;
         }
 
         if (!string.IsNullOrEmpty(UsrRol))
-            listareu = PizarraData.reudiatablas
+            listareu = _sourceAll
                 .Where(r => !string.IsNullOrEmpty(r.Responsable) && r.Responsable.StartsWith(UsrRol))
                 .ToList();
         else
-            listareu = PizarraData.reudiatablas.ToList();
+            listareu = _sourceAll.ToList();
     }
 
     private void AplicarFiltrosEnMemoria()
     {
         if (listareu is null) listareu = new();
 
-        if (EsOpcionVencidosGenerico(Status))
+        if (EsOpcionVencidasDiaria(Status))
         {
-            var canonico = ValidationMessages.MapStatusKey(Status ?? string.Empty);
-
-            if (canonico.Equals("VencidasDiaria", StringComparison.OrdinalIgnoreCase))
-            {
-                // ✅ Solo vencidos de Reunión Diaria
-                listareu = listareu
-                    .Where(d => d.Idksf == 6 && EsVencido(d.RdfecTra, d.Rdstatus ?? string.Empty))
-                    .ToList();
-            }
-            else
-            {
-                // ✅ Vencidos general: excluir los de Reunión Diaria
-                listareu = listareu
-                    .Where(d => d.Idksf != 6 && EsVencido(d.RdfecTra, d.Rdstatus ?? string.Empty))
-                    .ToList();
-            }
+            // ✅ Solo los vencidos de Reunión Diaria (KSF=6)
+            listareu = listareu
+                .Where(d => d.Idksf == 6 && EsVencido(d.RdfecTra, d.Rdstatus ?? string.Empty))
+                .ToList();
+        }
+        else if (EsOpcionVencidos(Status))
+        {
+            // ✅ Vencidos general: EXCLUIR los de Reunión Diaria (KSF != 6)
+            listareu = listareu
+                .Where(d => d.Idksf != 6 && EsVencido(d.RdfecTra, d.Rdstatus ?? string.Empty))
+                .ToList();
         }
         else if (EsOpcionTotalPendiente(Status))
         {
@@ -524,6 +549,14 @@ else if (dataIsLoaded == 2 && registrosVisibles.Count == 0)
                                             StringComparison.OrdinalIgnoreCase))
                     .ToList();
             }
+            else if (s.Equals("No Conforme", StringComparison.OrdinalIgnoreCase))
+            {
+                listareu = listareu
+                    .Where(d => string.Equals(d.Rdstatus ?? string.Empty,
+                                            "No Conforme",
+                                            StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+            }
             else
             {
                 listareu = listareu
@@ -532,9 +565,9 @@ else if (dataIsLoaded == 2 && registrosVisibles.Count == 0)
             }
         }
 
-        // Mantén el gating y el resto de filtros tal cual los tienes:
+        // ✅ Mismo gating del archivo bueno + incluir VencidasDiaria
         var permitirVencidos =
-            EsOpcionVencidosGenerico(Status) || EsOpcionTotalPendiente(Status) || EsOpcionTodo(Status);
+            EsOpcionVencidasDiaria(Status) || EsOpcionVencidos(Status) || EsOpcionTotalPendiente(Status) || EsOpcionTodo(Status);
 
         if (!permitirVencidos)
         {
