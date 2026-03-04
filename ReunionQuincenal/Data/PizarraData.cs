@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Mvc;
 using ReunionWeb.ReunionDiaria.DTOs;
-
-
+using System.Linq;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 using static System.Net.WebRequestMethods;
 using ReunionWeb.DTOs.Maestra;
 using ReunionWeb.Interface;
@@ -53,9 +55,11 @@ public class PizarraData : IPizarraData
         return reunionditablas = await _http.GetFromJsonAsync<List<ReunionDTO>>(url) ?? new List<ReunionDTO>();
     }
 
-    public async Task<List<ReunionDTO>> GetPendientes(string idcentro, string iddiv, DateTime f1, DateTime f2, string tipo, string estado)
+    public async Task<List<ReunionDTO>> GetPendientes(
+        string idcentro, string iddiv, DateTime f1, DateTime f2, string tipo, string estado)
     {
         const int reunionQuincenal = 3;
+        const int pageSize = 5000; // único parámetro interno que se enviará
 
         string f1Formateado = f1.ToString("yyyy-MM-dd");
         string f2Formateado = f2.ToString("yyyy-MM-dd");
@@ -64,16 +68,20 @@ public class PizarraData : IPizarraData
         for (int i = 0; i < 2; i++)
         {
             string dec = Uri.UnescapeDataString(estadoNormalizado);
-            if (dec == estadoNormalizado) break;   // ya no hay más para decodificar
+            if (dec == estadoNormalizado) break;
             estadoNormalizado = dec;
         }
-
         string estadoEncoded = Uri.EscapeDataString(estadoNormalizado);
 
-        url = $"{BaseUrl}/GetPendientes/{idcentro}/{iddiv}/{f1Formateado}/{f2Formateado}/{tipo}/{estadoEncoded}/{reunionQuincenal}";
+        // Solo pageSize; NO se envían lastDate ni lastId
+        var url =
+            $"{BaseUrl}/GetPendientes/{idcentro}/{iddiv}/{f1Formateado}/{f2Formateado}/{tipo}/{estadoEncoded}/{reunionQuincenal}" +
+            $"?pageSize={pageSize}";
 
-        return reudiatablas = await _http.GetFromJsonAsync<List<ReunionDTO>>(url)
-                            ?? new List<ReunionDTO>();
+        var result = await _http.GetFromJsonAsync<List<ReunionDTO>>(url)
+                    ?? new List<ReunionDTO>();
+
+        return result;
     }
 
     public async Task<List<ReunionDTO>> GetPendientesTurno(string idcentro, string iddiv)

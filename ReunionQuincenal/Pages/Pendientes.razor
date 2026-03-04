@@ -769,7 +769,7 @@ else if (dataIsLoaded == 2 && PizarraData.reudiatablas.Count() == 0)
                 }
                 estConsulta = ValidationMessages.MapStatusKey(estConsulta ?? string.Empty);
 
-                await PizarraData.GetPendientes(
+                PizarraData.reudiatablas = await PizarraData.GetPendientes(
                     IdCentro.ToString(),
                     IdDiv.ToString(),
                     fecha1,
@@ -777,6 +777,10 @@ else if (dataIsLoaded == 2 && PizarraData.reudiatablas.Count() == 0)
                     tipoconsulta,
                     estConsulta
                 );
+
+                PizarraData.reudiatablas = PizarraData.reudiatablas
+                .Where(d => d.Idksf != 6 ||  d.Idksf != 29)
+                .ToList();
 
                 // actualiza listareu desde reudiatablas
                 ObtenerReunionesPorRol();
@@ -794,6 +798,7 @@ else if (dataIsLoaded == 2 && PizarraData.reudiatablas.Count() == 0)
                 AplicarFiltrosDerivadosDeEstado();
 
                 dataIsLoaded = 2;
+                StateHasChanged();
             }
         }
         else
@@ -995,7 +1000,13 @@ else if (dataIsLoaded == 2 && PizarraData.reudiatablas.Count() == 0)
                     estConsulta = ValidationMessages.MapStatusKey(estConsulta ?? string.Empty);
 
                     // Llama al backend con el estado de consulta (NO con "Vencidos")
-                    await PizarraData.GetPendientes(accion, division, date1, date2, tipo, estConsulta);
+                    PizarraData.reudiatablas = await PizarraData.GetPendientes
+                    (accion, division, date1, date2, tipo, estConsulta)
+                    ?? new List<ReunionDTO>();
+
+                    PizarraData.reudiatablas = PizarraData.reudiatablas
+                        .Where(d => d.Idksf != 6 ||  d.Idksf != 29)
+                        .ToList();
 
                     // Actualiza la lista en memoria según rol
                     ObtenerReunionesPorRol();

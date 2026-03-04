@@ -416,7 +416,9 @@ else if (dataIsLoaded == 2 && registrosVisibles.Count == 0)
                     estConsulta = "Todo";
                 }
 
-                await PizarraData.GetPendientes(accion, division, date1, date2, tipo, estConsulta);
+                PizarraData.reudiatablas = await PizarraData.GetPendientes
+                (accion, division, date1, date2, tipo, est) 
+                ?? new List<ReunionDTO>();
                 dataIsLoaded = 2;
 
                 if (PizarraData?.reudiatablas is null)

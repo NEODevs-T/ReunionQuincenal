@@ -21,19 +21,16 @@
 @using System.Globalization
 @using ReunionWeb.Services
 
+
 @if (!traduccionesCargadas || dataIsLoaded == 1)
 {
-    <div class="loading-container">
-        <div class="loader"></div>
-    </div>
+    <div class="loading-container"><div class="loader"></div></div>
 }
 else
 {
-<body>
-
-    @if (idPais != 0 && PizarraData.reudiatablas.Count() > 0 && dataIsLoaded == 2)
-    {
-
+    <div class="print-wrapper">
+        @if (PizarraData.reudiatablas?.Count() > 0 && dataIsLoaded == 2)
+        {
 
         <BSTable IsStriped="true" IsBordered="true">
             <BSTHead Class="cabecera">
@@ -71,8 +68,8 @@ else
             <BSTBody>
                 @foreach (var d in PizarraData.reudiatablas)
                 {
-                    @if (d.Rdstatus != "Listo" & d.RdfecTra <= DateTime.Now | (d.Rdstatus != "Listo" & (d.Rdodt == "" | d.Rdodt
-                   is null)))
+                    @if ((d.Rdstatus != "Listo" && d.RdfecTra <= DateTime.Now) || (d.Rdstatus != "Listo" && string.IsNullOrEmpty(d.Rdodt)))
+
                     //@if (d.Rdstatus != "Listo")
                     {
 
@@ -135,7 +132,7 @@ else
                                 var nombreResponsable = idPais == 5 
                                     ? responsable?.Rrenglish 
                                     : responsable?.Rrnombre ?? string.Empty;
-                            }
+                                }
                             <BSTD class="@(nombreResponsable == "Por Definir" ? "Definir" : "")">@nombreResponsable</BSTD>
                             @{
                                 var estadoTraducido = d.Rdstatus switch
@@ -178,9 +175,12 @@ else
         </BSTable>
 
     }
-    <button type="button" onclick="window.print()" class="btn btn-success"><span class="oi oi-print"></span></button>
-</body>
+        <button type="button" onclick="window.print()" class="btn btn-success">
+            <span class="oi oi-print"></span>
+        </button>
+    </div>
 }
+
 
 
 @code {
@@ -220,7 +220,6 @@ else
     int CentroComedor = 0;
     private bool traduccionesCargadas = false;
     private async Task CreateData()
-
     {
         var authState = await AuthStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
@@ -231,7 +230,18 @@ else
         {
             idPais = paisTemp;
         }
+        else
+        {
+            // fallback
+            try
+            {
+                idPais = await LocalStorage.GetItemAsync<int>("idPais");
+            }
+            catch { /* ignora */ }
 
+            if (idPais == 0)
+                idPais = 1; // Español por defecto
+        }
     }
 
     protected override async Task OnInitializedAsync()
@@ -245,18 +255,30 @@ else
         await DiccionarioTraduccionesService.CargarTraduccionesAsync();
         traduccionesCargadas = true;
     }
+    
     protected override async Task OnParametersSetAsync()
     {
         if (accion != null)
         {
             dataIsLoaded = 1;
-            await PizarraData.GetPendientes(accion, division, DateTime.Now.AddDays(-1), DateTime.Now, tipo, "Reunion");
+
+            DateTime desde = DateTime.Now.AddDays(-1);
+            DateTime hasta = DateTime.Now;
+
+            if (!string.IsNullOrWhiteSpace(f1))
+                DateTime.TryParseExact(f1, "dd-MM-yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out desde);
+            if (!string.IsNullOrWhiteSpace(f2))
+                DateTime.TryParseExact(f2, "dd-MM-yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out hasta);
+
+            PizarraData.reudiatablas = await PizarraData.GetPendientes(accion, division, desde, hasta, tipo, "Reunion")
+                                    ?? new List<ReunionDTO>();
+
             dataIsLoaded = 2;
 
             foreach (var e in PizarraData.reudiatablas)
             {
-                e.Ksf = KsfData.ksfs.Where(x => x.Idksf == e.Idksf).FirstOrDefault().KsfNombre;
-                e.Responsable = RespoReuData.resporeus.Where(x => x.IdResReu == e.IdResReu).FirstOrDefault().Rrnombre;
+                e.Ksf = KsfData.ksfs.FirstOrDefault(x => x.Idksf == e.Idksf)?.KsfNombre;
+                e.Responsable = RespoReuData.resporeus.FirstOrDefault(x => x.IdResReu == e.IdResReu)?.Rrnombre;
             }
         }
     }

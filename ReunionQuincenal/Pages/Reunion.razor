@@ -425,8 +425,9 @@ List<ReunionDTO> registrosVisibles
             if (dataIsLoaded != 1)
             {
                 dataIsLoaded = 1;
-                await PizarraData.GetPendientes(IdCentro.ToString(), IdDiv.ToString(), DateTime.Now.AddDays(-1), DateTime.Now, "1",
-                "Reunion");
+                PizarraData.reudiatablas = await PizarraData.GetPendientes
+                (IdCentro.ToString(), IdDiv.ToString(), DateTime.Now.AddDays(-1), DateTime.Now, "1",
+                "Reunion") ?? new List<ReunionDTO>();
                 dataIsLoaded = 2;
             }
         }
@@ -451,18 +452,20 @@ List<ReunionDTO> registrosVisibles
             dataIsLoaded = 1;
             IdCentro = int.Parse(accion);
             IdDiv = int.Parse(division);
-            await PizarraData.GetPendientes(accion, division, DateTime.Now.AddDays(-1), DateTime.Now, tipo, "Reunion");
+            PizarraData.reudiatablas = await PizarraData.GetPendientes
+            (accion, division, DateTime.Now.AddDays(-1), DateTime.Now, tipo, "Reunion") ?? new List<ReunionDTO>();
             dataIsLoaded = 2;
         }
 
     }
+
     public async Task PrintDocument()
     {
         string idiomaRuta = idPais == 5 ? "en" : "es";
         string nombrePagina = idPais == 5 ? "TableMeeting" : "TablaReunion";
-        string url = $"{idiomaRuta}/{nombrePagina}/{IdCentro}/{IdDiv}/{DateTime.Now.AddDays(-1):dd-MM-yyyy}/{DateTime.Now:dd-MM-yyyy}/1";
-        await IJS.InvokeAsync<object>("open", new object[] { url, "_blank" });
-        //await IJS.InvokeAsync<object>("open", new object[] { $"TablaReunion/{IdCentro.ToString()}/{IdDiv.ToString()}/{DateTime.Now.AddDays(-1).ToString("dd-MM-yyyy")}/{DateTime.Now.ToString("dd-MM-yyyy")}/1", "_blank" });
+        string url = $"/{idiomaRuta}/{nombrePagina}/{IdCentro}/{IdDiv}/{DateTime.Now.AddDays(-1):dd-MM-yyyy}/{DateTime.Now:dd-MM-yyyy}/1";
+        await IJS.InvokeVoidAsync("open", url, "_blank");
     }
+
 
 }
