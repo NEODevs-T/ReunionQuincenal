@@ -1,0 +1,284 @@
+@page "/es/calendario"
+@page "/en/calendar"
+@using Radzen.Blazor.Rendering;
+@inject DialogService DialogService
+@inject IAsistenciaReuData AsistenciaReuData
+@inject IAvisadorData AvisadorData
+@inject ICargoReuData CargoReuData
+@inject IKsfData KsfData
+@inject IPizarraData PizarraData
+@inject IRespoReuData RespoReuData
+@inject IMaestraData MaestraData
+@inject NavigationManager NavigationManager
+@inject HttpClient Http
+@inject AuthenticationStateProvider AuthStateProvider
+@inject ILocalStorageService LocalStorage
+
+@inject LocalizationService LocalizationService
+@inject ITranslationService Translator
+@inject IDiccionarioTraduccionesService DiccionarioTraduccionesService
+
+@using ReunionWeb.Resources
+@using System.Globalization
+@using ReunionWeb.Services
+
+
+
+<BSContainer>
+
+    @if (!traduccionesCargadas || MaestraData.centro.Count() == 0)
+    {
+        <div class="loader"></div>
+    }
+    else
+    {
+        <h3>@DiccionarioTraduccionesService.Traducciones["Calendario"]</h3>
+        <BSRow>
+            <BSCol Column="3" ColumnSmall="2">
+                <BSLabel>@DiccionarioTraduccionesService.Traducciones["Centro"]</BSLabel>
+                <BSInput InputType="InputType.Select" @onchange="BuscarDivision"  @bind-Value="IdCentro">
+                    <option value="0">@DiccionarioTraduccionesService.Traducciones["Seleccione"]</option>
+                    @foreach (var d in MaestraData.centro)
+                    {
+                        <option value="@d.IdCentro">@d.Centro</option>
+                    }
+                </BSInput>
+                <BSValidationSummary />
+                <BSFeedback For="@(() => IdCentro)" ValidMessage="@DiccionarioTraduccionesService.Traducciones["Correcto"]" />
+            </BSCol>
+
+
+
+            <BSCol Column="3" ColumnSmall="2">
+                <BSLabel>@DiccionarioTraduccionesService.Traducciones["Division"]</BSLabel>
+                <BSInput InputType="InputType.Select" @bind-Value="IdDiv">
+                    <option value="0">@DiccionarioTraduccionesService.Traducciones["Seleccione"]</option>
+                    @foreach (var d in MaestraData.divisions)
+                    {
+                            <option value="@d.IdDivision">@d.Ndivision</option>
+                    }
+                    <option value="0">@DiccionarioTraduccionesService.Traducciones["Todo"]</option>
+                </BSInput>
+                <BSFeedback For="@(() => IdDiv)" ValidMessage="@DiccionarioTraduccionesService.Traducciones["Correcto"]" />
+            </BSCol>
+
+
+            <BSCol ColumnSmall="2">
+                <BSRow>
+                    <BSLabel>@DiccionarioTraduccionesService.Traducciones["Aceptar"]</BSLabel>
+                </BSRow>
+                <BSButton IsOutlined Color="BSColor.Success" Size="Size.ExtraSmall" @onclick="(() => Get(IdCentro,IdDiv))">
+                    @DiccionarioTraduccionesService.Traducciones["Consultar"] <span class="oi oi-check"></span></BSButton>
+            </BSCol>
+
+        </BSRow>
+    }
+
+</BSContainer>
+
+<p>
+
+</p>
+@if (PizarraData.calentrabajo.Count() > 0 && dataIsLoaded == 2)
+{
+
+    <RadzenScheduler Data="@data" TItem="DataItem" StartProperty="Start" SelectedIndex="1" style="height: 630px;"
+        EndProperty="End" TodayText="@DiccionarioTraduccionesService.Traducciones["Hoy"]" TextProperty="Text" AppointmentRender=@OnAppointmentRender>
+        <RadzenDayView Text="@DiccionarioTraduccionesService.Traducciones["Dia"]" />
+        <RadzenWeekView Text="@DiccionarioTraduccionesService.Traducciones["Semana"]" />
+        <RadzenMonthView Text="@DiccionarioTraduccionesService.Traducciones["Mes"]" />
+        <RadzenYearPlannerView Text="@DiccionarioTraduccionesService.Traducciones["Planificacion"]" />
+        <RadzenYearView Text="@DiccionarioTraduccionesService.Traducciones["Año"]" />
+    </RadzenScheduler>
+}
+
+else if (dataIsLoaded == 1 && PizarraData.calentrabajo.Count() == 0)
+{
+    <div class="loader"></div>
+}
+else if (dataIsLoaded == 2 && PizarraData.calentrabajo.Count() == 0)
+{
+<div style="text-align: center; padding: 20px; font-size: 18px; color: rgb(102, 101, 101);">
+    <p>@DiccionarioTraduccionesService.Traducciones["NoHayDatos"]</p>
+</div>
+}
+
+
+
+@code {
+    private List<Claim> claims { get; set; }
+
+
+    [Required(ErrorMessage = "Seleccione el Centro")]
+    private int IdCentro { get; set; } //id del Centro
+    [Required(ErrorMessage = "Seleccione la división.")]
+    private int IdDiv { get; set; } //id de la division
+    private int dataIsLoaded { get; set; } //verificar si cargo la lista
+    DataItem[] data;
+
+    private string mensaje = "";
+    private int idPais { get; set; }
+    private bool traduccionesCargadas = false;
+
+    private async Task CreateData()
+
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        claims = user.Claims.ToList();
+
+        var idPaisClaim = claims.FirstOrDefault(c => c.Type == "IdPais")?.Value;
+        if (int.TryParse(idPaisClaim, out int paisTemp))
+        {
+            idPais = paisTemp;
+        }
+
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        await CreateData();
+        await LocalizationService.EstablecerCulturaDesdeTokenAsync();
+        CultureInfo.CurrentCulture = CultureInfo.DefaultThreadCurrentCulture;
+        CultureInfo.CurrentUICulture = CultureInfo.DefaultThreadCurrentUICulture;
+        await DiccionarioTraduccionesService.CargarTraduccionesAsync();
+        traduccionesCargadas = true;
+        if (claims != null && claims.Count > 10)
+        {
+            await MaestraData.GetCentrosxEmpresa("All" + claims[10].Value);
+        }
+
+        var rol = claims.FirstOrDefault(c => c.Type.Contains("role"))?.Value;
+
+        if (rol == "Admin" || rol == "SuperAdmin" || rol == "PrimeUser" || rol == "MttoAdmin" || rol == "SeguridadAdmin" || rol == "Auditores" || rol
+        == "CalidadAdmin")
+        {
+
+            await MaestraData.GetCentrosxEmpresa("All" + claims[10].Value);
+
+        }
+        else
+        {
+
+            await MaestraData.GetCentrosxEmpresa(claims[11].Value);
+
+        }
+
+        await KsfData.Getksf();
+        await RespoReuData.GetResReu();
+
+
+    }
+
+    protected async Task Get(int IdCentro, int IdDiv)
+    {
+        string centro = "", division = "";
+        if (IdCentro > 0)
+        {
+            centro = MaestraData.centro.Where(c => c.IdCentro == IdCentro).FirstOrDefault(c => c.IdCentro.Equals(IdCentro)).Centro;
+            if (IdDiv == 0)
+            {
+                division = "All";
+            }
+            else
+            {
+                foreach (var d in MaestraData.divisions)
+                {
+                    if (IdDiv == d.IdDivision)
+                    {
+                        division = d.Ndivision;
+                    }
+                }
+            }
+
+            if (dataIsLoaded != 1)
+            {
+                dataIsLoaded = 1;
+                await PizarraData.GetTrabajosCalendario(claims[9].Value.ToString(), centro, division);
+                data = new DataItem[PizarraData.calentrabajo.Count()];
+
+                for (int i = 0; i < data.Count(); i++)
+                {
+                    DateTime Inicio = new DateTime(PizarraData.calentrabajo[i].RdfecTra.Year, PizarraData.calentrabajo[i].RdfecTra.Month,
+                    PizarraData.calentrabajo[i].RdfecTra.Day, 08, 00, 00);
+                    @* DateTime Final = Inicio.AddHours((PizarraData.calentrabajo[i].Rdtiempo is null) ? 0 : (double.Parse(PizarraData.calentrabajo[i].Rdtiempo))); *@
+                    DateTime Final = Inicio.AddHours(
+                    PizarraData.calentrabajo[i].Rdtiempo is null 
+                    ? 0 
+                    : (double.TryParse(PizarraData.calentrabajo[i].Rdtiempo, out double result) ? result : 0)
+                    );
+                    data[i] = new DataItem
+                        {
+
+                            Start = Inicio,
+                            End = Final,
+                            Text = PizarraData.calentrabajo[i].Linea + " - " + PizarraData.calentrabajo[i].Responsable + " - " + ((PizarraData.calentrabajo[i].Rddisc.Length < 30) ?
+                        PizarraData.calentrabajo[i].Rddisc : PizarraData.calentrabajo[i].Rddisc.Substring(0, 30) + "...") + " - " + PizarraData.calentrabajo[i].RdcodEq
+
+                        };
+                    if (data[i].End < DateTime.Today)
+                    {
+                        data[i].Text = "Vencido " + data[i].Text;
+                    }
+
+                }
+
+
+                dataIsLoaded = 2;
+            }
+        }
+    }
+
+    void OnAppointmentRender(SchedulerAppointmentRenderEventArgs<DataItem> args)
+    {
+        // Never call StateHasChanged in AppointmentRender - would lead to infinite loop
+        //for (int i = 0; i < data.Count(); i++)
+        //{
+        if (args.Data.Text.Substring(0, 7) == "Vencido")
+        {
+            args.Attributes["style"] = "background: red !important";
+        }
+        //}
+
+    }
+
+        protected async Task BuscarDivision(ChangeEventArgs e)
+    {
+            IdCentro = int.Parse(e.Value.ToString());
+            IdDiv = 0;
+            try{
+                if(IdCentro != 0){
+                    MaestraData.divisions = await MaestraData.ObtenerDivisionDelCentro(IdCentro);
+                }
+            }catch(Exception ex){
+                mensaje = "Error: " + ex.Message;
+            }
+    }
+
+
+    class DataItem
+    {
+        public DateTime Start { get; set; }
+        public DateTime End { get; set; }
+        public string Text { get; set; }
+    }
+
+
+    //DataItem[] data = new DataItem[]
+    // {
+
+
+    // new DataItem
+    // {
+    // Start = DateTime.Today,
+    // End = DateTime.Today.AddDays(1),
+    // Text = "Birthday"
+    // },
+    // new DataItem
+    // {
+    // Start = DateTime.Today,
+    // End = DateTime.Today.AddDays(1),
+    // Text = "Birthday"
+    // }
+    // };
+
+}
