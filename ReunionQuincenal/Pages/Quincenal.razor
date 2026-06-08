@@ -255,11 +255,10 @@ else
 @code {
     int idCent = 0;
     int idDiv = 0;
-    string estado { get; set; }
     bool band = false;
     public DateTime fecha1;
     public DateTime fecha2;
-    private List<Claim> claims { get; set; }
+    private List<Claim> claims { get; set; } = new();
     private string mensaje = "";
     public RadzenDataGrid<ReunionDTO> reunion { get; set; } = new RadzenDataGrid<ReunionDTO>();
     private NotifiRadzen Notificar = new NotifiRadzen();
@@ -293,31 +292,50 @@ else
         fecha2 = DateTime.Now;
         await CreateData();
         await LocalizationService.EstablecerCulturaDesdeTokenAsync();
-        CultureInfo.CurrentCulture = CultureInfo.DefaultThreadCurrentCulture;
-        CultureInfo.CurrentUICulture = CultureInfo.DefaultThreadCurrentUICulture;
+        CultureInfo.CurrentCulture = CultureInfo.DefaultThreadCurrentCulture ?? CultureInfo.InvariantCulture;
+        CultureInfo.CurrentUICulture = CultureInfo.DefaultThreadCurrentUICulture ?? CultureInfo.InvariantCulture;
         await DiccionarioTraduccionesService.CargarTraduccionesAsync();
         traduccionesCargadas = true;
 
         PizarraData.reudiatablas = new List<ReunionDTO>();
-        if (claims != null && claims.Count > 1 && (claims[1]?.Value == "Admin" || claims[1]?.Value == "SuperAdmin" || claims[1]?.Value == "PrimeUser"))
-        {
+        var role = claims.FirstOrDefault(c => c.Type.Contains("role"))?.Value;
+        var idEmpresa = claims.FirstOrDefault(c => c.Type.Contains("IdEmpresa"))?.Value;
+        var idCentro = claims.FirstOrDefault(c => c.Type.Contains("IdCentro"))?.Value;
 
-            await MaestraData.GetCentrosxEmpresa("All" + claims[10].Value);
+        if (role == "Admin" || role == "SuperAdmin" || role == "PrimeUser")
+        {
+            if (!string.IsNullOrWhiteSpace(idEmpresa))
+            {
+                await MaestraData.GetCentrosxEmpresa("All" + idEmpresa);
+            }
         }
         else
         {
-            await MaestraData.GetCentrosxEmpresa(claims[11].Value);
+            if (!string.IsNullOrWhiteSpace(idCentro))
+            {
+                await MaestraData.GetCentrosxEmpresa(idCentro);
+            }
         }
     }
+
     protected async Task BuscarDivision(ChangeEventArgs e)
     {
-        idCent = int.Parse(e.Value.ToString());
         idDiv = 0;
+
+        if (e?.Value is not string valor || !int.TryParse(valor, out var centroId))
+        {
+            idCent = 0;
+            return;
+        }
+
+        idCent = centroId;
+
         try
         {
             if (idCent != 0)
             {
-                MaestraData.divisions = await MaestraData.ObtenerDivisionDelCentro(idCent);
+                MaestraData.divisions =
+                    await MaestraData.ObtenerDivisionDelCentro(idCent);
             }
         }
         catch (Exception ex)
