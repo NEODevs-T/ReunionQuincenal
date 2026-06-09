@@ -205,7 +205,7 @@ namespace ReunionWeb.Resources
                 _ => nombre
             };
         }
-        public static string MapStatusKey(string status)
+        public static string MapStatusKey(string? status)
         {
             return status switch
             {
