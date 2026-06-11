@@ -106,7 +106,7 @@ else if (dataIsLoaded == 2 && PizarraData.calentrabajo.Count() == 0)
 
 
 @code {
-    private List<Claim> claims { get; set; }
+    private List<Claim> claims { get; set; } = new();
 
 
     [Required(ErrorMessage = "Seleccione el Centro")]
@@ -114,7 +114,7 @@ else if (dataIsLoaded == 2 && PizarraData.calentrabajo.Count() == 0)
     [Required(ErrorMessage = "Seleccione la división.")]
     private int IdDiv { get; set; } //id de la division
     private int dataIsLoaded { get; set; } //verificar si cargo la lista
-    DataItem[] data;
+    DataItem[] data = Array.Empty<DataItem>();
 
     private string mensaje = "";
     private int idPais { get; set; }
@@ -138,29 +138,25 @@ else if (dataIsLoaded == 2 && PizarraData.calentrabajo.Count() == 0)
     {
         await CreateData();
         await LocalizationService.EstablecerCulturaDesdeTokenAsync();
-        CultureInfo.CurrentCulture = CultureInfo.DefaultThreadCurrentCulture;
-        CultureInfo.CurrentUICulture = CultureInfo.DefaultThreadCurrentUICulture;
+        CultureInfo.CurrentCulture = CultureInfo.DefaultThreadCurrentCulture ?? CultureInfo.InvariantCulture;
+        CultureInfo.CurrentUICulture = CultureInfo.DefaultThreadCurrentUICulture ?? CultureInfo.InvariantCulture;
         await DiccionarioTraduccionesService.CargarTraduccionesAsync();
         traduccionesCargadas = true;
         if (claims != null && claims.Count > 10)
         {
             await MaestraData.GetCentrosxEmpresa("All" + claims[10].Value);
         }
+        var rol = claims?.FirstOrDefault(c => c.Type.Contains("role"))?.Value;
 
-        var rol = claims.FirstOrDefault(c => c.Type.Contains("role"))?.Value;
-
-        if (rol == "Admin" || rol == "SuperAdmin" || rol == "PrimeUser" || rol == "MttoAdmin" || rol == "SeguridadAdmin" || rol == "Auditores" || rol
-        == "CalidadAdmin")
+        if (rol == "Admin" || rol == "SuperAdmin" || rol == "PrimeUser" || rol == "MttoAdmin" || rol == "SeguridadAdmin" || rol == "Auditores" || rol == "CalidadAdmin")
         {
-
-            await MaestraData.GetCentrosxEmpresa("All" + claims[10].Value);
-
+            var empresa = claims?.Count > 10 ? claims[10]?.Value : null;
+            await MaestraData.GetCentrosxEmpresa("All" + (empresa ?? ""));
         }
         else
         {
-
-            await MaestraData.GetCentrosxEmpresa(claims[11].Value);
-
+            var empresa = claims?.Count > 11 ? claims[11]?.Value : null;
+            await MaestraData.GetCentrosxEmpresa(empresa ?? "");
         }
 
         await KsfData.Getksf();
@@ -169,64 +165,79 @@ else if (dataIsLoaded == 2 && PizarraData.calentrabajo.Count() == 0)
 
     }
 
-    protected async Task Get(int IdCentro, int IdDiv)
+protected async Task Get(int IdCentro, int IdDiv)
+{
+    string centro = "";
+    string division = "";
+
+    if (IdCentro > 0)
     {
-        string centro = "", division = "";
-        if (IdCentro > 0)
+        centro = MaestraData.centro
+            .FirstOrDefault(c => c.IdCentro == IdCentro)?
+            .Centro ?? "";
+
+        if (IdDiv == 0)
         {
-            centro = MaestraData.centro.Where(c => c.IdCentro == IdCentro).FirstOrDefault(c => c.IdCentro.Equals(IdCentro)).Centro;
-            if (IdDiv == 0)
+            division = "All";
+        }
+        else
+        {
+            foreach (var d in MaestraData.divisions)
             {
-                division = "All";
-            }
-            else
-            {
-                foreach (var d in MaestraData.divisions)
+                if (IdDiv == d.IdDivision)
                 {
-                    if (IdDiv == d.IdDivision)
-                    {
-                        division = d.Ndivision;
-                    }
+                    division = d.Ndivision ?? "";
+                    break;
                 }
-            }
-
-            if (dataIsLoaded != 1)
-            {
-                dataIsLoaded = 1;
-                await PizarraData.GetTrabajosCalendario(claims[9].Value.ToString(), centro, division);
-                data = new DataItem[PizarraData.calentrabajo.Count()];
-
-                for (int i = 0; i < data.Count(); i++)
-                {
-                    DateTime Inicio = new DateTime(PizarraData.calentrabajo[i].RdfecTra.Year, PizarraData.calentrabajo[i].RdfecTra.Month,
-                    PizarraData.calentrabajo[i].RdfecTra.Day, 08, 00, 00);
-                    @* DateTime Final = Inicio.AddHours((PizarraData.calentrabajo[i].Rdtiempo is null) ? 0 : (double.Parse(PizarraData.calentrabajo[i].Rdtiempo))); *@
-                    DateTime Final = Inicio.AddHours(
-                    PizarraData.calentrabajo[i].Rdtiempo is null 
-                    ? 0 
-                    : (double.TryParse(PizarraData.calentrabajo[i].Rdtiempo, out double result) ? result : 0)
-                    );
-                    data[i] = new DataItem
-                        {
-
-                            Start = Inicio,
-                            End = Final,
-                            Text = PizarraData.calentrabajo[i].Linea + " - " + PizarraData.calentrabajo[i].Responsable + " - " + ((PizarraData.calentrabajo[i].Rddisc.Length < 30) ?
-                        PizarraData.calentrabajo[i].Rddisc : PizarraData.calentrabajo[i].Rddisc.Substring(0, 30) + "...") + " - " + PizarraData.calentrabajo[i].RdcodEq
-
-                        };
-                    if (data[i].End < DateTime.Today)
-                    {
-                        data[i].Text = "Vencido " + data[i].Text;
-                    }
-
-                }
-
-
-                dataIsLoaded = 2;
             }
         }
+
+        if (dataIsLoaded != 1)
+        {
+            dataIsLoaded = 1;
+
+            var claim9 = claims?.ElementAtOrDefault(9)?.Value ?? "";
+            await PizarraData.GetTrabajosCalendario(claim9, centro, division);
+
+            data = new DataItem[PizarraData.calentrabajo.Count()];
+
+            for (int i = 0; i < data.Count(); i++)
+            {
+                DateTime Inicio = new DateTime(
+                    PizarraData.calentrabajo[i].RdfecTra.Year,
+                    PizarraData.calentrabajo[i].RdfecTra.Month,
+                    PizarraData.calentrabajo[i].RdfecTra.Day,
+                    8, 0, 0
+                );
+
+                DateTime Final = Inicio.AddHours(
+                    double.TryParse(PizarraData.calentrabajo[i].Rdtiempo, out double result)
+                        ? result
+                        : 0
+                );
+
+                var disc = PizarraData.calentrabajo[i].Rddisc ?? "";
+
+                data[i] = new DataItem
+                {
+                    Start = Inicio,
+                    End = Final,
+                    Text = PizarraData.calentrabajo[i].Linea + " - " +
+                           PizarraData.calentrabajo[i].Responsable + " - " +
+                           (disc.Length < 30 ? disc : disc.Substring(0, 30) + "...") + " - " +
+                           PizarraData.calentrabajo[i].RdcodEq
+                };
+
+                if (data[i].End < DateTime.Today)
+                {
+                    data[i].Text = "Vencido " + data[i].Text;
+                }
+            }
+
+            dataIsLoaded = 2;
+        }
     }
+}
 
     void OnAppointmentRender(SchedulerAppointmentRenderEventArgs<DataItem> args)
     {
@@ -241,17 +252,31 @@ else if (dataIsLoaded == 2 && PizarraData.calentrabajo.Count() == 0)
 
     }
 
-        protected async Task BuscarDivision(ChangeEventArgs e)
+    protected async Task BuscarDivision(ChangeEventArgs e)
     {
-            IdCentro = int.Parse(e.Value.ToString());
-            IdDiv = 0;
-            try{
-                if(IdCentro != 0){
+        IdDiv = 0;
+
+        try
+        {
+            if (int.TryParse(e.Value?.ToString(), out int idCentro))
+            {
+                IdCentro = idCentro;
+
+                if (IdCentro != 0)
+                {
                     MaestraData.divisions = await MaestraData.ObtenerDivisionDelCentro(IdCentro);
                 }
-            }catch(Exception ex){
-                mensaje = "Error: " + ex.Message;
             }
+            else
+            {
+                mensaje = DiccionarioTraduccionesService.Traducciones["SCentro"];
+                IdCentro = 0;
+            }
+        }
+        catch (Exception ex)
+        {
+            mensaje = "Error: " + ex.Message;
+        }
     }
 
 
@@ -259,7 +284,7 @@ else if (dataIsLoaded == 2 && PizarraData.calentrabajo.Count() == 0)
     {
         public DateTime Start { get; set; }
         public DateTime End { get; set; }
-        public string Text { get; set; }
+        public string Text { get; set; } = "";
     }
 
 
