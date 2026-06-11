@@ -116,7 +116,7 @@ else
                                 @texto</BSTD>
                             }
                             <BSTD>@d.RdcodEq</BSTD>
-                            <BSTD ColSpan="4">@d.Rddisc.ToUpper()</BSTD>
+                            <BSTD ColSpan="4">@(d.Rddisc?.ToUpperInvariant() ?? string.Empty)</BSTD>
                             <BSTD>@d.RdcodDis</BSTD>
                             @if (@d.RdplanAcc is not null)
                             {
@@ -196,26 +196,26 @@ else
     [Parameter]
     public string? tipo { get; set; }
 
-    private List<AsistenReuDTO> listaAsistencia { get; set; }
-    private List<LineaDTO> lineas { get; set; }
-    private List<DivisionDTO> divisions { get; set; }
-    private List<MaestraVDTO> centro { get; set; }
-    private List<KsfDTO> ksfs { get; set; }
-    private List<RespoReuDTO> resporeu { get; set; }
-    private List<ReunionDTO> reunionditabla { get; set; }
-    private List<ReunionDTO> reudiatabla { get; set; }
-    private List<AsistenReuDTO> asistenreus { get; set; }
-    private List<CargoReuDTO> cargoreus { get; set; }
-    private List<StatsAsisDto> StatsAsisDtos { get; set; }
-    private List<EquiposEamVDTO> equipos { get; set; }
-    private List<EquiposEamVDTO> equiposlinea { get; set; }
-    private List<EquipoEamDTO> listaEqupis { get; set; }
-    private RegistroCambiosDTO listaRegistro { get; set; }
-    private List<CalendarioTrabajoDTO> calentrabajo { get; set; }
-    private List<CambFecDTO> cambiofecha { get; set; }
-    private List<ReunionDTO> reudiatablas { get; set; }
+    private List<AsistenReuDTO> listaAsistencia { get; set; } = new();
+    private List<LineaDTO> lineas { get; set; } = new();
+    private List<DivisionDTO> divisions { get; set; } = new();
+    private List<MaestraVDTO> centro { get; set; } = new();
+    private List<KsfDTO> ksfs { get; set; } = new();
+    private List<RespoReuDTO> resporeu { get; set; } = new();
+    private List<ReunionDTO> reunionditabla { get; set; } = new();
+    private List<ReunionDTO> reudiatabla { get; set; } = new();
+    private List<AsistenReuDTO> asistenreus { get; set; } = new();
+    private List<CargoReuDTO> cargoreus { get; set; } = new();
+    private List<StatsAsisDto> StatsAsisDtos { get; set; } = new();
+    private List<EquiposEamVDTO> equipos { get; set; } = new();
+    private List<EquiposEamVDTO> equiposlinea { get; set; } = new();
+    private List<EquipoEamDTO> listaEqupis { get; set; } = new();
+    private List<RegistroCambiosDTO> listaRegistro { get; set; } = new();
+    private List<CalendarioTrabajoDTO> calentrabajo { get; set; } = new();
+    private List<CambFecDTO> cambiofecha { get; set; } = new();
+    private List<ReunionDTO> reudiatablas { get; set; } = new();
     private int idPais { get; set; }
-    private List<Claim> claims { get; set; }
+    private List<Claim> claims { get; set; } = new();
     int dataIsLoaded = 0;
     int CentroComedor = 0;
     private bool traduccionesCargadas = false;
@@ -250,8 +250,8 @@ else
         await KsfData.Getksf();
         await RespoReuData.GetResReu();
         await LocalizationService.EstablecerCulturaDesdeTokenAsync();
-        CultureInfo.CurrentCulture = CultureInfo.DefaultThreadCurrentCulture;
-        CultureInfo.CurrentUICulture = CultureInfo.DefaultThreadCurrentUICulture;
+        CultureInfo.CurrentCulture = CultureInfo.DefaultThreadCurrentCulture ?? CultureInfo.InvariantCulture;
+        CultureInfo.CurrentUICulture = CultureInfo.DefaultThreadCurrentUICulture ?? CultureInfo.InvariantCulture;
         await DiccionarioTraduccionesService.CargarTraduccionesAsync();
         traduccionesCargadas = true;
     }
@@ -270,8 +270,19 @@ else
             if (!string.IsNullOrWhiteSpace(f2))
                 DateTime.TryParseExact(f2, "dd-MM-yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out hasta);
 
-            PizarraData.reudiatablas = await PizarraData.GetPendientes(accion, division, desde, hasta, tipo, "Reunion")
-                                    ?? new List<ReunionDTO>();
+            var idCentro = accion;
+            var idDivision = division ?? string.Empty;
+            var tipoConsulta = tipo ?? string.Empty;
+
+            // 3) Llamada segura al backend
+            PizarraData.reudiatablas = await PizarraData.GetPendientes(
+                idCentro,
+                idDivision,
+                desde,
+                hasta,
+                tipoConsulta,
+                "Reunion"
+            ) ?? new List<ReunionDTO>();
 
             dataIsLoaded = 2;
 

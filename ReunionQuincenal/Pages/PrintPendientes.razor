@@ -70,7 +70,7 @@ else
 }
 <BSCol Column="3">
     <BSLabel>@DiccionarioTraduccionesService.Traducciones["Linea"]</BSLabel>
-    <BSInput InputType="InputType.Text" @bind-Value="@lineaTraducida" IsReadonly="true" />
+    <BSInput InputType="InputType.Text" Value="@lineaTraducida" IsReadonly="true" />
 </BSCol>
 
 
@@ -80,7 +80,7 @@ else
 
 <body>
     
-@if (registrosVisibles.Count > 0 && dataIsLoaded == 2)
+@if (PizarraData.reudiatablas.Any() && dataIsLoaded == 2)
 {
     @if (PizarraData?.reudiatablas?.Count > 0 && dataIsLoaded == 2)
     {
@@ -136,7 +136,7 @@ else
                                         }
                                         @texto</BSTD>
                                         <BSTD>@d.RdcodEq</BSTD>
-                                        <BSTD ColSpan="4">@d.Rddisc.ToUpperInvariant()</BSTD>
+                                        <BSTD ColSpan="4">@(d.Rddisc?.ToUpperInvariant() ?? string.Empty)</BSTD>
                                         <BSTD>@d.RdcodDis</BSTD>
                                         <BSTD Class="textotabla">@d.RdplanAcc</BSTD>
                                         <BSTD>@d.Rdtiempo</BSTD>
@@ -148,7 +148,7 @@ else
                                         }
                                         <BSTD class="@(nombreResponsable == "Por Definir" ? "Definir" : "")">@nombreResponsable</BSTD>
                                         @{
-                                            var estadoTraducido = GetVisualStatus(d.RdfecTra, d.Rdstatus, d.Idksf);
+                                            var estadoTraducido = GetVisualStatus(d.RdfecTra, d.Rdstatus ?? "", d.Idksf);
                                             var claseEstado = EsVencido(d.RdfecTra, d.Rdstatus)
                                                     ? "Vencido"
                                                     : d.Rdstatus switch
@@ -210,13 +210,9 @@ else if (dataIsLoaded == 2 && registrosVisibles.Count == 0)
     public string? tipo { get; set; }
     [Parameter]
     public string? est { get; set; }
-    [Parameter] public int? idrespo 
-    { 
-        get => _idrespo; 
-        set { _idrespo = value; ReaplicarFiltrosSiListo(); } 
-    }
+    [Parameter] public int? idrespo { get; set; }
     int dataIsLoaded = 0;
-    int CentroComedor = 0;
+    //int CentroComedor = 0;
 
     private string _codigo = "Todo";
     private string Codigo 
@@ -228,30 +224,30 @@ else if (dataIsLoaded == 2 && registrosVisibles.Count == 0)
     private string UsrAdmin { get; set; } = ""; //permisos de admin
     private string UsrRol { get; set; } = ""; //rol para filtrar
 
-    private List<AsistenReuDTO> listaAsistencia { get; set; }
-    private List<LineaDTO> lineas { get; set; }
-    private List<DivisionDTO> divisions { get; set; }
-    private List<MaestraVDTO> centro { get; set; }
-    private List<KsfDTO> ksfs { get; set; }
+    private List<AsistenReuDTO> listaAsistencia { get; set; } = new();
+    private List<LineaDTO> lineas { get; set; } = new();
+    private List<DivisionDTO> divisions { get; set; } = new();
+    private List<MaestraVDTO> centro { get; set; } = new();
+    private List<KsfDTO> ksfs { get; set; } = new();
     private List<RespoReuDTO> resporeu { get; set; } = new();
-    private List<ReunionDTO> reunionditabla { get; set; }
-    private List<ReunionDTO> reudiatabla { get; set; }
-    private List<AsistenReuDTO> asistenreus { get; set; }
-    private List<CargoReuDTO> cargoreus { get; set; }
-    private List<StatsAsisDto> StatsAsisDtos { get; set; }
-    private List<EquiposEamVDTO> equipos { get; set; }
-    private List<EquiposEamVDTO> equiposlinea { get; set; }
-    private List<EquipoEamDTO> listaEqupis { get; set; }
-    private RegistroCambiosDTO listaRegistro { get; set; }
-    private List<CalendarioTrabajoDTO> calentrabajo { get; set; }
-    private List<CambFecDTO> cambiofecha { get; set; }
+    private List<ReunionDTO> reunionditabla { get; set; } = new();
+    private List<ReunionDTO> reudiatabla { get; set; } = new();
+    private List<AsistenReuDTO> asistenreus { get; set; } = new();
+    private List<CargoReuDTO> cargoreus { get; set; } = new();
+    private List<StatsAsisDto> StatsAsisDtos { get; set; } = new();
+    private List<EquiposEamVDTO> equipos { get; set; } = new();
+    private List<EquiposEamVDTO> equiposlinea { get; set; } = new();
+    private List<EquipoEamDTO> listaEqupis { get; set; } = new();
+    private List<RegistroCambiosDTO> listaRegistro { get; set; } = new();
+    private List<CalendarioTrabajoDTO> calentrabajo { get; set; } = new();
+    private List<CambFecDTO> cambiofecha { get; set; } = new();
     private List<ReunionDTO> reudiatablas { get; set; } = new();
     private bool traduccionesCargadas = false;
     private int idPais {get; set;}
-    private int? _idrespo;
+    private int? _idrespo = 0;
     private bool DatosListos => dataIsLoaded == 2 && PizarraData?.reudiatablas != null;
     private List<ReunionDTO> _sourceAll = new();
-    private List<Claim> claims { get; set; }
+    private List<Claim> claims { get; set; } = new();
     private string _status = "Total Pendiente";   
     List<ReunionDTO> listareu = new List<ReunionDTO>();//filtar los responsables
 
@@ -300,7 +296,9 @@ else if (dataIsLoaded == 2 && registrosVisibles.Count == 0)
         var valor = (s ?? string.Empty).Trim();
         var tieneDic = DiccionarioTraduccionesService.Traducciones != null &&
                     DiccionarioTraduccionesService.Traducciones.ContainsKey("TotalPendiente");
-        var traducidoTP = tieneDic ? DiccionarioTraduccionesService.Traducciones["TotalPendiente"] : "Total Pendiente";
+        var traducidoTP = (tieneDic && DiccionarioTraduccionesService?.Traducciones != null)
+        ? DiccionarioTraduccionesService.Traducciones["TotalPendiente"]
+        : "Total Pendiente";
         return valor.Equals("Total Pendiente", StringComparison.OrdinalIgnoreCase)
             || valor.Equals("Total Pending", StringComparison.OrdinalIgnoreCase)
             || valor.Equals(traducidoTP, StringComparison.OrdinalIgnoreCase);
@@ -366,59 +364,73 @@ else if (dataIsLoaded == 2 && registrosVisibles.Count == 0)
         await RespoReuData.GetResReu();
         await KsfData.Getksf();
         await LocalizationService.EstablecerCulturaDesdeTokenAsync();
-        CultureInfo.CurrentCulture = CultureInfo.DefaultThreadCurrentCulture;
-        CultureInfo.CurrentUICulture = CultureInfo.DefaultThreadCurrentUICulture;
+        CultureInfo.CurrentCulture = CultureInfo.DefaultThreadCurrentCulture ?? CultureInfo.InvariantCulture;
+        CultureInfo.CurrentUICulture = CultureInfo.DefaultThreadCurrentUICulture ?? CultureInfo.InvariantCulture;
         await DiccionarioTraduccionesService.CargarTraduccionesAsync();
         traduccionesCargadas = true;
+    }
+
+    protected override void OnParametersSet()
+    {
+        ReaplicarFiltrosSiListo();
     }
 
     protected override async Task OnParametersSetAsync()
     {
         await CreateData();
 
-        switch (claims.FirstOrDefault(c => c.Type.Contains("role"))?.Value)
+        var role = claims.FirstOrDefault(c => c.Type.Contains("role"))?.Value
+            ?? string.Empty;
+        var idEmpresa = claims.FirstOrDefault(c => c.Type.Contains("IdEmpresa"))?.Value
+            ?? string.Empty;
+        var idCentro = claims.FirstOrDefault(c => c.Type.Contains("IdCentro"))?.Value
+            ?? string.Empty;
+
+        switch (role)
         {
             case "Admin":
             case "SuperAdmin":
                 UsrAdmin = "SuperAdmin";
-                await MaestraData.GetCentrosxEmpresa("All" + claims.FirstOrDefault(c => c.Type.Contains("IdEmpresa"))?.Value);
+                await MaestraData.GetCentrosxEmpresa("All" + idEmpresa);
                 break;
 
             case "SemiAdmin":
                 UsrAdmin = "SemiAdmin";
-                await MaestraData.GetCentrosxEmpresa(claims.FirstOrDefault(c => c.Type.Contains("IdCentro"))?.Value);
+                await MaestraData.GetCentrosxEmpresa(idCentro);
                 break;
 
             case "Planificador":
             case "SuperUser":
-                await MaestraData.GetCentrosxEmpresa(claims.FirstOrDefault(c => c.Type.Contains("IdCentro"))?.Value);
+                await MaestraData.GetCentrosxEmpresa(idCentro);
                 break;
 
             case "MttoAdmin":
                 UsrRol = "Mtto";
-                await MaestraData.GetCentrosxEmpresa("All" + claims.FirstOrDefault(c => c.Type.Contains("IdEmpresa"))?.Value);
+                await MaestraData.GetCentrosxEmpresa("All" + idEmpresa);
                 break;
+
             case "SeguridadAdmin":
-                UsrRol = "Seguridad";//Seguridad para filtar por seguridad
-                await MaestraData.GetCentrosxEmpresa("All" + claims.FirstOrDefault(c => c.Type.Contains("IdEmpresa"))?.Value);
+                UsrRol = "Seguridad";
+                await MaestraData.GetCentrosxEmpresa("All" + idEmpresa);
                 break;
+
             case "CalidadAdmin":
-                UsrRol = "Calidad";//Seguridad para filtar por calidad
-                await MaestraData.GetCentrosxEmpresa("All" + claims.FirstOrDefault(c => c.Type.Contains("IdEmpresa"))?.Value);
+                UsrRol = "Calidad";
+                await MaestraData.GetCentrosxEmpresa("All" + idEmpresa);
                 break;
 
             case "Mantenimiento":
                 UsrRol = "Mtto";
-                await MaestraData.GetCentrosxEmpresa(claims.FirstOrDefault(c => c.Type.Contains("IdCentro"))?.Value);
+                await MaestraData.GetCentrosxEmpresa(idCentro);
                 break;
 
             case "Auditores":
-                await MaestraData.GetCentrosxEmpresa("All" + claims.FirstOrDefault(c => c.Type.Contains("IdEmpresa"))?.Value);
+                await MaestraData.GetCentrosxEmpresa("All" + idEmpresa);
                 break;
 
             default:
-                UsrRol = claims.FirstOrDefault(c => c.Type.Contains("role"))?.Value;
-                await MaestraData.GetCentrosxEmpresa(claims.FirstOrDefault(c => c.Type.Contains("IdCentro"))?.Value);
+                UsrRol = role;
+                await MaestraData.GetCentrosxEmpresa(idCentro);
                 break;
         }
 
@@ -442,10 +454,10 @@ else if (dataIsLoaded == 2 && registrosVisibles.Count == 0)
                 PizarraData.reudiatablas = await PizarraData.GetPendientes
                 (
                     accion,
-                    division,
+                    division!,
                     date1,
                     date2,
-                    tipo,
+                    tipo!,
                     estConsulta
                 ) ?? new List<ReunionDTO>();
                 dataIsLoaded = 2;
