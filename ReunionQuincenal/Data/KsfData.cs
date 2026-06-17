@@ -32,10 +32,12 @@ public class KsfData: IKsfData
     
     public async Task<List<KsfDTO>> Getksf()
     {
-        url = $"{BaseUrl}/GetKsf";
-        cliente = _clientFactory.CreateClient();
-        ksfs = await _http.GetFromJsonAsync<List<KsfDTO>>(url);
-        var results = ksfs;
-        return results;
+        var url = $"{BaseUrl}/GetKsf";
+        var cliente = _clientFactory.CreateClient();
+
+        ksfs = await cliente.GetFromJsonAsync<List<KsfDTO>>(url)
+            ?? new List<KsfDTO>();
+
+        return ksfs;
     }
 }

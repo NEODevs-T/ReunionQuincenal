@@ -205,8 +205,12 @@ namespace ReunionWeb.Resources
                 _ => nombre
             };
         }
+
         public static string MapStatusKey(string? status)
         {
+            if (string.IsNullOrEmpty(status))
+                return "Desconocido";
+
             return status switch
             {
                 "Listo" => "Listo",
@@ -215,7 +219,7 @@ namespace ReunionWeb.Resources
                 "Pendiente/Responsable" => "PendienteResponsable",
                 "Pendiente" => "Pendiente",
                 "Revisar" => "Revisar",
-                _ => status // fallback por si no hay traducción
+                _ => status
             };
         }
     }   

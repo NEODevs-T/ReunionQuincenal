@@ -20,7 +20,7 @@ public class EquipoEamDTO
 
     public DateTime Efecha { get; set; }
 
-    public LineaDTO Linea { get; set; }
+    public LineaDTO Linea { get; set; } = new();
 
 
 }

@@ -45,7 +45,8 @@ public class APIReunionService : IAPIReunionService
         public List<EquipoEamDTO> equiposlinea { get; set; } = new List<EquipoEamDTO>();
         public List<CalendarioTrabajoDTO> calentrabajo { get; set; } = new List<CalendarioTrabajoDTO>();
 
-        public RegistroCambiosDTO listaRegistro { get; set; } //= new RegistroCambiosDTO(); 
+        public RegistroCambiosDTO listaRegistro { get; set; } = new RegistroCambiosDTO();
+
 
 
         // **-------> PROPIEDADES DE JAVIER <------**
@@ -124,12 +125,14 @@ public class APIReunionService : IAPIReunionService
 
         public async Task<List<KsfDTO>> Getksf()
         {
-                url = $"{BaseUrlLineas}/GetKsf";
-                cliente = _clientFactory.CreateClient();
-                ksfs = await _http.GetFromJsonAsync<List<KsfDTO>>($"{BaseUrlLineas}/GetKsf");
-                var results = await cliente.GetFromJsonAsync<List<KsfDTO>>(url);
-                return results;
-                // return await cliente.GetFromJsonAsync<List<KsfDTO>>(url) ?? new List<KsfDTO>();
+        url = $"{BaseUrl}/GetKsf";
+        cliente = _clientFactory.CreateClient();
+
+        var resultado =
+                await _http.GetFromJsonAsync<List<KsfDTO>>(url)
+                ?? new List<KsfDTO>();
+
+        return resultado;
         }
 
         public async Task<List<RespoReuDTO>> GetResReu()

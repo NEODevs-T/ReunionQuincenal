@@ -163,7 +163,6 @@
 <data name="FechaDeTrabajo" xml:space="preserve"><value>Fecha del Trabajo</value></data>
 <data name="TotalPendiente" xml:space="preserve"><value>Total Pendiente</value></data>
 <data name="NoConforme" xml:space="preserve"><value>No Conforme</value></data>
-<data name="CambiosDeFechaTrabajo" xml:space="preserve"><value>Cambios de Fecha Trabajo</value></data>
 <data name="ProximaFecha" xml:space="preserve"><value>Próxima Fecha</value></data>
 <data name="Descripcion" xml:space="preserve"><value>Descripción</value></data>
 <data name="Revisar" xml:space="preserve"><value>Revisar</value></data>

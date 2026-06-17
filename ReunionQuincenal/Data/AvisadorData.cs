@@ -29,7 +29,7 @@ public class AvisadorData: IAvisadorData
     private string url { get; set; } = "";
     public List<CambStatDTO> cambiostatus { get; set; } = new List<CambStatDTO>();
     public List<CambFecDTO> cambiofecha { get; set; } = new List<CambFecDTO>();
-    public RegistroCambiosDTO listaRegistro { get; set; }
+    public RegistroCambiosDTO listaRegistro { get; set; } = new();
 
     private readonly NavigationManager _navigationManager;
 

@@ -40,7 +40,9 @@ public class CargoReuData : ICargoReuData
 
     public async Task<List<CarReuDTO>> GetCargosReunion()
     {
-        return await _http.GetFromJsonAsync<List<CarReuDTO>>("http://neo.grandbay-corp.com/ApiNeoMasterP/api/AsistenciaReu/GetCargoReuDiaria");
+        return await _http.GetFromJsonAsync<List<CarReuDTO>>(
+            "http://neo.grandbay-corp.com/ApiNeoMasterP/api/AsistenciaReu/GetCargoReuDiaria")
+            ?? new List<CarReuDTO>();
     }
 
 }

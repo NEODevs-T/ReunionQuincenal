@@ -71,7 +71,8 @@ public class AsistenciaReuData : IAsistenciaReuData
                 $"empresa={Uri.EscapeDataString(empresa)}&" +
                 $"area={Uri.EscapeDataString(area)}";
         var cliente = _clientFactory.CreateClient();
-        return await cliente.GetFromJsonAsync<PorcentajeAsistenciaQuincenalResponseDTO>(url);
+        return await cliente.GetFromJsonAsync<PorcentajeAsistenciaQuincenalResponseDTO>(url)
+            ?? new PorcentajeAsistenciaQuincenalResponseDTO();
     }
 
 }
