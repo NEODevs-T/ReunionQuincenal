@@ -1,4 +1,4 @@
-﻿@page "/addequipo"
+﻿@*@page "/addequipo"
 @inject IAsistenciaReuData AsistenciaReuData
 @inject IAvisadorData AvisadorData
 @inject ICargoReuData CargoReuData
@@ -197,7 +197,7 @@ else
                     <BSTHead Class="cabecera">
                         <BSTR>
 
-                            @*<BSTD>Id</BSTD>*@
+                            @*<BSTD>Id</BSTD>
                             <BSTD>Centro</BSTD>
                             <BSTD>División</BSTD>
                             <BSTD>Línea</BSTD>
@@ -227,7 +227,7 @@ else
                                         {
                                             <BSTR>
                                             @*<BSTD>@d.IdEquipo</BSTD>*@
-                                            @* <BSTD>@d.centro</BSTD> *@
+                                            @* <BSTD>@d.centro</BSTD> *
                                             <BSTD>@d.EdescriEam</BSTD>
                                             <BSTD>@d.Linea</BSTD>
                                             
@@ -311,7 +311,7 @@ else
                                   <BSTR>
                        @*         <BSTD>@d.IdEquipo</BSTD>*@
                                 @* <BSTD>@d.Centro</BSTD> *@
-                                @* <BSTD>@d.Division</BSTD> *@
+                                @* <BSTD>@d.Division</BSTD> *
                                 <BSTD>@d.Linea</BSTD>
                                             @if(idequipoeditar==d.IdEquipo)
                                             {
@@ -589,5 +589,5 @@ else
         EquipoForm = new EquipoDTO();
         IdCent = 0;
     }
-    }
+    }*@
 

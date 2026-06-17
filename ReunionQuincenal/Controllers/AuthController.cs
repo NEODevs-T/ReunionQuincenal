@@ -10,10 +10,10 @@ namespace ReunionWeb.Controllers
     {
 
         [HttpPost]
-        public async Task<ActionResult<string>> Loging(UserLoginDto request)
+        public ActionResult<string> Loging(UserLoginDto request)
         {
-            string token = @"Prueba";
-            return token;
+            string token = "Prueba";
+            return Ok(token);
         }
     }
 }

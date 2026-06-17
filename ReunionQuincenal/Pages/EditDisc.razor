@@ -561,13 +561,14 @@ else
     CambFecDTO CambFec = new CambFecDTO();//Formulario para agregar que usuario hizo el cambio de fecha.
     List<CambFecDTO> CambiosFecha = new List<CambFecDTO>();//Lista para  cambio de fecha.
     private NotifiRadzen Notificar = new NotifiRadzen();//Logic para crear las noyificaciones radzen
-    private DateTime fechahoy, fechatrabajo = DateTime.Today;
-    private string fechahoy2, Emp = "";//Empresa
-    private string planificador;//Variable para verificar si es el usuario del planificador;
-    private string camStat;//Variable para verificar si es el usuario cambio el Status;
-    private string PlanOld;//Variable para verificar si es el usuario cambio el plan de accion;
+    //private DateTime fechahoy, fechatrabajo = DateTime.Today;
+    //private string fechahoy2, 
+    private string Emp = "";//Empresa
+    private string planificador = string.Empty;//Variable para verificar si es el usuario del planificador;
+    private string camStat = string.Empty;//Variable para verificar si es el usuario cambio el Status;
+    private string PlanOld = string.Empty;//Variable para verificar si es el usuario cambio el plan de accion;
     private DateTime? camFec;//Variable para verificar si es el usuario cambio la Fecha;
-    private List<Claim> claims { get; set; }//obtener datos del token
+    private List<Claim> claims { get; set; } = new();//obtener datos del token
     int dataIsLoaded = 0;
     private bool traduccionesCargadas = false;
     private int idPais { get; set; }
@@ -591,8 +592,10 @@ else
     {
         await CreateData();
         await LocalizationService.EstablecerCulturaDesdeTokenAsync();
-        CultureInfo.CurrentCulture = CultureInfo.DefaultThreadCurrentCulture;
-        CultureInfo.CurrentUICulture = CultureInfo.DefaultThreadCurrentUICulture;
+        CultureInfo.CurrentCulture =
+            CultureInfo.DefaultThreadCurrentCulture ?? CultureInfo.InvariantCulture;
+        CultureInfo.CurrentUICulture =
+            CultureInfo.DefaultThreadCurrentUICulture ?? CultureInfo.InvariantCulture;
         await DiccionarioTraduccionesService.CargarTraduccionesAsync();
                 traduccionesCargadas = true;
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
@@ -602,30 +605,39 @@ else
         EsPlanificador = user.IsInRole("Planificador");
     }
 
-    protected override async Task OnParametersSetAsync()
+        protected override async Task OnParametersSetAsync()
     {
         await CreateData();
         loader = true;
-        Emp = claims[5].Value;
-        planificador = claims[1].Value;
+
+        Emp = claims.Count > 5 ? claims[5].Value : string.Empty;
+        planificador = claims.Count > 1 ? claims[1].Value : string.Empty;
+
+        if (Id is null)
+        {
+            loader = false;
+            return;
+        }
+
         DiscForm = await PizarraData.GetDiscrepantacia((int)Id);
-        await AvisadorData.GetCambioFecha((int)Id);
+        await AvisadorData.GetCambioFecha(Id.Value);
         CambiosFecha = AvisadorData.cambiofecha;
 
-        camStat = DiscForm.Rdstatus;
+        camStat = DiscForm.Rdstatus ?? string.Empty;
         camFec = DiscForm.RdfecTra;
-        PlanOld = DiscForm.RdplanAcc;
+        PlanOld = DiscForm.RdplanAcc ?? string.Empty;
 
         await KsfData.Getksf();
         await RespoReuData.GetResReu();
         RespoReuData.resporeus = RespoReuData.resporeus.Where(a => a.Rrdesc == claims.FirstOrDefault(c => c.Type.Contains("Empresa"))?.Value || string.IsNullOrEmpty(a.Rrdesc)).ToList();
+
         loader = false;
     }
 
     async Task Back()
     {
-        string backcentro = DiscForm.Rdcentro;
-        string backdiv = DiscForm.Rddiv;
+        string backcentro = DiscForm.Rdcentro ?? "";
+        string backdiv = DiscForm.Rddiv ?? "";
 
         CentroDivisionDTO centrodiv = await PizarraData.GetCentroDivi(backcentro, backdiv, 1);
         string lang = idPais == 5 ? "en" : "es";
@@ -654,43 +666,83 @@ else
     {
         try
         {
+            if (DiscForm == null)
+            {
+                NotificationService.Notify(
+                    Notificar.Notificacion(
+                        "error",
+                        DiccionarioTraduccionesService.Traducciones["ErrorInesp"],
+                        DiccionarioTraduccionesService.Traducciones["Reload"]));
+                return;
+            }
+
+            if (!tipo.HasValue || !Id.HasValue)
+            {
+                NotificationService.Notify(
+                    Notificar.Notificacion(
+                        "advertencia",
+                        DiccionarioTraduccionesService.Traducciones["Atencion"],
+                        DiccionarioTraduccionesService.Traducciones["ErrorP"]));
+                return;
+            }
+
+            int tipoValue = tipo.Value;
+            int idValue = Id.Value;
 
             DiscForm.IdTipReu = reunionQuincenal;
-            if (DiscForm.RdfecTra  >= DiscForm.RdfecReu && (int)tipo == 1 || (int)tipo == 0 || (int)tipo == 2)
+
+            if ((DiscForm.RdfecTra >= DiscForm.RdfecReu && tipoValue == 1) || tipoValue == 0 || tipoValue == 2)
             {
-                if (CambiosFecha.Count() >= 5 & camFec != DiscForm.RdfecTra)
+                if (CambiosFecha.Count() >= 5 && camFec != DiscForm.RdfecTra)
                 {
-                    NotificationService.Notify(Notificar.Notificacion("error", DiccionarioTraduccionesService.Traducciones["Atencion"], DiccionarioTraduccionesService.Traducciones["Limite"]));
+                    NotificationService.Notify(
+                        Notificar.Notificacion(
+                            "error",
+                            DiccionarioTraduccionesService.Traducciones["Atencion"],
+                            DiccionarioTraduccionesService.Traducciones["Limite"]));
                 }
-                else if (String.IsNullOrEmpty(DiscForm.RdplanAcc) && DiscForm.Rdstatus == "Cerrado")
+                else if (string.IsNullOrEmpty(DiscForm.RdplanAcc) && DiscForm.Rdstatus == "Cerrado")
                 {
-                    NotificationService.Notify(Notificar.Notificacion("advertencia", DiccionarioTraduccionesService.Traducciones["Atencion"], DiccionarioTraduccionesService.Traducciones["NPA1"]));
+                    NotificationService.Notify(
+                        Notificar.Notificacion(
+                            "advertencia",
+                            DiccionarioTraduccionesService.Traducciones["Atencion"],
+                            DiccionarioTraduccionesService.Traducciones["NPA1"]));
                 }
-                else if (PlanOld != DiscForm.RdplanAcc && String.IsNullOrEmpty(DiscForm.RdplanAcc))
+                else if (PlanOld != DiscForm.RdplanAcc && string.IsNullOrEmpty(DiscForm.RdplanAcc))
                 {
-                    NotificationService.Notify(Notificar.Notificacion("advertencia", DiccionarioTraduccionesService.Traducciones["Atencion"], DiccionarioTraduccionesService.Traducciones["NPA2"]));
+                    NotificationService.Notify(
+                        Notificar.Notificacion(
+                            "advertencia",
+                            DiccionarioTraduccionesService.Traducciones["Atencion"],
+                            DiccionarioTraduccionesService.Traducciones["NPA2"]));
+
                     DiscForm.RdplanAcc = PlanOld;
                 }
                 else
                 {
+                    string nombre = claims?.ElementAtOrDefault(2)?.Value ?? "";
+                    string apellido = claims?.ElementAtOrDefault(3)?.Value ?? "";
+                    string usuarioCambio = $"{nombre} {apellido}".Trim();
+
                     //Prueba con sin Update
-                    // cambio = await DbReunionService.UpdateDiscrepancia(DiscForm, (int)Id, (int)tipo, f1, f2, est);
+                    // cambio = await DbReunionService.UpdateDiscrepancia(DiscForm, idValue, tipoValue, f1, f2, est);
 
                     // if (camStat != DiscForm.Rdstatus && cambio == true)
                     // {
-                    //     CambStat.IdReuDia = (int)Id;
+                    //     CambStat.IdReuDia = idValue;
                     //     CambStat.Cbfecha = DateTime.Now;
                     //     CambStat.Cbstat = DiscForm.Rdstatus;
-                    //     CambStat.Cbuser = claims[2].Value + " " + claims[3].Value;
+                    //     CambStat.Cbuser = usuarioCambio;
 
                     //     await DbReunionService.InsertCambioStatus(CambStat);
                     // }
                     // if (camFec != DiscForm.RdfecTra && cambio == true)
                     // {
-                    //     CambFec.IdReuDia = (int)Id;
+                    //     CambFec.IdReuDia = idValue;
                     //     CambFec.Cffec = DateTime.Now;
                     //     CambFec.CffecNew = DiscForm.RdfecTra;
-                    //     CambFec.Cfuser = claims[2].Value + " " + claims[3].Value;
+                    //     CambFec.Cfuser = usuarioCambio;
 
                     //     await DbReunionService.InsertCambioFec(CambFec);
                     // }
@@ -701,23 +753,38 @@ else
                         CambStat.IdReuDia = DiscForm.IdReuDia;
                         CambStat.Cbfecha = DateTime.Now;
                         CambStat.Cbstat = DiscForm.Rdstatus;
-                        CambStat.Cbuser = claims[2].Value + " " + claims[3].Value;
+                        CambStat.Cbuser = usuarioCambio;
 
+                        await AvisadorData.InsertCambioStatus(CambStat);
                     }
+
                     if (camFec != DiscForm.RdfecTra)
                     {
                         CambFec.IdReuDia = DiscForm.IdReuDia;
                         CambFec.Cffec = DateTime.Now;
                         CambFec.CffecNew = DiscForm.RdfecTra;
-                        CambFec.Cfuser = claims[2].Value + " " + claims[3].Value;
+                        CambFec.Cfuser = usuarioCambio;
+
+                        await AvisadorData.InsertCambioFec(CambFec);
                     }
 
-                    await AvisadorData.InsertCambioStatus(CambStat);
-                    await AvisadorData.InsertCambioFec(CambFec);
-                    var resultado = await PizarraData.UpdateDiscrepancia2(DiscForm, (int)Id);
+                    var resultado = await PizarraData.UpdateDiscrepancia2(DiscForm, idValue);
                     cambio = resultado.success;
-                    // Obtener centro y división para navegación
-                    var centrodiv = await PizarraData.GetCentroDivi(DiscForm.Rdcentro, DiscForm.Rddiv, 1);
+
+                    string? rdcentro = DiscForm.Rdcentro;
+                    string? rddiv = DiscForm.Rddiv;
+
+                    if (string.IsNullOrWhiteSpace(rdcentro) || string.IsNullOrWhiteSpace(rddiv))
+                    {
+                        NotificationService.Notify(
+                            Notificar.Notificacion(
+                                "advertencia",
+                                DiccionarioTraduccionesService.Traducciones["Atencion"],
+                                DiccionarioTraduccionesService.Traducciones["ErrorP"]));
+                        return;
+                    }
+
+                    var centrodiv = await PizarraData.GetCentroDivi(rdcentro, rddiv, 1);
                     string centro = centrodiv.IdCentro.ToString();
                     string division = centrodiv.IdDivision.ToString();
 
@@ -729,38 +796,43 @@ else
 
                     string ruta = "";
 
-                    if ((int)tipo == 0 || (int)tipo == 2)
+                    if (tipoValue == 0 || tipoValue == 2)
                     {
-                        ruta = $"{lang}/{(lang == "en" ? "remaining" : "pendientes")}/{centro}/{division}/{lineaFinal}/{f1Final}/{f2Final}/{tipo}/{estFinal}";
+                        ruta = $"{lang}/{(lang == "en" ? "remaining" : "pendientes")}/{centro}/{division}/{lineaFinal}/{f1Final}/{f2Final}/{tipoValue}/{estFinal}";
                     }
-                    else if ((int)tipo == 1)
+                    else if (tipoValue == 1)
                     {
-                        ruta = $"{lang}/{(lang == "en" ? "meeting" : "reunion")}/{centro}/{division}/Re/{f1Final}/{f2Final}/{tipo}/Reunion";
+                        ruta = $"{lang}/{(lang == "en" ? "meeting" : "reunion")}/{centro}/{division}/Re/{f1Final}/{f2Final}/{tipoValue}/Reunion";
                     }
 
                     NavigationManager.NavigateTo(ruta);
                 }
             }
-
             else
             {
-                NotificationService.Notify(Notificar.Notificacion("advertencia", DiccionarioTraduccionesService.Traducciones["ERevisar"], DiccionarioTraduccionesService.Traducciones["FechaMenor"]));
-
+                NotificationService.Notify(
+                    Notificar.Notificacion(
+                        "advertencia",
+                        DiccionarioTraduccionesService.Traducciones["ERevisar"],
+                        DiccionarioTraduccionesService.Traducciones["FechaMenor"]));
             }
 
             if (cambio == false)
             {
-                NotificationService.Notify(Notificar.Notificacion("advertencia", DiccionarioTraduccionesService.Traducciones["FalloR"], DiccionarioTraduccionesService.Traducciones["ErrorP"]));
-
+                NotificationService.Notify(
+                    Notificar.Notificacion(
+                        "advertencia",
+                        DiccionarioTraduccionesService.Traducciones["FalloR"],
+                        DiccionarioTraduccionesService.Traducciones["ErrorP"]));
             }
-
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-
-            NotificationService.Notify(Notificar.Notificacion("error", DiccionarioTraduccionesService.Traducciones["ErrorInesp"], DiccionarioTraduccionesService.Traducciones["Reload"]));//LLamar notificacion con el objeto de logic
-
+            NotificationService.Notify(
+                Notificar.Notificacion(
+                    "error",
+                    DiccionarioTraduccionesService.Traducciones["ErrorInesp"],
+                    DiccionarioTraduccionesService.Traducciones["Reload"]));
         }
-
     }
 }    

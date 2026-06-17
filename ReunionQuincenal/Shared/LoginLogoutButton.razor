@@ -33,7 +33,7 @@ else
                 [CascadingParameter]
     private Task<AuthenticationState>? authenticationState { get; set; }
     private int idPais { get; set; }
-    private List<Claim> claims { get; set; }
+    private List<Claim> claims { get; set; } = new();
 
     private bool traduccionesCargadas = false;
     private int dataIsLoaded = 0;
@@ -58,8 +58,8 @@ else
         var authState = await AuthStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
         await LocalizationService.EstablecerCulturaDesdeTokenAsync();
-        CultureInfo.CurrentCulture = CultureInfo.DefaultThreadCurrentCulture;
-        CultureInfo.CurrentUICulture = CultureInfo.DefaultThreadCurrentUICulture;
+        CultureInfo.CurrentCulture = CultureInfo.DefaultThreadCurrentCulture ?? CultureInfo.InvariantCulture;
+        CultureInfo.CurrentUICulture = CultureInfo.DefaultThreadCurrentUICulture ?? CultureInfo.InvariantCulture;
         await DiccionarioTraduccionesService.CargarTraduccionesAsync();
         traduccionesCargadas = true;
     }

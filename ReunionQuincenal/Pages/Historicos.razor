@@ -318,11 +318,10 @@ else if (dataIsLoaded == 2 && tabla.Count() == 0)
 }
 }
 @code {
-    RadzenDataGrid<ReunionDTO> ReuTabla;
+    RadzenDataGrid<ReunionDTO>? ReuTabla;
     List<ReunionDTO> tabla = new List<ReunionDTO>();
 
     int dataIsLoaded = 0;
-    string ayer = DateTime.Now.AddDays(-1).ToString("yyyyMMdd"), error;
     private bool data { get; set; } = false; //Centro
 
 
@@ -331,7 +330,7 @@ else if (dataIsLoaded == 2 && tabla.Count() == 0)
     [Required(ErrorMessage = "Seleccione la división.")]
     private int IdDiv { get; set; } = 0; //id de la division
 
-    private int CentroComedor;//Variable para verificar si es el comedor venezuela;
+    //private int CentroComedor;//Variable para verificar si es el comedor venezuela;
 
     //private string Div { get; set; } //Centro
     //private string Division { get; set; } //División
@@ -342,7 +341,7 @@ else if (dataIsLoaded == 2 && tabla.Count() == 0)
     private string UsrRol { get; set; } = ""; //rol para filtrar
     private bool cargandocambio { get; set; } = false; //para cargar los datos del trazabilidad
     private string tipoconsulta { get; set; } = "0"; //1-fecha de reuinion 0 fecha trabajo
-    private List<Claim> claims { get; set; }
+    private List<Claim> claims { get; set; } = new();
     public DateTime fecha1;
     public DateTime fecha2;
     private string mensaje = "";
@@ -371,57 +370,63 @@ else if (dataIsLoaded == 2 && tabla.Count() == 0)
         fecha2 = DateTime.Now;
         await CreateData();
         await LocalizationService.EstablecerCulturaDesdeTokenAsync();
-        CultureInfo.CurrentCulture = CultureInfo.DefaultThreadCurrentCulture;
-        CultureInfo.CurrentUICulture = CultureInfo.DefaultThreadCurrentUICulture;
+        CultureInfo.CurrentCulture = CultureInfo.DefaultThreadCurrentCulture ?? CultureInfo.InvariantCulture;
+        CultureInfo.CurrentUICulture = CultureInfo.DefaultThreadCurrentUICulture ?? CultureInfo.InvariantCulture;
         await DiccionarioTraduccionesService.CargarTraduccionesAsync();
         traduccionesCargadas = true;        
 
-        var rol = claims.FirstOrDefault(c => c.Type.Contains("role"))?.Value;
+        var role = claims.FirstOrDefault(c => c.Type.Contains("role"))?.Value
+            ?? string.Empty;
+        var idEmpresa = claims.FirstOrDefault(c => c.Type.Contains("IdEmpresa"))?.Value
+            ?? string.Empty;
+        var idCentro = claims.FirstOrDefault(c => c.Type.Contains("IdCentro"))?.Value
+            ?? string.Empty;
 
-        //TODO: Crear logica con funcion qur retorne esto.se usa en hoistoricos tambien
-        switch (claims.FirstOrDefault(c => c.Type.Contains("role"))?.Value)
+        switch (role)
         {
             case "Admin":
             case "SuperAdmin":
-            case "PrimeUser":
                 UsrAdmin = "SuperAdmin";
-                await MaestraData.GetCentrosxEmpresa("All" + claims.FirstOrDefault(c => c.Type.Contains("IdEmpresa"))?.Value);
+                await MaestraData.GetCentrosxEmpresa("All" + idEmpresa);
                 break;
 
             case "SemiAdmin":
                 UsrAdmin = "SemiAdmin";
-                await MaestraData.GetCentrosxEmpresa(claims.FirstOrDefault(c => c.Type.Contains("IdCentro"))?.Value);
+                await MaestraData.GetCentrosxEmpresa(idCentro);
                 break;
 
             case "Planificador":
             case "SuperUser":
-                await MaestraData.GetCentrosxEmpresa(claims.FirstOrDefault(c => c.Type.Contains("IdCentro"))?.Value);
-                break;
-
-            case "Auditores":
-                await MaestraData.GetCentrosxEmpresa("All" + claims.FirstOrDefault(c => c.Type.Contains("IdEmpresa"))?.Value);
+                await MaestraData.GetCentrosxEmpresa(idCentro);
                 break;
 
             case "MttoAdmin":
                 UsrRol = "Mtto";
-                await MaestraData.GetCentrosxEmpresa("All" + claims.FirstOrDefault(c => c.Type.Contains("IdEmpresa"))?.Value);
+                await MaestraData.GetCentrosxEmpresa("All" + idEmpresa);
                 break;
+
             case "SeguridadAdmin":
-                UsrRol = "Seguridad";//Seguridad para filtar por seguridad
-                await MaestraData.GetCentrosxEmpresa("All" + claims.FirstOrDefault(c => c.Type.Contains("IdEmpresa"))?.Value);
+                UsrRol = "Seguridad";
+                await MaestraData.GetCentrosxEmpresa("All" + idEmpresa);
                 break;
+
             case "CalidadAdmin":
-                UsrRol = "Calidad";//Seguridad para filtar por calidad
-                await MaestraData.GetCentrosxEmpresa("All" + claims.FirstOrDefault(c => c.Type.Contains("IdEmpresa"))?.Value);
+                UsrRol = "Calidad";
+                await MaestraData.GetCentrosxEmpresa("All" + idEmpresa);
                 break;
+
             case "Mantenimiento":
                 UsrRol = "Mtto";
-                await MaestraData.GetCentrosxEmpresa(claims.FirstOrDefault(c => c.Type.Contains("IdCentro"))?.Value);
+                await MaestraData.GetCentrosxEmpresa(idCentro);
+                break;
+
+            case "Auditores":
+                await MaestraData.GetCentrosxEmpresa("All" + idEmpresa);
                 break;
 
             default:
-                UsrRol = claims.FirstOrDefault(c => c.Type.Contains("role"))?.Value;
-                await MaestraData.GetCentrosxEmpresa(claims.FirstOrDefault(c => c.Type.Contains("IdCentro"))?.Value);
+                UsrRol = role;
+                await MaestraData.GetCentrosxEmpresa(idCentro);
                 break;
         }
 
@@ -432,18 +437,39 @@ else if (dataIsLoaded == 2 && tabla.Count() == 0)
 
 
     }
+
     protected async Task BuscarDivision(ChangeEventArgs e)
     {
-            IdCentro = int.Parse(e.Value.ToString());
-            IdDiv = 0;
-            try{
-                if(IdCentro != 0){
-                    MaestraData.divisions = await MaestraData.ObtenerDivisionDelCentro(IdCentro);
-                }
-            }catch(Exception ex){
-                mensaje = "Error: " + ex.Message;
-            }
+        IdDiv = 0;
+
+        if (e?.Value is not string valor || !int.TryParse(valor, out var centroId))
+        {
+            IdCentro = 0;
+            return;
+        }
+
+        IdCentro = centroId;
+
+        if (IdCentro == 0)
+            return;
+
+        try
+        {
+            MaestraData.divisions =
+                await MaestraData.ObtenerDivisionDelCentro(IdCentro);
+        }
+        catch
+        {
+            NotificationService.Notify(
+                Notificar.Notificacion(
+                    "error",
+                    "Error",
+                    DiccionarioTraduccionesService.Traducciones["SCentro"]
+                )
+            );
+        }
     }
+
     protected async Task Get()
     {
         if (IdCentro != 0 & IdDiv != 0)

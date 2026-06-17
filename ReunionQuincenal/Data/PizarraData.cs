@@ -141,20 +141,18 @@ public class PizarraData : IPizarraData
         bool band = false;
         url = $"{BaseUrl}/UpdateDiscrepancia/{id}";
         cliente = _clientFactory.CreateClient();
-        mensaje = await cliente.PutAsJsonAsync(url, id);
+        mensaje = await cliente.PutAsJsonAsync(url, d);
 
         try
         {
             string div = "", centro = "";
 
-            if (d.Rdcentro is not null)
+            if (!string.IsNullOrEmpty(d.Rdcentro) && !string.IsNullOrEmpty(d.Rddiv))
             {
                 CentroDivisionDTO centrodiv = await GetCentroDivi(d.Rdcentro, d.Rddiv, 1);
 
                 if (centrodiv == null)
-                {
                     return false;
-                }
 
                 centro = centrodiv.IdCentro.ToString();
                 div = centrodiv.IdDivision.ToString();
@@ -165,31 +163,21 @@ public class PizarraData : IPizarraData
                 band = await mensaje.Content.ReadFromJsonAsync<bool>();
             }
 
-            if (band == true)
+            if (band)
             {
-
-                if (tipo == 0)
-                {
+                if (tipo == 0 || tipo == 2)
                     _navigationManager.NavigateTo($"pendientes/{centro}/{div}/{f1}/{f2}/{tipo}/{estado}");
-                }
                 else if (tipo == 1)
-                {
                     _navigationManager.NavigateTo($"reunion/{centro}/{div}/{f1}/{f2}/{tipo}/Reunion");
-                }
-                else if (tipo == 2)
-                {
-                    _navigationManager.NavigateTo($"pendientes/{centro}/{div}/{f1}/{f2}/{tipo}/{estado}");
-                }
             }
 
             return true;
-
         }
         catch (Exception ex)
         {
+            Console.WriteLine(ex.Message);
             return false;
         }
-
     }
 
     public async Task<(bool success, string centro, string division)> UpdateDiscrepancia2(ReunionDTO d, int id)
@@ -201,10 +189,18 @@ public class PizarraData : IPizarraData
         if (response.IsSuccessStatusCode)
         {
             bool band = await response.Content.ReadFromJsonAsync<bool>();
+
             if (band)
             {
-                var centrodiv = await GetCentroDivi(d.Rdcentro, d.Rddiv, 1);
-                return (true, centrodiv.IdCentro.ToString(), centrodiv.IdDivision.ToString());
+                if (!string.IsNullOrEmpty(d.Rdcentro) && !string.IsNullOrEmpty(d.Rddiv))
+                {
+                    var centrodiv = await GetCentroDivi(d.Rdcentro, d.Rddiv, 1);
+
+                    if (centrodiv != null)
+                    {
+                        return (true, centrodiv.IdCentro.ToString(), centrodiv.IdDivision.ToString());
+                    }
+                }
             }
         }
 

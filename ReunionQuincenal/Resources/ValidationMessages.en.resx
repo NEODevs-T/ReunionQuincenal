@@ -27,7 +27,6 @@
 <data name="Calendario" xml:space="preserve"><value>Calendar</value></data>
 <data name="Calidad" xml:space="preserve"><value>Quality</value></data>
 <data name="CambiosDeEstados" xml:space="preserve"><value>Changes of Status</value></data>
-<data name="CambiosDeFechaTrabajo" xml:space="preserve"><value>Changes of Work Date</value></data>
 <data name="Centro" xml:space="preserve"><value>Center</value></data>
 <data name="Cerrado" xml:space="preserve"><value>Closed</value></data>
 <data name="Codigo" xml:space="preserve"><value>Code</value></data>

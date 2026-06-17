@@ -370,11 +370,11 @@ else if (PizarraData.reudiatablas.Count() == 0 && confirmacion == true)
     List<ReunionDTO> tabla = new List<ReunionDTO>();
     int idCent = 0;
     int idDiv = 0;
-    string estado { get; set; }
+    string estado { get; set; } = "";
     bool band = false;
     public DateTime fecha1;
     public DateTime fecha2;
-    private List<Claim> claims { get; set; }
+    private List<Claim> claims { get; set; } = new();
     private string mensaje = "";
     public RadzenDataGrid<ReunionDTO> reunion { get; set; } = new RadzenDataGrid<ReunionDTO>();
     private NotifiRadzen Notificar = new NotifiRadzen();
@@ -410,8 +410,8 @@ else if (PizarraData.reudiatablas.Count() == 0 && confirmacion == true)
         fecha2 = DateTime.Now;
         await CreateData();
         await LocalizationService.EstablecerCulturaDesdeTokenAsync();
-        CultureInfo.CurrentCulture = CultureInfo.DefaultThreadCurrentCulture;
-        CultureInfo.CurrentUICulture = CultureInfo.DefaultThreadCurrentUICulture;
+        CultureInfo.CurrentCulture = CultureInfo.DefaultThreadCurrentCulture ?? CultureInfo.InvariantCulture;
+        CultureInfo.CurrentUICulture = CultureInfo.DefaultThreadCurrentUICulture ?? CultureInfo.InvariantCulture;
         await DiccionarioTraduccionesService.CargarTraduccionesAsync();
         traduccionesCargadas = true;
         await KsfData.Getksf();
@@ -420,18 +420,27 @@ else if (PizarraData.reudiatablas.Count() == 0 && confirmacion == true)
         PizarraData.reudiatablas = new List<ReunionDTO>();
         if (claims != null && claims.Count > 1 && (claims[1]?.Value == "Admin" || claims[1]?.Value == "SuperAdmin" || claims[1]?.Value == "PrimeUser"))
         {
-
-            await MaestraData.GetCentrosxEmpresa("All" + claims[10].Value);
+            var empresa = claims?.Count > 10 ? claims[10]?.Value : null;
+            await MaestraData.GetCentrosxEmpresa("All" + (empresa ?? ""));
         }
         else
         {
-            await MaestraData.GetCentrosxEmpresa(claims[11].Value);
+            var empresa = claims?.Count > 11 ? claims[11]?.Value : null;
+            await MaestraData.GetCentrosxEmpresa(empresa ?? "");
         }
     }
+
     protected async Task BuscarDivision(ChangeEventArgs e)
     {
-        idCent = int.Parse(e.Value.ToString());
+        if (e.Value is not string valor || !int.TryParse(valor, out var centro))
+        {
+            idCent = 0;
+            return;
+        }
+
+        idCent = centro;
         idDiv = 0;
+
         try
         {
             if (idCent != 0)
@@ -445,7 +454,6 @@ else if (PizarraData.reudiatablas.Count() == 0 && confirmacion == true)
         }
     }
     
-
     protected async Task buscar()
     {
         if (idCent != 0 && idDiv != 0)

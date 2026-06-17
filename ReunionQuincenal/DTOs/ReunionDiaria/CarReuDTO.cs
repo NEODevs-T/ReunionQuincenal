@@ -7,9 +7,9 @@ namespace ReunionWeb.ReunionDiaria.DTOs;
 public partial class CarReuDTO
 {
     public int IdPais { get; set; }
-    public string Pais { get; set; }
+    public string Pais { get; set; } = string.Empty;
     public string Empresa { get; set; } = null!;
-    public string Centro { get; set; }
+    public string Centro { get; set; } = string.Empty;
     public int IdCargoR { get; set; }
     public string Crnombre { get; set; } = null!;
     public bool Cresta { get; set; }

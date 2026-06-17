@@ -190,7 +190,7 @@
 
 
     [CascadingParameter]
-    private List<Claim> claims { get; set; }
+    private List<Claim> claims { get; set; } = new();
 
     private string _message = "", mensaje = "";
     UserLoginDto user = new UserLoginDto();

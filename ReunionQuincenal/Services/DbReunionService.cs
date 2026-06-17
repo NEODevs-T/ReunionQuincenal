@@ -90,21 +90,18 @@ public class DbReunionService : IDbReunionService
         bool band = false;
         url = $"{BaseUrl}/UpdateDiscrepancia/{id}";
         cliente = _clientFactory.CreateClient();
-        mensaje = await cliente.PutAsJsonAsync(url, id);
+        mensaje = await cliente.PutAsJsonAsync(url, d);
 
         try
         {
             string div = "", centro = "";
 
-            if (d.Rdcentro is not null)
+            if (!string.IsNullOrEmpty(d.Rdcentro) && !string.IsNullOrEmpty(d.Rddiv))
             {
-                // Consultar nombre del centro y división para retornar el id en pendientes
                 CentroDivisionDTO centrodiv = await GetCentroDivi(d.Rdcentro, d.Rddiv, 1);
 
                 if (centrodiv == null)
-                {
                     return false;
-                }
 
                 centro = centrodiv.IdCentro.ToString();
                 div = centrodiv.IdDivision.ToString();
@@ -115,10 +112,9 @@ public class DbReunionService : IDbReunionService
                 band = await mensaje.Content.ReadFromJsonAsync<bool>();
             }
 
-            if (band == true)
+            if (band)
             {
-
-                if (tipo == 0)
+                if (tipo == 0 || tipo == 2)
                 {
                     _navigationManager.NavigateTo($"pendientes/{centro}/{div}/{f1}/{f2}/{tipo}/{estado}");
                 }
@@ -126,65 +122,63 @@ public class DbReunionService : IDbReunionService
                 {
                     _navigationManager.NavigateTo($"reunion/{centro}/{div}/{f1}/{f2}/{tipo}/Reunion");
                 }
-                else if (tipo == 2)
-                {
-                    _navigationManager.NavigateTo($"pendientes/{centro}/{div}/{f1}/{f2}/{tipo}/{estado}");
-                }
             }
 
             return true;
-
         }
         catch (Exception ex)
         {
+            Console.WriteLine(ex.Message);
             return false;
         }
-
     }
-
-
-
 
     public async Task<bool> UpdateDiscrepancia2(ReunionDTO d, int id, int tipo, string f1, string f2, string estado, string linea)
     {
         bool band = false;
         url = $"{BaseUrl}/UpdateDiscrepancia2/{id}";
         cliente = _clientFactory.CreateClient();
-        mensaje = await cliente.PutAsJsonAsync(url, id);
+        mensaje = await cliente.PutAsJsonAsync(url, d);
 
         try
         {
             string div = "", centro = "";
+
+            if (!string.IsNullOrEmpty(d.Rdcentro) && !string.IsNullOrEmpty(d.Rddiv))
+            {
+                CentroDivisionDTO centrodiv = await GetCentroDivi(d.Rdcentro, d.Rddiv, 1);
+
+                if (centrodiv == null)
+                    return false;
+
+                centro = centrodiv.IdCentro.ToString();
+                div = centrodiv.IdDivision.ToString();
+            }
+
             if (mensaje.IsSuccessStatusCode)
             {
                 band = await mensaje.Content.ReadFromJsonAsync<bool>();
             }
 
-            if (band == true)
+            if (band)
             {
-                if (tipo == 0)
+                if (tipo == 0 || tipo == 2)
                 {
-                    _navigationManager.NavigateTo($"pendientes/{centro}/{div}/{linea}/{f1}/{f2}/{tipo}/{estado}", forceLoad: true);
+                    _navigationManager.NavigateTo($"pendientes/{centro}/{div}/{linea}/{f1}/{f2}/{tipo}/{estado}", true);
                 }
                 else if (tipo == 1)
                 {
-                    _navigationManager.NavigateTo($"reunion/{centro}/{div}/Re/{f1}/{f2}/{tipo}/Reunion", forceLoad: true);
-                }
-                else if (tipo == 2)
-                {
-                    _navigationManager.NavigateTo($"pendientes/{centro}/{div}/{linea}/{f1}/{f2}/{tipo}/{estado}", forceLoad: true);
+                    _navigationManager.NavigateTo($"reunion/{centro}/{div}/Re/{f1}/{f2}/{tipo}/Reunion", true);
                 }
 
                 return true;
             }
-            else
-            {
-                return false;
-            }
 
+            return false;
         }
         catch (Exception ex)
         {
+            Console.WriteLine(ex.Message);
             return false;
         }
     }

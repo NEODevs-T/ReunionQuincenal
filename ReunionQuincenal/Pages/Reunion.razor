@@ -165,7 +165,7 @@ else
                                 }
                                 @texto
                                 </BSTD>
-                                <BSTD ColSpan="4">@d.Rddisc.ToUpper()</BSTD>
+                                <BSTD ColSpan="4">@(d.Rddisc?.ToUpperInvariant() ?? string.Empty)</BSTD>
                                 <BSTD>@d.RdcodDis</BSTD>
                                 @if (@d.RdplanAcc is not null)
                                 {
@@ -256,13 +256,12 @@ else if (dataIsLoaded == 2 && registrosVisibles.Count == 0)
     public string? est { get; set; }
 
 
-    int dataIsLoaded = 0, filtrocod = 0;
+    int dataIsLoaded = 0;
     string ayer = DateTime.Now.AddDays(-1).ToString("yyyyMMdd");
-    string error;
+    private string error = string.Empty;
 
     private int IdCentro { get; set; } = 0; //id del Centro
     private int IdDiv { get; set; } = 0; //id de la division
-    private int CentroComedor;//Variable para verificar si es el comedor venezuela;
     private NotifiRadzen Notificar = new NotifiRadzen();//Logic para crear las noyificaciones radzen
 
     //private string Div { get; set; } //Centro
@@ -279,7 +278,7 @@ else if (dataIsLoaded == 2 && registrosVisibles.Count == 0)
 
 
 
-    private List<Claim> claims { get; set; }
+    private List<Claim> claims { get; set; } = new ();
 
 List<ReunionDTO> registrosVisibles
 {
@@ -300,16 +299,13 @@ List<ReunionDTO> registrosVisibles
             fechaFin = DateTime.Now.AddDays(+1);
         }
 
-        bool EsOdtVacia(string s) =>
-        string.IsNullOrWhiteSpace(s) || s.Trim().Length == 0;
-
         return PizarraData.reudiatablas
             .Where(d => d.Rdstatus != "Rechazada"
                     && d.Rdstatus != "Listo"
                     && d.Rdstatus != "Cerrado"
                     &&
                     (
-                        (d.RdfecReu.Date < DateTime.Today && EsOdtVacia(d.Rdodt))
+                        (d.RdfecReu.Date < DateTime.Today && string.IsNullOrWhiteSpace(d.Rdodt))
                         
                         || (d.RdfecReu.Date == DateTime.Today
                             && d.RdfecReu.Date >= fechaInicio.Date
@@ -364,11 +360,11 @@ List<ReunionDTO> registrosVisibles
     {
         await CreateData();
         await LocalizationService.EstablecerCulturaDesdeTokenAsync();
-        CultureInfo.CurrentCulture = CultureInfo.DefaultThreadCurrentCulture;
-        CultureInfo.CurrentUICulture = CultureInfo.DefaultThreadCurrentUICulture;
+        CultureInfo.CurrentCulture = CultureInfo.DefaultThreadCurrentCulture ?? CultureInfo.InvariantCulture;
+        CultureInfo.CurrentUICulture = CultureInfo.DefaultThreadCurrentUICulture ?? CultureInfo.InvariantCulture;
         await DiccionarioTraduccionesService.CargarTraduccionesAsync();
         traduccionesCargadas = true;
-        Rol = claims?.FirstOrDefault(c => c.Type.Contains("role"))?.Value;
+        Rol = claims?.FirstOrDefault(c => c.Type.Contains("role"))?.Value?? string.Empty;
         var idEmpresa = claims?.FirstOrDefault(c => c.Type.Contains("IdEmpresa"))?.Value;
         var idCentroClaim = claims?.FirstOrDefault(c => c.Type.Contains("IdCentro"))?.Value;
 
@@ -381,7 +377,7 @@ List<ReunionDTO> registrosVisibles
         }
         else
         {
-            await MaestraData.GetCentrosxEmpresa(idCentroClaim);
+            await MaestraData.GetCentrosxEmpresa(idCentroClaim ?? string.Empty);
         }
 
 
@@ -405,15 +401,34 @@ List<ReunionDTO> registrosVisibles
 
     protected async Task BuscarDivision(ChangeEventArgs e)
     {
-            IdCentro = int.Parse(e.Value.ToString());
-            IdDiv = 0;
-            try{
-                if(IdCentro != 0){
-                    MaestraData.divisions = await MaestraData.ObtenerDivisionDelCentro(IdCentro);
-                }
-            }catch(Exception ex){
-                mensaje = "Error: " + ex.Message;
+        IdDiv = 0;
+
+        if (e?.Value is not string valor || !int.TryParse(valor, out var centroId))
+        {
+            IdCentro = 0;
+            return;
+        }
+
+        IdCentro = centroId;
+
+        try
+        {
+            if (IdCentro != 0)
+            {
+                MaestraData.divisions =
+                    await MaestraData.ObtenerDivisionDelCentro(IdCentro);
             }
+        }
+        catch
+        {
+            NotificationService.Notify(
+                Notificar.Notificacion(
+                    "error",
+                    "Error",
+                    DiccionarioTraduccionesService.Traducciones["SCentro"]
+                )
+            );
+        }
     }
 
 
@@ -421,7 +436,7 @@ List<ReunionDTO> registrosVisibles
     {
         if (IdCentro != 0 & IdDiv != 0)
         {
-            error = null;
+            error = string.Empty;
             if (dataIsLoaded != 1)
             {
                 dataIsLoaded = 1;
@@ -445,18 +460,30 @@ List<ReunionDTO> registrosVisibles
         NavigationManager.NavigateTo(url);
         //NavigationManager.NavigateTo($"EditDisc/{id}/1/Re/{DateTime.Now.AddDays(-1).ToString("dd-MM-yyyy")}/{DateTime.Now.ToString("dd-MM-yyyy")}/Reunion");
     }
+
     protected override async Task OnParametersSetAsync()
     {
-        if (accion != null)
-        {
-            dataIsLoaded = 1;
-            IdCentro = int.Parse(accion);
-            IdDiv = int.Parse(division);
-            PizarraData.reudiatablas = await PizarraData.GetPendientes
-            (accion, division, DateTime.Now.AddDays(-1), DateTime.Now, tipo, "Reunion") ?? new List<ReunionDTO>();
-            dataIsLoaded = 2;
-        }
+        if (accion == null)
+            return;
 
+        dataIsLoaded = 1;
+
+        IdCentro = int.Parse(accion);
+        IdDiv = int.TryParse(division, out var divId) ? divId : 0;
+
+        var idDivSafe = division ?? "0";
+        var tipoSafe = tipo ?? string.Empty;
+
+        PizarraData.reudiatablas = await PizarraData.GetPendientes(
+            accion,
+            idDivSafe,
+            DateTime.Now.AddDays(-1),
+            DateTime.Now,
+            tipoSafe,
+            "Reunion"
+        ) ?? new List<ReunionDTO>();
+
+        dataIsLoaded = 2;
     }
 
     public async Task PrintDocument()
