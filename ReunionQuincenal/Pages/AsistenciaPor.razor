@@ -224,8 +224,8 @@ else
         await CreateData();
         await LocalizationService.EstablecerCulturaDesdeTokenAsync();
 
-        CultureInfo.CurrentCulture = CultureInfo.DefaultThreadCurrentCulture;
-        CultureInfo.CurrentUICulture = CultureInfo.DefaultThreadCurrentUICulture;
+        CultureInfo.CurrentCulture = CultureInfo.DefaultThreadCurrentCulture ?? CultureInfo.InvariantCulture;
+        CultureInfo.CurrentUICulture = CultureInfo.DefaultThreadCurrentUICulture ?? CultureInfo.InvariantCulture;
 
         await DiccionarioTraduccionesService.CargarTraduccionesAsync();
         traduccionesCargadas = true;
