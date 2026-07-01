@@ -3,6 +3,7 @@
 
 @using Radzen
 @using System.Linq
+@inject IMaestraData MaestraData
 @inject IAsistenciaReuData AsistenciaReuData
 @inject AuthenticationStateProvider AuthStateProvider
 @inject ICargoReuData CargoReuData
@@ -15,7 +16,6 @@
 @using ReunionWeb.Resources
 @using System.Globalization
 @using ReunionWeb.Services
-@attribute [Authorize(Roles = "Admin, AdminChempro, SuperUser, PrimeUser, SemiAdmin, SuperAdmin")]
 
 @if (!traduccionesCargadas || dataIsLoaded == 1)
 {
@@ -186,6 +186,10 @@ else
     private int dataIsLoaded = 0;
     private List<Claim> claims = new();
     private bool traduccionesCargadas = false;
+    private string rolUsuario = "";
+    private string empresaUsuario = "";     
+    private string idEmpresaUsuario = "";  
+    private string idCentroUsuario = ""; 
 
      private async Task CreateData()
     {
@@ -198,48 +202,119 @@ else
         {
             idPais = paisTemp;
         }
+        
+        rolUsuario = claims.FirstOrDefault(c => c.Type.Contains("role"))?.Value ?? "";
+
+        empresaUsuario = claims.FirstOrDefault(c =>
+                c.Type == "Empresa" ||
+                (c.Type.Contains("Empresa") && !c.Type.Contains("IdEmpresa")))
+            ?.Value ?? "";
+
+        idEmpresaUsuario = claims.FirstOrDefault(c =>
+                c.Type == "IdEmpresa" || c.Type.Contains("IdEmpresa"))
+            ?.Value ?? "";
+
+        idCentroUsuario = claims.FirstOrDefault(c =>
+                c.Type == "IdCentro" || c.Type.Contains("IdCentro"))
+            ?.Value ?? "";
     }
 
     protected override async Task OnInitializedAsync()
     {
         await CreateData();
         await LocalizationService.EstablecerCulturaDesdeTokenAsync();
-        CultureInfo.CurrentCulture = CultureInfo.DefaultThreadCurrentCulture ?? CultureInfo.InvariantCulture;
-        CultureInfo.CurrentUICulture = CultureInfo.DefaultThreadCurrentUICulture ?? CultureInfo.InvariantCulture;
+
+        CultureInfo.CurrentCulture = CultureInfo.DefaultThreadCurrentCulture;
+        CultureInfo.CurrentUICulture = CultureInfo.DefaultThreadCurrentUICulture;
+
         await DiccionarioTraduccionesService.CargarTraduccionesAsync();
         traduccionesCargadas = true;
 
-        string? idEmpresaUsuario = claims.FirstOrDefault(c => c.Type.Contains("Empresa"))?.Value;
-
         cargosReunion = await CargoReuData.GetCargosReunion();
 
-        empresas = cargosReunion
-            .Where(c => c.Empresa.Contains(idEmpresaUsuario ?? string.Empty))
-            .Select(c => c.Empresa)
-            .Distinct()
-            .Select(e => new Empresa { Id = e, Nombre = e })
-            .ToList();
+        if (string.IsNullOrWhiteSpace(empresaUsuario))
+        {
+            empresas = cargosReunion
+                .Where(c => !string.IsNullOrWhiteSpace(c.Empresa))
+                .Select(c => c.Empresa.Trim())
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .OrderBy(e => e)
+                .Select(e => new Empresa { Id = e, Nombre = e })
+                .ToList();
+        }
+        else
+        {
+            empresas = cargosReunion
+                .Where(c => !string.IsNullOrWhiteSpace(c.Empresa) &&
+                            string.Equals(c.Empresa.Trim(), empresaUsuario.Trim(), StringComparison.OrdinalIgnoreCase))
+                .Select(c => c.Empresa.Trim())
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .OrderBy(e => e)
+                .Select(e => new Empresa { Id = e, Nombre = e })
+                .ToList();
+        }
+
+        switch (rolUsuario)
+        {
+            case "Admin":
+                await MaestraData.GetCentrosxEmpresa("All" + idEmpresaUsuario);
+                break;
+
+            default:
+                await MaestraData.GetCentrosxEmpresa(idCentroUsuario);
+                break;
+        }
 
         areas = new List<Area>();
+
+        if (empresas.Count == 1)
+        {
+            empresa = empresas.First().Id;
+            OnEmpresaChanged(empresa);
+        }
     }
 
     private void OnEmpresaChanged(object value)
     {
         empresa = value?.ToString() ?? "";
         area = "";
-        if (string.IsNullOrEmpty(empresa))
+
+        if (string.IsNullOrWhiteSpace(empresa))
         {
             areas = new List<Area>();
+            StateHasChanged();
+            return;
         }
-        else
+
+        var centrosPorEmpresa = cargosReunion
+            .Where(c => !string.IsNullOrWhiteSpace(c.Empresa)
+                    && string.Equals(c.Empresa.Trim(), empresa.Trim(), StringComparison.OrdinalIgnoreCase))
+            .Select(c => c.Centro?.Trim())
+            .Where(c => !string.IsNullOrWhiteSpace(c))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        var centrosPermitidos = MaestraData.centro
+            .Select(c => c.Centro?.Trim())
+            .Where(c => !string.IsNullOrWhiteSpace(c))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        areas = centrosPorEmpresa
+            .Where(c => centrosPermitidos.Contains(c!))
+            .OrderBy(c => c)
+            .Select(c => new Area
+            {
+                Id = c!,
+                Nombre = c!
+            })
+            .ToList();
+
+        if (areas.Count == 1)
         {
-            areas = cargosReunion
-                .Where(c => c.Empresa == empresa)
-                .Select(c => c.Centro)
-                .Distinct()
-                .Select(a => new Area { Id = a, Nombre = a })
-                .ToList();
+            area = areas.First().Id;
         }
+
         StateHasChanged();
     }
 
@@ -294,6 +369,16 @@ void LimpiarFiltros()
     filtroCargo = string.Empty;
     registros.Clear();
     registrosFiltrados.Clear();
+    
+    if (empresas.Count == 1)
+    {
+        empresa = empresas.First().Id;
+        OnEmpresaChanged(empresa);
+    }
+    else
+    {
+        areas = new List<Area>();
+    }
 }
 private string GetColor(double porcentaje, bool mayorEsMejor)
 {
