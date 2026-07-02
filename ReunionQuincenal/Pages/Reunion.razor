@@ -490,7 +490,8 @@ List<ReunionDTO> registrosVisibles
     {
         string idiomaRuta = idPais == 5 ? "en" : "es";
         string nombrePagina = idPais == 5 ? "TableMeeting" : "TablaReunion";
-        string url = $"/{idiomaRuta}/{nombrePagina}/{IdCentro}/{IdDiv}/{DateTime.Now.AddDays(-1):dd-MM-yyyy}/{DateTime.Now:dd-MM-yyyy}/1";
+        string rutaRelativa = $"{idiomaRuta}/{nombrePagina}/{IdCentro}/{IdDiv}/{DateTime.Now.AddDays(-1):dd-MM-yyyy}/{DateTime.Now:dd-MM-yyyy}/1";
+        string url = $"{NavigationManager.BaseUri.TrimEnd('/')}/{rutaRelativa}";
         await IJS.InvokeVoidAsync("open", url, "_blank");
     }
 
